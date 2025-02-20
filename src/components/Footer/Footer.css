@@ -1,0 +1,31 @@
+/* src/components/Footer.css */
+.footer-section {
+  background: linear-gradient(135deg, #141e30, #243b55);
+  padding: 20px 0;
+  border-top: 3px solid #1e90ff;
+}
+
+.footer-container {
+  color: #fff;
+}
+
+.social-icons {
+  margin-bottom: 1rem;
+}
+
+.social-icons a {
+  color: #fff;
+  margin: 0 0.5rem;
+  font-size: 1.25rem;
+  transition: color 0.3s ease;
+}
+
+.social-icons a:hover {
+  color: #1e90ff;
+}
+
+.footer-text {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 400;
+}

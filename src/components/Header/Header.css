@@ -1,0 +1,45 @@
+/* src/components/Header.css */
+.modern-navbar {
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem 0;
+  transition: background 0.3s ease-in-out;
+}
+
+.modern-brand {
+  display: flex;
+  align-items: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.5rem;
+  transition: color 0.3s ease;
+}
+
+.modern-brand:hover {
+  color: #d1d1d1;
+}
+
+.logo {
+  height: 40px;
+  width: auto;
+  margin-right: 10px;
+}
+
+.modern-nav .nav-link {
+  color: #fff;
+  margin-right: 1rem;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.modern-nav .nav-link:hover {
+  color: #d1d1d1;
+}
+
+@media (max-width: 991.98px) {
+  .modern-nav .nav-link {
+    margin-right: 0;
+    text-align: center;
+    padding: 0.5rem 0;
+  }
+}

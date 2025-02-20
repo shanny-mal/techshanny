@@ -1,6 +1,7 @@
 // src/components/Contact.jsx
 import React, { useState } from "react";
 import { Container, Form, Button } from "react-bootstrap";
+import "./Contact.css"; // Import custom CSS
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -16,14 +17,14 @@ const Contact = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Form Data:", formData);
-    // You can integrate your form submission logic here (e.g., an API call)
+    // Integrate your form submission logic here (e.g., an API call)
   };
 
   return (
-    <section id="contact" className="py-5 bg-light">
+    <section id="contact" className="contact-section">
       <Container>
-        <h2 className="text-center mb-4">Contact Us</h2>
-        <Form onSubmit={handleSubmit}>
+        <h2 className="contact-heading">Contact Us</h2>
+        <Form onSubmit={handleSubmit} className="contact-form">
           <Form.Group controlId="formName" className="mb-3">
             <Form.Label>Name</Form.Label>
             <Form.Control
@@ -55,7 +56,7 @@ const Contact = () => {
               required
             />
           </Form.Group>
-          <Button variant="primary" type="submit">
+          <Button variant="primary" type="submit" className="contact-btn">
             Submit
           </Button>
         </Form>
