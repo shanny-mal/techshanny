@@ -10,7 +10,7 @@ const Header = () => {
         <Navbar.Brand href="#" className="modern-brand">
           <img
             src="/logo.png"
-            alt="logo"
+            alt=""
             className="logo"
           />
           ShannyTechSolutions
