@@ -1,6 +1,6 @@
 /* src/components/Header.css */
 .modern-navbar {
-  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  background: linear-gradient(135deg, #2c1593, #1c117e);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 0.75rem 0;
   transition: background 0.3s ease;
