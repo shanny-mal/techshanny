@@ -9,8 +9,8 @@ const Header = () => {
       <Container>
         <Navbar.Brand href="#" className="modern-brand">
           <img
-            src="/assets/logo.png"
-            alt=""
+            src="/logo.png"
+            alt="logo"
             className="logo"
           />
           ShannyTechSolutions
