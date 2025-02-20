@@ -45,7 +45,7 @@ const Footer = () => {
         </div>
         <p className="footer-text">
           &copy; {new Date().getFullYear()} ShannyTechSolutions. All rights
-          reserved.
+          reserved | This website is created by ShannyTechSolutions.
         </p>
       </Container>
     </footer>
