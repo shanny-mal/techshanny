@@ -1,41 +1,49 @@
 /* src/components/Services.css */
 .services-section {
-  background: #f5f7fa;
+  background-color: #f5f7fa;
   padding: 80px 0;
 }
 
-.services-section h2 {
-  font-size: 2.5rem;
-  font-weight: bold;
+.services-heading {
+  font-size: 2.8rem;
+  font-weight: 700;
   color: #333;
-  margin-bottom: 2rem;
+  position: relative;
+  margin-bottom: 40px;
+}
+
+.services-heading::after {
+  content: "";
+  width: 80px;
+  height: 4px;
+  background: #1e3c72;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -10px;
+  border-radius: 2px;
 }
 
 .service-card {
   border: none;
-  border-radius: 8px;
-  overflow: hidden;
+  border-radius: 12px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .service-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
 }
 
-.service-card .card-body {
-  background: #ffffff;
-  padding: 1.5rem;
-}
-
-.service-card .card-title {
+.service-title {
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 1rem;
   color: #1e1e1e;
 }
 
-.service-card .card-text {
+.service-text {
   font-size: 1rem;
   color: #666;
+  line-height: 1.6;
 }

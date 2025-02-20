@@ -7,7 +7,7 @@ const Portfolio = () => {
   return (
     <section id="portfolio" className="portfolio-section py-5">
       <Container>
-        <h2 className="portfolio-heading text-center mb-4">Our Work</h2>
+        <h2 className="portfolio-heading text-center mb-4">Our Portfolio</h2>
         <Row>
           <Col md={4}>
             <Card className="portfolio-card mb-4">
@@ -23,8 +23,8 @@ const Portfolio = () => {
                   Responsive Corporate Website
                 </Card.Title>
                 <Card.Text className="portfolio-card-text">
-                  Developed a state-of-the-art corporate website with a focus on
-                  user experience and responsiveness, resulting in increased
+                  Developed a state-of-the-art corporate website that emphasizes
+                  user experience and performance, leading to increased
                   engagement and conversion rates.
                 </Card.Text>
               </Card.Body>
@@ -44,9 +44,9 @@ const Portfolio = () => {
                   E-Commerce Platform
                 </Card.Title>
                 <Card.Text className="portfolio-card-text">
-                  Engineered a robust e-commerce solution featuring secure
-                  payment integration, intuitive navigation, and a seamless
-                  shopping experience that boosted online sales.
+                  Engineered a robust e-commerce solution with secure payment
+                  integration, intuitive navigation, and a seamless shopping
+                  experience that drives online sales growth.
                 </Card.Text>
               </Card.Body>
             </Card>
@@ -65,9 +65,9 @@ const Portfolio = () => {
                   Enterprise Network Infrastructure
                 </Card.Title>
                 <Card.Text className="portfolio-card-text">
-                  Designed and implemented a scalable, secure, and resilient
-                  network infrastructure for large enterprises, ensuring maximum
-                  uptime and efficient data flow.
+                  Designed and implemented a scalable, secure network
+                  infrastructure for large enterprises, ensuring maximum uptime
+                  and efficient data flow.
                 </Card.Text>
               </Card.Body>
             </Card>
