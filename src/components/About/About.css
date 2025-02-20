@@ -1,28 +1,41 @@
 /* src/components/About.css */
 .about-section {
-  background: #f8f9fa; /* Light background for a clean look */
+  background: #f8f9fa; /* Soft, light background for clarity */
   padding: 80px 0;
 }
 
 .about-section h2 {
   font-size: 2.5rem;
   font-weight: 700;
-  margin-bottom: 1.5rem;
   color: #333;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.about-section h2::after {
+  content: "";
+  width: 60px;
+  height: 4px;
+  background: #1e3c72;
+  display: block;
+  margin-top: 8px;
+  border-radius: 2px;
 }
 
 .about-section p {
   font-size: 1.1rem;
   line-height: 1.6;
   color: #555;
+  margin-bottom: 0;
 }
 
 .about-img {
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .about-img:hover {
   transform: scale(1.05);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
 }

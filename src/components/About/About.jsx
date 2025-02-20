@@ -11,15 +11,16 @@ const About = () => {
           <Col md={6}>
             <h2>About Us</h2>
             <p>
-              At ShannyTechSolutions, we specialize in delivering cutting-edge
-              technology solutions tailored for your business needs. We blend
-              creativity with innovation to help you stay ahead in a fast-paced
-              digital world.
+              At ShannyTechSolutions, we craft state-of-the-art technology
+              solutions tailored to your unique business challenges. Our team
+              fuses creative vision with innovative expertise to develop robust,
+              intuitive digital experiences that drive your organization forward
+              in today’s dynamic digital landscape.
             </p>
           </Col>
           <Col md={6}>
             <img
-              src="/assets/about-image.jpg"
+              src="/about-image.jpg"
               alt=""
               className="img-fluid about-img"
             />
