@@ -20,10 +20,12 @@ const Portfolio = () => {
               </div>
               <Card.Body>
                 <Card.Title className="portfolio-card-title">
-                  Project One
+                  Responsive Corporate Website
                 </Card.Title>
                 <Card.Text className="portfolio-card-text">
-                  A brief description of Project One.
+                  Developed a state-of-the-art corporate website with a focus on
+                  user experience and responsiveness, resulting in increased
+                  engagement and conversion rates.
                 </Card.Text>
               </Card.Body>
             </Card>
@@ -39,10 +41,12 @@ const Portfolio = () => {
               </div>
               <Card.Body>
                 <Card.Title className="portfolio-card-title">
-                  Project Two
+                  E-Commerce Platform
                 </Card.Title>
                 <Card.Text className="portfolio-card-text">
-                  A brief description of Project Two.
+                  Engineered a robust e-commerce solution featuring secure
+                  payment integration, intuitive navigation, and a seamless
+                  shopping experience that boosted online sales.
                 </Card.Text>
               </Card.Body>
             </Card>
@@ -58,10 +62,12 @@ const Portfolio = () => {
               </div>
               <Card.Body>
                 <Card.Title className="portfolio-card-title">
-                  Project Three
+                  Enterprise Network Infrastructure
                 </Card.Title>
                 <Card.Text className="portfolio-card-text">
-                  A brief description of Project Three.
+                  Designed and implemented a scalable, secure, and resilient
+                  network infrastructure for large enterprises, ensuring maximum
+                  uptime and efficient data flow.
                 </Card.Text>
               </Card.Body>
             </Card>
