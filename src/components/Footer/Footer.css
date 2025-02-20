@@ -1,27 +1,57 @@
 /* src/components/Footer.css */
 .footer-section {
-  background: linear-gradient(135deg, #2a5097, #326bab);
-  padding: 20px 0;
-  border-top: 3px solid #1e90ff;
+  background: linear-gradient(135deg, #232526, #414345); /* Dark gradient background */
+  padding: 40px 0;
+  border-top: 2px solid #1e90ff;
 }
 
 .footer-container {
-  color: #fff;
+  color: #ffffff;
 }
 
 .social-icons {
-  margin-bottom: 1rem;
+  margin-bottom: 20px;
 }
 
 .social-icons a {
-  color: #fff;
-  margin: 0 0.5rem;
-  font-size: 1.25rem;
-  transition: color 0.3s ease;
+  display: inline-block;
+  margin: 0 10px;
+  font-size: 1.5rem;
+  transition: transform 0.3s ease;
 }
 
+/* Hover effect for all icons */
 .social-icons a:hover {
-  color: #1e90ff;
+  transform: scale(1.1);
+}
+
+/* Custom colors for each social media icon */
+.social-icons a:nth-child(1) {
+  color: #3b5998; /* Facebook */
+}
+.social-icons a:nth-child(1):hover {
+  color: #8b9dc3;
+}
+
+.social-icons a:nth-child(2) {
+  color: #00acee; /* Twitter */
+}
+.social-icons a:nth-child(2):hover {
+  color: #66c0f4;
+}
+
+.social-icons a:nth-child(3) {
+  color: #0077b5; /* LinkedIn */
+}
+.social-icons a:nth-child(3):hover {
+  color: #5aa3d0;
+}
+
+.social-icons a:nth-child(4) {
+  color: #e1306c; /* Instagram */
+}
+.social-icons a:nth-child(4):hover {
+  color: #f497a4;
 }
 
 .footer-text {

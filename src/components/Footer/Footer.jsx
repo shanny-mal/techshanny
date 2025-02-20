@@ -29,7 +29,7 @@ const Footer = () => {
             <FaTwitter />
           </a>
           <a
-            href="https://linkedin.com"
+            href="https://www.linkedin.com/in/shannon-chipezeze"
             target="_blank"
             rel="noopener noreferrer"
           >
