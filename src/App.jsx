@@ -78,7 +78,7 @@ const LiveChat = () => {
       var s1 = document.createElement("script"),
         s0 = document.getElementsByTagName("script")[0];
       s1.async = true;
-      s1.src = `https://embed.tawk.to/${propertyId}/1ikjpu2t1`;
+      s1.src = `https://embed.tawk.to/67b839184cb53c1906d27b78/1ikjpu2t1`;
       s1.charset = "UTF-8";
       s1.setAttribute("crossorigin", "*");
       s0.parentNode.insertBefore(s1, s0);
