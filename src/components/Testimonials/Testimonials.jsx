@@ -5,21 +5,21 @@ import "./Testimonials.css";
 const testimonials = [
   {
     id: 1,
-    name: "John Doe",
-    role: "CEO, ExampleCorp",
+    name: "Idris Chipezeze",
+    role: "Developer, AgriTech",
     message:
       "ShannyTechSolutions transformed our online presence with their innovative web development solutions.",
   },
   {
     id: 2,
-    name: "Jane Smith",
-    role: "CTO, Tech Innovations",
+    name: "Shahyana Macklin",
+    role: "Artist, Tech Innovations",
     message:
       "Their networking solutions are robust and reliable. Our communication has never been smoother.",
   },
   {
     id: 3,
-    name: "Alice Johnson",
+    name: "Malvin Ntini",
     role: "Marketing Director, Creative Media",
     message:
       "The IT consulting services provided strategic insights that boosted our operational efficiency.",
