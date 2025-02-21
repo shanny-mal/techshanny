@@ -15,14 +15,14 @@ const Footer = () => {
       <Container className="footer-container text-center">
         <div className="social-icons">
           <a
-            href="https://facebook.com"
+            href="https://www.facebook.com/share/1H2NoTgyQR/"
             target="_blank"
             rel="noopener noreferrer"
           >
             <FaFacebookF />
           </a>
           <a
-            href="https://twitter.com"
+            href="https://x.com/shannymalvin?t=eRrkrpWEaFgBFciTLSaAGw&s=09"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -36,7 +36,7 @@ const Footer = () => {
             <FaLinkedinIn />
           </a>
           <a
-            href="https://instagram.com"
+            href="https://www.instagram.com/malshayn?igsh=ZGhmdXdyMW9vdmgx"
             target="_blank"
             rel="noopener noreferrer"
           >
