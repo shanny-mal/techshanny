@@ -14,22 +14,22 @@
   text-decoration: none;
 }
 
-/* Adjust the logo-wrapper to push the logo to the left */
+/* Push the logo to the left, add space between logo and text */
 .logo-wrapper {
-  margin-left: -16px;  /* push left */
-  margin-right: 24px;  /* space between logo and text */
+  margin-left: -16px;
+  margin-right: 16px;
   display: flex;
   align-items: center;
 }
 
-/* Set a larger maximum height for the logo */
+/* Increase the logo size without affecting navbar height */
 .logo {
-  max-height: 100px; /* Increase the logo size */
+  max-height: 80px;  /* Adjust this value as needed */
   width: auto;
 }
 
-/* Ensure the brand text aligns with the logo */
 .brand-text {
+  margin-left: 8px;
   display: inline-block;
   vertical-align: middle;
 }
@@ -50,7 +50,6 @@
 @media (max-width: 991.98px) {
   .modern-nav .nav-link {
     margin-right: 0;
-    text-align: center;
     padding: 0.5rem 0;
   }
 }
