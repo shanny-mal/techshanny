@@ -8,7 +8,7 @@ const blogPosts = [
     title: "Innovative Trends in Web Development",
     excerpt:
       "Discover the latest trends and technologies shaping the future of web development.",
-    image: "/assets/blog1.jpg",
+    image: "/logo.png",
     link: "#",
   },
   {
@@ -16,7 +16,7 @@ const blogPosts = [
     title: "Optimizing Network Performance",
     excerpt:
       "Learn how to design and implement network solutions for maximum efficiency.",
-    image: "/assets/blog2.jpg",
+    image: "/logo.png",
     link: "#",
   },
   {
@@ -24,7 +24,7 @@ const blogPosts = [
     title: "Effective IT Consulting Strategies",
     excerpt:
       "Explore strategies that drive business success through innovative IT consulting.",
-    image: "/assets/blog3.jpg",
+    image: "/logo.png",
     link: "#",
   },
 ];

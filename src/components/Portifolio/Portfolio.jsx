@@ -10,7 +10,7 @@ const Portfolio = () => {
     {
       id: 1,
       title: "Responsive Corporate Website",
-      image: "/assets/project1.jpg",
+      image: "/logo.png",
       description:
         "Developed a state-of-the-art corporate website emphasizing user experience and performance.",
       details:
@@ -19,7 +19,7 @@ const Portfolio = () => {
     {
       id: 2,
       title: "E-Commerce Platform",
-      image: "/assets/project2.jpg",
+      image: "/logo.png",
       description:
         "Engineered a robust e-commerce solution with secure payment integration and intuitive navigation.",
       details:
@@ -28,7 +28,7 @@ const Portfolio = () => {
     {
       id: 3,
       title: "Enterprise Network Infrastructure",
-      image: "/assets/project3.jpg",
+      image: "/logo.png",
       description:
         "Designed and implemented a scalable, secure network infrastructure for large enterprises.",
       details:
