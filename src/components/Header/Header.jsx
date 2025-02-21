@@ -1,11 +1,15 @@
-// src/components/Header.jsx
 import React from "react";
 import { Navbar, Nav, Container } from "react-bootstrap";
-import "./Header.css"; // Import the custom CSS
+import "./Header.css";
 
 const Header = () => {
   return (
-    <Navbar className="modern-navbar" expand="lg" sticky="top">
+    <Navbar
+      className="modern-navbar"
+      expand="lg"
+      sticky="top"
+      aria-label="Main Navigation"
+    >
       <Container>
         <Navbar.Brand href="#" className="modern-brand">
           <img
@@ -15,8 +19,11 @@ const Header = () => {
           />
           ShannyTechSolutions
         </Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
+        <Navbar.Toggle
+          aria-controls="navbar-nav"
+          aria-label="Toggle navigation"
+        />
+        <Navbar.Collapse id="navbar-nav">
           <Nav className="ms-auto modern-nav">
             <Nav.Link href="#home" className="modern-nav-link">
               Home
