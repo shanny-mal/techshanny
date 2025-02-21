@@ -1,13 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap');
-
-body {
-  font-family: 'Roboto', sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #ffffff;
-  color: #333;
-}
-
+/* index.css */
 body.dark-mode {
   background-color: #121212;
   color: #e0e0e0;
@@ -21,4 +12,20 @@ body.dark-mode .footer-section {
 body.dark-mode .card {
   background: #1e1e1e;
   color: #e0e0e0;
+}
+
+/* Specific overrides for navigation links */
+body.dark-mode .modern-nav .nav-link {
+  color: #e0e0e0;
+}
+body.dark-mode .modern-nav .nav-link:hover {
+  color: #ffffff;
+}
+
+/* Dark mode for sections */
+body.dark-mode .services-section,
+body.dark-mode .about-section,
+body.dark-mode .portfolio-section,
+body.dark-mode .contact-section {
+  background-color: #1a1a1a;
 }

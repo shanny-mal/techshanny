@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Suspense } from "react";
-import { Helmet } from "react-helmet";
+import { Helmet, HelmetProvider } from "react-helmet-async";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Header from "./components/Header/Header";
@@ -12,7 +12,9 @@ import Footer from "./components/Footer/Footer";
 import DarkModeToggle from "./components/DarkModeToggle/DarkModeToggle";
 
 // Lazy-load Testimonials and Blog for performance
-const Testimonials = React.lazy(() => import("./components/Testimonials/Testimonials"));
+const Testimonials = React.lazy(() =>
+  import("./components/Testimonials/Testimonials")
+);
 const Blog = React.lazy(() => import("./components/Blog/Blog"));
 
 function App() {
@@ -31,7 +33,7 @@ function App() {
   }, [darkMode]);
 
   return (
-    <>
+    <HelmetProvider>
       <Helmet>
         <title>ShannyTechSolutions - Cutting-edge Technology Solutions</title>
         <meta
@@ -41,6 +43,7 @@ function App() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Helmet>
       <Header />
+      {/* Dark Mode Toggle is fixed at the top-right corner */}
       <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
       <Hero />
       <About />
@@ -55,20 +58,27 @@ function App() {
       <Contact />
       <Footer />
       <LiveChat />
-    </>
+    </HelmetProvider>
   );
 }
 
-// LiveChat component that loads a Tawk.to chat widget
 const LiveChat = () => {
   useEffect(() => {
+    const propertyId = import.meta.env.VITE_TAWK_PROPERTY_ID;
+    console.log("Tawk.to Property ID:", propertyId); // Debug: Check if propertyId is loaded
+    if (!propertyId) {
+      console.warn(
+        "Tawk.to property ID is not set. Please set VITE_TAWK_PROPERTY_ID in your .env file."
+      );
+      return;
+    }
     var Tawk_API = Tawk_API || {},
       Tawk_LoadStart = new Date();
     (function () {
       var s1 = document.createElement("script"),
         s0 = document.getElementsByTagName("script")[0];
       s1.async = true;
-      s1.src = "https://embed.tawk.to/YOUR_PROPERTY_ID/default";
+      s1.src = `https://embed.tawk.to/${propertyId}/1ikjpu2t1`;
       s1.charset = "UTF-8";
       s1.setAttribute("crossorigin", "*");
       s0.parentNode.insertBefore(s1, s0);
