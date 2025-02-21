@@ -1,4 +1,4 @@
-{ 
+{
   "name": "techsolutions",
   "private": true,
   "version": "0.0.0",
@@ -6,16 +6,15 @@
   "scripts": {
     "dev": "vite",
     "lint": "eslint .",
-    "build": "npm install --force && vite build",
+    "build": "vite build",
     "preview": "vite preview"
-},
-
+  },
   "dependencies": {
     "aos": "^2.3.4",
     "bootstrap": "^5.3.3",
-    "react": "^19.0.0",
+    "react": "^18.3.0", 
     "react-bootstrap": "^2.10.9",
-    "react-dom": "^19.0.0",
+    "react-dom": "^18.3.0",
     "react-google-recaptcha": "^3.1.0",
     "react-helmet": "^6.1.0",
     "react-helmet-async": "^2.0.5",
@@ -23,8 +22,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
-    "@types/react": "^19.0.8",
-    "@types/react-dom": "^19.0.3",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
     "@vitejs/plugin-react": "^4.3.4",
     "eslint": "^9.19.0",
     "eslint-plugin-react": "^7.37.4",
