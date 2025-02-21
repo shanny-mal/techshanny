@@ -1,0 +1,46 @@
+.testimonials-section {
+  background-color: #fff;
+  padding: 80px 0;
+}
+
+.testimonials-heading {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.testimonials-heading::after {
+  content: "";
+  width: 80px;
+  height: 4px;
+  background: #1e3c72;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -10px;
+  border-radius: 2px;
+}
+
+.testimonial-item {
+  padding: 20px;
+}
+
+.testimonial-message {
+  font-size: 1.2rem;
+  font-style: italic;
+  margin-bottom: 10px;
+  color: #555;
+}
+
+.testimonial-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e1e1e;
+}
+
+.testimonial-role {
+  font-size: 1rem;
+  color: #888;
+}
