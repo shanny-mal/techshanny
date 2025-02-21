@@ -1,7 +1,7 @@
-// src/components/Contact.jsx
 import React, { useState } from "react";
-import { Container, Form, Button } from "react-bootstrap";
-import "./Contact.css"; // Import custom CSS
+import { Container, Form, Button, Alert } from "react-bootstrap";
+import ReCAPTCHA from "react-google-recaptcha";
+import "./Contact.css";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -9,31 +9,70 @@ const Contact = () => {
     email: "",
     message: "",
   });
+  const [captchaValue, setCaptchaValue] = useState(null);
+  const [errors, setErrors] = useState({});
+  const [submitted, setSubmitted] = useState(false);
+
+  const validate = () => {
+    const newErrors = {};
+    if (!formData.name) newErrors.name = "Name is required.";
+    if (!formData.email) {
+      newErrors.email = "Email is required.";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Email is invalid.";
+    }
+    if (!formData.message) newErrors.message = "Message is required.";
+    if (!captchaValue)
+      newErrors.captcha = "Please verify that you are not a robot.";
+    return newErrors;
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleCaptchaChange = (value) => {
+    setCaptchaValue(value);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form Data:", formData);
-    // Integrate your form submission logic here (e.g., an API call)
+    const newErrors = validate();
+    if (Object.keys(newErrors).length === 0) {
+      // Submit form logic here (e.g., API call)
+      console.log("Form Data:", formData);
+      setSubmitted(true);
+      setFormData({ name: "", email: "", message: "" });
+      setCaptchaValue(null);
+    } else {
+      setErrors(newErrors);
+    }
   };
 
   return (
-    <section id="contact" className="contact-section">
+    <section id="contact" className="contact-section py-5" data-aos="fade-up">
       <Container>
-        <h2 className="contact-heading">Contact Us</h2>
-        <Form onSubmit={handleSubmit} className="contact-form">
+        <h2 className="contact-heading text-center mb-4">Contact Us</h2>
+        {submitted && (
+          <Alert variant="success">
+            Your message has been sent successfully!
+          </Alert>
+        )}
+        <Form onSubmit={handleSubmit} noValidate>
           <Form.Group controlId="formName" className="mb-3">
             <Form.Label>Name</Form.Label>
             <Form.Control
               type="text"
               name="name"
               placeholder="Enter your name"
+              value={formData.name}
               onChange={handleChange}
-              required
+              isInvalid={!!errors.name}
+              aria-required="true"
             />
+            <Form.Control.Feedback type="invalid">
+              {errors.name}
+            </Form.Control.Feedback>
           </Form.Group>
           <Form.Group controlId="formEmail" className="mb-3">
             <Form.Label>Email address</Form.Label>
@@ -41,22 +80,45 @@ const Contact = () => {
               type="email"
               name="email"
               placeholder="Enter your email"
+              value={formData.email}
               onChange={handleChange}
-              required
+              isInvalid={!!errors.email}
+              aria-required="true"
             />
+            <Form.Control.Feedback type="invalid">
+              {errors.email}
+            </Form.Control.Feedback>
           </Form.Group>
           <Form.Group controlId="formMessage" className="mb-3">
             <Form.Label>Message</Form.Label>
             <Form.Control
               as="textarea"
               name="message"
-              rows={3}
+              rows={4}
               placeholder="Your message"
+              value={formData.message}
               onChange={handleChange}
-              required
+              isInvalid={!!errors.message}
+              aria-required="true"
             />
+            <Form.Control.Feedback type="invalid">
+              {errors.message}
+            </Form.Control.Feedback>
           </Form.Group>
-          <Button variant="primary" type="submit" className="contact-btn">
+          <Form.Group className="mb-3">
+            <ReCAPTCHA
+              sitekey="YOUR_RECAPTCHA_SITE_KEY"
+              onChange={handleCaptchaChange}
+            />
+            {errors.captcha && (
+              <div className="text-danger">{errors.captcha}</div>
+            )}
+          </Form.Group>
+          <Button
+            variant="primary"
+            type="submit"
+            aria-label="Submit Contact Form"
+          >
             Submit
           </Button>
         </Form>
