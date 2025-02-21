@@ -4,20 +4,17 @@ import "./Header.css";
 
 const Header = () => {
   return (
-    <Navbar
-      className="modern-navbar"
-      expand="lg"
-      sticky="top"
-      aria-label="Main Navigation"
-    >
+    <Navbar className="modern-navbar" expand="lg" sticky="top">
       <Container>
         <Navbar.Brand href="#" className="modern-brand">
-          <img
-            src="/logo.png"
-            alt=""
-            className="logo"
-          />
-          ShannyTechSolutions
+          <div className="logo-wrapper">
+            <img
+              src="/logo.png"
+              alt="ShannyTechSolutions Logo"
+              className="logo"
+            />
+          </div>
+          <span className="brand-text">ShannyTechSolutions</span>
         </Navbar.Brand>
         <Navbar.Toggle
           aria-controls="navbar-nav"

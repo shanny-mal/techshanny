@@ -1,4 +1,3 @@
-/* src/components/Header.css */
 .modern-navbar {
   background: linear-gradient(135deg, #2c1593, #1c117e);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -15,10 +14,24 @@
   text-decoration: none;
 }
 
+/* Adjust the logo-wrapper to push the logo to the left */
+.logo-wrapper {
+  margin-left: -16px;  /* push left */
+  margin-right: 24px;  /* space between logo and text */
+  display: flex;
+  align-items: center;
+}
+
+/* Set a larger maximum height for the logo */
 .logo {
-  height: 50px;
+  max-height: 100px; /* Increase the logo size */
   width: auto;
-  margin-right: 12px;
+}
+
+/* Ensure the brand text aligns with the logo */
+.brand-text {
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .modern-nav .nav-link {
