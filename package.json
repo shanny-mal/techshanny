@@ -1,4 +1,4 @@
-{
+{ 
   "name": "techsolutions",
   "private": true,
   "version": "0.0.0",
@@ -8,7 +8,7 @@
     "lint": "eslint .",
     "build": "npm install --force && vite build",
     "preview": "vite preview"
-  },
+},
 
   "dependencies": {
     "aos": "^2.3.4",
