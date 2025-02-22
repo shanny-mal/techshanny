@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Container, Form, Button, Alert } from "react-bootstrap";
 import ReCAPTCHA from "react-google-recaptcha";
+import emailjs from "emailjs-com";
 import "./Contact.css";
 
 const Contact = () => {
@@ -39,11 +40,25 @@ const Contact = () => {
     e.preventDefault();
     const newErrors = validate();
     if (Object.keys(newErrors).length === 0) {
-      // Submit form logic here (e.g., API call)
-      console.log("Form Data:", formData);
-      setSubmitted(true);
-      setFormData({ name: "", email: "", message: "" });
-      setCaptchaValue(null);
+      // Send email using EmailJS
+      emailjs
+        .send(
+          "service_rupt02a",
+          "template_fgddh3a",
+          formData,
+          "8fFyWaO5kSCdQc_XC"
+        )
+        .then(
+          (result) => {
+            console.log("Email successfully sent!", result.text);
+            setSubmitted(true);
+            setFormData({ name: "", email: "", message: "" });
+            setCaptchaValue(null);
+          },
+          (error) => {
+            console.error("Failed to send email:", error.text);
+          }
+        );
     } else {
       setErrors(newErrors);
     }
