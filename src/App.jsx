@@ -131,7 +131,6 @@ function App() {
 const LiveChat = () => {
   useEffect(() => {
     const propertyId = import.meta.env.VITE_TAWK_PROPERTY_ID;
-    console.log("Tawk.to Property ID:", propertyId);
 
     if (!propertyId) {
       console.warn(
