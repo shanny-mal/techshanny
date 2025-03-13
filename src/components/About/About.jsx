@@ -20,7 +20,7 @@ const About = () => {
           </Col>
           <Col md={6}>
             <img
-              src="/logo.png"
+              src="/about1.jpg"
               alt=""
               className="img-fluid about-img"
             />
