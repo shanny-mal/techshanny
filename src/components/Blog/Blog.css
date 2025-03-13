@@ -1,12 +1,12 @@
 .blog-section {
-  background-color: #f5f7fa;
+  background-color: #f5f3ee; /* Light background for contrast */
   padding: 80px 0;
 }
 
 .blog-heading {
   font-size: 2.8rem;
   font-weight: 700;
-  color: #333;
+  color: #3E2723;
   position: relative;
   margin-bottom: 40px;
 }
@@ -15,7 +15,7 @@
   content: "";
   width: 80px;
   height: 4px;
-  background: #1e3c72;
+  background: #A67B5B; /* Mocha accent */
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
@@ -23,9 +23,17 @@
   border-radius: 2px;
 }
 
+/* Using CSS Grid for a bento-style layout */
+.blog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
 .blog-card {
   border: none;
   border-radius: 12px;
+  overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   background: #fff;
 }
@@ -33,4 +41,14 @@
 .blog-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.read-more-btn {
+  background-color: #A67B5B;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.read-more-btn:hover {
+  background-color: #8F5E42;
 }

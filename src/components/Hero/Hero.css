@@ -1,10 +1,12 @@
-/* src/components/Hero.css */
-
-/* Ensure the hero section occupies full viewport height */
+/* Hero Section styling with a responsive, flex-based layout */
 .hero-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
-  overflow: hidden;
   height: 100vh;
+  background-color: #F5F3EE; /* Light background complementing mocha accents */
+  overflow: hidden;
 }
 
 /* Background slider container */
@@ -16,7 +18,7 @@
   height: 100%;
 }
 
-/* Each slide styling */
+/* Slide common styles */
 .hero-slide {
   position: absolute;
   width: 100%;
@@ -27,59 +29,57 @@
   animation: fade 12s infinite;
 }
 
-/* Assign background images and delays to each slide */
-.hero-slide:nth-child(1) {
+/* Specific slides with delays */
+.slide1 {
   background-image: url("/image1.jpg");
   animation-delay: 0s;
 }
-
-.hero-slide:nth-child(2) {
+.slide2 {
   background-image: url("/image2.jpg");
   animation-delay: 4s;
 }
-
-.hero-slide:nth-child(3) {
+.slide3 {
   background-image: url("/image3.jpg");
   animation-delay: 8s;
 }
 
-/* Keyframes for fading effect */
+/* Fade keyframes */
 @keyframes fade {
-  0% {
-    opacity: 0;
-  }
-  8.33% {
-    opacity: 1;
-  }
-  33.33% {
-    opacity: 1;
-  }
-  41.66% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 0;
-  }
+  0% { opacity: 0; }
+  8.33% { opacity: 1; }
+  33.33% { opacity: 1; }
+  41.66% { opacity: 0; }
+  100% { opacity: 0; }
 }
 
-/* Ensure the content is on top of the slider */
+/* Content overlay styling */
 .hero-content {
   position: relative;
   z-index: 2;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #fff;
+  padding: 20px;
+  color: #3E2723; /* A dark brown to contrast the light background */
 }
 
-/* Optional: Enhance button styling */
+/* Button styling with mocha color accents */
 .hero-btn {
-  background-color: #1e90ff;
+  background-color: #A67B5B;
   border: none;
   padding: 0.75rem 2rem;
   font-size: 1.1rem;
   transition: background-color 0.3s ease;
+  margin-top: 20px;
 }
 
 .hero-btn:hover {
-  background-color: #1c86ee;
+  background-color: #8F5E42;
+}
+
+/* Responsive text adjustments */
+@media (max-width: 768px) {
+  .hero-content h1 {
+    font-size: 2rem;
+  }
+  .hero-content p {
+    font-size: 1rem;
+  }
 }

@@ -1,23 +1,27 @@
-// src/components/Hero.jsx
 import React from "react";
 import { Container, Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import "./Hero.css";
 
 const Hero = () => {
-  return (
-    <section id="home" className="hero-section">
-      {/* Background slider */}
-      <div className="hero-slider">
-        <div className="hero-slide"></div>
-        <div className="hero-slide"></div>
-        <div className="hero-slide"></div>
-      </div>
+  const navigate = useNavigate();
 
-      {/* Content overlay */}
+  const handleGetStarted = () => {
+    // Navigate to an appropriate page (e.g., /about or /get-started)
+    navigate("/about");
+  };
+
+  return (
+    <section className="hero-section">
+      <div className="hero-slider">
+        <div className="hero-slide slide1"></div>
+        <div className="hero-slide slide2"></div>
+        <div className="hero-slide slide3"></div>
+      </div>
       <Container className="hero-content text-center">
         <h1>Welcome to ShannyTechSolutions</h1>
         <p>Your technology partner for innovation</p>
-        <Button variant="primary" size="lg" className="hero-btn">
+        <Button className="hero-btn" onClick={handleGetStarted}>
           Get Started
         </Button>
       </Container>

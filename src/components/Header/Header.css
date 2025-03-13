@@ -1,5 +1,6 @@
+/* Navbar styling using mocha tones */
 .modern-navbar {
-  background: linear-gradient(135deg, #2c1593, #1c117e);
+  background: linear-gradient(135deg, #A67B5B, #8F5E42);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 0.75rem 0;
   transition: background 0.3s ease;
@@ -14,24 +15,26 @@
   text-decoration: none;
 }
 
-/* Push the logo to the left, add space between logo and text */
-.logo-wrapper {
-  margin-left: -16px;
-  margin-right: 16px;
+/* Logo circle styling */
+.logo-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
   display: flex;
   align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+  background-color: #fff; /* Optional: set a background if needed */
 }
 
-/* Increase the logo size without affecting navbar height */
 .logo {
-  max-height: 80px;  /* Adjust this value as needed */
-  width: auto;
+  width: 100%;
+  height: auto;
 }
 
 .brand-text {
   margin-left: 8px;
-  display: inline-block;
-  vertical-align: middle;
 }
 
 .modern-nav .nav-link {
