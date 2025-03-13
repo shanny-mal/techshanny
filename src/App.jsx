@@ -132,23 +132,27 @@ const LiveChat = () => {
   useEffect(() => {
     const propertyId = import.meta.env.VITE_TAWK_PROPERTY_ID;
     console.log("Tawk.to Property ID:", propertyId);
+
     if (!propertyId) {
       console.warn(
-        "Tawk.to property ID is not set. Please set VITE_TAWK_PROPERTY_ID in your .env file."
+        "Tawk.to property ID is not set. Please check your .env file."
       );
       return;
     }
+
     // Prevent duplicate script injection
     if (document.getElementById("tawk-chat-script")) return;
 
     const s1 = document.createElement("script");
     s1.async = true;
-    s1.src = `https://embed.tawk.to/67b839184cb53c1906d27b78/1ikjpu2t1`;
+    s1.src = `https://embed.tawk.to/${propertyId}/1ikjpu2t1`;
     s1.charset = "UTF-8";
     s1.setAttribute("crossorigin", "*");
     s1.id = "tawk-chat-script";
+
     document.body.appendChild(s1);
   }, []);
+
   return null;
 };
 
