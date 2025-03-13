@@ -122,7 +122,7 @@ const Contact = () => {
           </Form.Group>
           <Form.Group className="mb-3">
             <ReCAPTCHA
-              sitekey="6LdOYuIqAAAAAM42RdyL8UrpN0ykJ8qw4L1dsCPs"
+              sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
               onChange={handleCaptchaChange}
             />
             {errors.captcha && (
