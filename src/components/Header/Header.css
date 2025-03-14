@@ -1,6 +1,18 @@
+:root {
+  --mocha-primary: #A67B5B;
+  --mocha-secondary: #8F5E42;
+  --mocha-dark: #3E2723;
+  --mocha-light: #F5F3EE;
+}
+
+/* Enable smooth scrolling globally */
+html {
+  scroll-behavior: smooth;
+}
+
 /* Navbar styling using mocha tones */
 .modern-navbar {
-  background: linear-gradient(135deg, #A67B5B, #8F5E42);
+  background: linear-gradient(135deg, var(--mocha-primary), var(--mocha-secondary));
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 0.75rem 0;
   transition: background 0.3s ease;
@@ -25,7 +37,7 @@
   align-items: center;
   justify-content: center;
   margin-right: 16px;
-  background-color: #fff; /* Optional: set a background if needed */
+  background-color: #fff; /* Optional background */
 }
 
 .logo {

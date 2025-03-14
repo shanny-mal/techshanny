@@ -1,4 +1,3 @@
-// src/components/About.jsx
 import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import "./About.css"; // Import custom CSS
@@ -9,21 +8,25 @@ const About = () => {
       <Container>
         <Row className="align-items-center">
           <Col md={6}>
-            <h2>About Us</h2>
-            <p>
-              At ShannyTechSolutions, we craft state-of-the-art technology
-              solutions tailored to your unique business challenges. Our team
-              fuses creative vision with innovative expertise to develop robust,
-              intuitive digital experiences that drive your organization forward
-              in today’s dynamic digital landscape.
-            </p>
+            <div className="about-content">
+              <h2>About Us</h2>
+              <p>
+                At ShannyTechSolutions, we craft state-of-the-art technology
+                solutions tailored to your unique business challenges. Our team
+                fuses creative vision with innovative expertise to develop
+                robust, intuitive digital experiences that drive your
+                organization forward in today’s dynamic digital landscape.
+              </p>
+            </div>
           </Col>
           <Col md={6}>
-            <img
-              src="/about1.jpg"
-              alt=""
-              className="img-fluid about-img"
-            />
+            <div className="about-img-wrapper">
+              <img
+                src="/about1.jpg"
+                alt="About ShannyTechSolutions"
+                className="img-fluid about-img"
+              />
+            </div>
           </Col>
         </Row>
       </Container>

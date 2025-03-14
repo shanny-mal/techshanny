@@ -1,14 +1,16 @@
-/* src/components/Footer.css */
+/* Use a mocha-inspired gradient for a unified theme */
 .footer-section {
-  background: linear-gradient(135deg, #2c1593, #0d0744); /* Dark gradient background */
+  background: linear-gradient(135deg, #8f5e42, #a67b5b);
   padding: 40px 0;
-  border-top: 2px solid #1e90ff;
+  border-top: 2px solid rgba(255, 255, 255, 0.2);
 }
 
+/* Ensure text is legible on the mocha background */
 .footer-container {
   color: #ffffff;
 }
 
+/* Social icons with smooth transitions and appropriate spacing */
 .social-icons {
   margin-bottom: 20px;
 }
@@ -17,10 +19,9 @@
   display: inline-block;
   margin: 0 10px;
   font-size: 1.5rem;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, color 0.3s ease;
 }
 
-/* Hover effect for all icons */
 .social-icons a:hover {
   transform: scale(1.1);
 }
@@ -58,4 +59,15 @@
   margin: 0;
   font-size: 1rem;
   font-weight: 400;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 576px) {
+  .social-icons a {
+    font-size: 1.3rem;
+    margin: 0 8px;
+  }
+  .footer-text {
+    font-size: 0.9rem;
+  }
 }

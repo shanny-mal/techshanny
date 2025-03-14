@@ -1,4 +1,3 @@
-// src/components/Footer.jsx
 import React from "react";
 import { Container } from "react-bootstrap";
 import {
@@ -45,7 +44,7 @@ const Footer = () => {
         </div>
         <p className="footer-text">
           &copy; {new Date().getFullYear()} ShannyTechSolutions. All rights
-          reserved | This website is created by ShannyTechSolutions.
+          reserved | This website is created with ❤️ by ShannyTechSolutions.
         </p>
       </Container>
     </footer>

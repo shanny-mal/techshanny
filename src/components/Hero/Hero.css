@@ -1,3 +1,11 @@
+/* Define CSS variables for a unified mocha palette */
+:root {
+  --mocha-light: #F5F3EE;
+  --mocha-dark: #3E2723;
+  --mocha-primary: #A67B5B;
+  --mocha-secondary: #8F5E42;
+}
+
 /* Hero Section styling with a responsive, flex-based layout */
 .hero-section {
   display: flex;
@@ -5,7 +13,7 @@
   justify-content: center;
   position: relative;
   height: 100vh;
-  background-color: #F5F3EE; /* Light background complementing mocha accents */
+  background-color: var(--mocha-light);
   overflow: hidden;
 }
 
@@ -43,7 +51,7 @@
   animation-delay: 8s;
 }
 
-/* Fade keyframes */
+/* Fade keyframes for background slider */
 @keyframes fade {
   0% { opacity: 0; }
   8.33% { opacity: 1; }
@@ -52,26 +60,55 @@
   100% { opacity: 0; }
 }
 
+/* Overlay to darken slider images for improved text contrast */
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 1;
+}
+
 /* Content overlay styling */
 .hero-content {
   position: relative;
   z-index: 2;
   padding: 20px;
-  color: #3E2723; /* A dark brown to contrast the light background */
+  color: var(--mocha-dark);
+  animation: fadeIn 1.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-content h1 {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.hero-content p {
+  font-size: 1.25rem;
+  margin-bottom: 2rem;
 }
 
 /* Button styling with mocha color accents */
 .hero-btn {
-  background-color: #A67B5B;
+  background-color: var(--mocha-primary);
   border: none;
   padding: 0.75rem 2rem;
   font-size: 1.1rem;
-  transition: background-color 0.3s ease;
-  margin-top: 20px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .hero-btn:hover {
-  background-color: #8F5E42;
+  background-color: var(--mocha-secondary);
+  transform: translateY(-2px);
 }
 
 /* Responsive text adjustments */
