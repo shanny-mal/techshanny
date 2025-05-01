@@ -8,7 +8,7 @@ const slides = [
     id: 1,
     src: "/image1.jpg",
     srcSet:
-      "/image1-small.jpg 600w, /image1-medium.jpg 900w, /image1.jpg 1200w",
+      "/image1.jpg 600w, /image1.jpg 900w, /image1.jpg 1200w",
     sizes: "(max-width: 768px) 100vw, 50vw",
     alt: "Team working together",
     loading: "eager",
@@ -17,7 +17,7 @@ const slides = [
     id: 2,
     src: "/image2.jpg",
     srcSet:
-      "/image2-small.jpg 600w, /image2-medium.jpg 900w, /image2.jpg 1200w",
+      "/image2.jpg 600w, /image2.jpg 900w, /image2.jpg 1200w",
     sizes: "(max-width: 768px) 100vw, 50vw",
     alt: "Innovative tech solutions",
     loading: "lazy",
@@ -26,7 +26,7 @@ const slides = [
     id: 3,
     src: "/image3.jpg",
     srcSet:
-      "/image3-small.jpg 600w, /image3-medium.jpg 900w, /image3.jpg 1200w",
+      "/image3.jpg 600w, /image3.jpg 900w, /image3.jpg 1200w",
     sizes: "(max-width: 768px) 100vw, 50vw",
     alt: "Consulting session",
     loading: "lazy",
