@@ -13,7 +13,7 @@ const Footer = () => {
   return (
     <footer className="footer-section">
       {/* Skip link for keyboard users */}
-      <a href="#main" className="skip-link">
+      <a href="#home" className="skip-link">
         Skip to main content
       </a>
       <Container className="footer-container text-center">
