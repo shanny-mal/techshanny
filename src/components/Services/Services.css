@@ -1,4 +1,9 @@
-/* src/components/Services.css */
+/* src/components/Services/Services.css */
+:root {
+  --mocha-primary: #A67B5B;
+  --text-body: #555555; /* Improved contrast */
+}
+
 .services-section {
   background-color: #f5f7fa;
   padding: 80px 0;
@@ -7,11 +12,10 @@
 .services-heading {
   font-size: 2.8rem;
   font-weight: 700;
-  color: #333;
+  color: #333333;
   position: relative;
   margin-bottom: 40px;
 }
-
 .services-heading::after {
   content: "";
   width: 80px;
@@ -24,15 +28,32 @@
   border-radius: 2px;
 }
 
+.services-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+@media (min-width: 768px) {
+  .services-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 .service-card {
   border: none;
   border-radius: 12px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.service-card:hover,
+.service-card:focus {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.15);
 }
 
-.service-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+.service-icon {
+  font-size: 2rem;
+  color: var(--mocha-primary);
+  margin-bottom: 0.75rem;
 }
 
 .service-title {
@@ -44,6 +65,6 @@
 
 .service-text {
   font-size: 1rem;
-  color: #666;
+  color: var(--text-body);
   line-height: 1.6;
 }
