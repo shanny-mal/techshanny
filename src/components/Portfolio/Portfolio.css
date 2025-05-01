@@ -1,12 +1,11 @@
-/* Define CSS variables for the mocha palette */
+/* src/components/Portfolio/Portfolio.css */
 :root {
   --mocha-light: #F5F3EE;
   --mocha-dark: #3E2723;
   --mocha-primary: #A67B5B;
-  --mocha-secondary: #8F5E42;
+  --card-focus-shadow: 0 0 0 3px var(--mocha-primary);
 }
 
-/* Portfolio Section */
 .portfolio-section {
   background-color: var(--mocha-light);
   padding: 80px 0;
@@ -19,7 +18,6 @@
   position: relative;
   margin-bottom: 40px;
 }
-
 .portfolio-heading::after {
   content: "";
   width: 80px;
@@ -32,63 +30,69 @@
   border-radius: 2px;
 }
 
-/* Portfolio Card Styles */
-.portfolio-card {
-  border: none;
-  border-radius: 12px;
-  overflow: hidden;
-  background: #fff;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+@media (min-width: 768px) {
+  .portfolio-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
-.portfolio-card:hover {
+.portfolio-card {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.portfolio-card:hover,
+.portfolio-card:focus {
   transform: translateY(-5px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  outline: var(--card-focus-shadow);
 }
 
 .card-img-container {
   overflow: hidden;
-  border-bottom: 1px solid #eee;
 }
-
 .portfolio-card-img {
   width: 100%;
+  display: block;
+  object-fit: cover;
   transition: transform 0.3s ease;
 }
-
-.portfolio-card:hover .portfolio-card-img {
-  transform: scale(1.05);
+.portfolio-card:hover .portfolio-card-img,
+.portfolio-card:focus .portfolio-card-img {
+  transform: scale(1.03);
 }
 
+.portfolio-card-body {
+  padding: 1rem;
+}
 .portfolio-card-title {
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--mocha-dark);
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
 }
-
 .portfolio-card-text {
   font-size: 1rem;
-  color: #666;
+  color: #555;
   line-height: 1.6;
 }
 
-/* Modal Custom Styles */
-.modal-header {
-  background-color: var(--mocha-light);
-  border-bottom: 2px solid var(--mocha-primary);
-}
-
-.modal-title {
-  color: var(--mocha-dark);
-}
-
-.modal-body {
-  background-color: var(--mocha-light);
-  color: var(--mocha-dark);
-}
-
+/* Modal overrides */
+.modal-header,
+.modal-body,
 .modal-footer {
   background-color: var(--mocha-light);
+}
+.modal-header {
+  border-bottom: 2px solid var(--mocha-primary);
+}
+.modal-footer {
   border-top: 2px solid var(--mocha-primary);
 }
