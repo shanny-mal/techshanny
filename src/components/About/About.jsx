@@ -1,34 +1,43 @@
+// src/components/About/About.jsx
 import React from "react";
-import { Container, Row, Col } from "react-bootstrap";
-import "./About.css"; // Import custom CSS
+import { Container } from "react-bootstrap";
+import { FaCheckCircle } from "react-icons/fa";
+import "./About.css";
+
+const features = [
+  "Craft state-of-the-art technology solutions tailored to your unique business challenges",
+  "Fuse creative vision with innovative expertise",
+  "Develop robust, intuitive digital experiences",
+  "Drive your organization forward in today’s dynamic digital landscape",
+];
 
 const About = () => {
   return (
     <section id="about" className="about-section">
-      <Container>
-        <Row className="align-items-center">
-          <Col md={6}>
-            <div className="about-content">
-              <h2>About Us</h2>
-              <p>
-                At ShannyTechSolutions, we craft state-of-the-art technology
-                solutions tailored to your unique business challenges. Our team
-                fuses creative vision with innovative expertise to develop
-                robust, intuitive digital experiences that drive your
-                organization forward in today’s dynamic digital landscape.
-              </p>
-            </div>
-          </Col>
-          <Col md={6}>
-            <div className="about-img-wrapper">
-              <img
-                src="/about1.webp"
-                alt="About ShannyTechSolutions"
-                className="img-fluid about-img"
-              />
-            </div>
-          </Col>
-        </Row>
+      <Container className="about-container">
+        <div className="about-grid">
+          <div className="about-content">
+            <h2>About Us</h2>
+            <ul className="about-list">
+              {features.map((feature, idx) => (
+                <li key={idx}>
+                  <FaCheckCircle aria-hidden="true" className="about-icon" />
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <figure className="about-figure">
+            <img
+              src="/about1.webp"
+              alt="Team collaborating at ShannyTechSolutions"
+              className="img-fluid about-img"
+            />
+            <figcaption className="about-figcaption">
+              Our team crafting innovative digital solutions
+            </figcaption>
+          </figure>
+        </div>
       </Container>
     </section>
   );
