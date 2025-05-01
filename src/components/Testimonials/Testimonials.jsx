@@ -1,3 +1,4 @@
+// src/components/Testimonials/Testimonials.jsx
 import React from "react";
 import { Container, Carousel } from "react-bootstrap";
 import "./Testimonials.css";
@@ -32,12 +33,16 @@ const Testimonials = () => {
       id="testimonials"
       className="testimonials-section py-5"
       data-aos="fade-up"
+      aria-labelledby="testimonials-heading"
     >
       <Container>
-        <h2 className="testimonials-heading text-center mb-4">
+        <h2
+          id="testimonials-heading"
+          className="testimonials-heading text-center mb-4"
+        >
           What Our Clients Say
         </h2>
-        <Carousel>
+        <Carousel pause="hover" keyboard indicators>
           {testimonials.map((testimonial) => (
             <Carousel.Item key={testimonial.id}>
               <div className="testimonial-item text-center">

@@ -1,7 +1,10 @@
+// src/components/Contact/Contact.jsx
 import React, { useState } from "react";
-import { Container, Form, Button, Alert } from "react-bootstrap";
+import { Container, Form, Button } from "react-bootstrap";
 import ReCAPTCHA from "react-google-recaptcha";
 import emailjs from "emailjs-com";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./Contact.css";
 
 const Contact = () => {
@@ -9,22 +12,23 @@ const Contact = () => {
     name: "",
     email: "",
     message: "",
+    website: "",
   });
   const [captchaValue, setCaptchaValue] = useState(null);
   const [errors, setErrors] = useState({});
-  const [submitted, setSubmitted] = useState(false);
 
   const validate = () => {
     const newErrors = {};
-    if (!formData.name) newErrors.name = "Name is required.";
-    if (!formData.email) {
-      newErrors.email = "Email is required.";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email is invalid.";
+    // Honeypot
+    if (formData.website) {
+      newErrors.website = "Bot detected.";
     }
+    if (!formData.name) newErrors.name = "Name is required.";
+    if (!formData.email) newErrors.email = "Email is required.";
+    else if (!/\S+@\S+\.\S+/.test(formData.email))
+      newErrors.email = "Email is invalid.";
     if (!formData.message) newErrors.message = "Message is required.";
-    if (!captchaValue)
-      newErrors.captcha = "Please verify that you are not a robot.";
+    if (!captchaValue) newErrors.captcha = "Please verify you are not a robot.";
     return newErrors;
   };
 
@@ -40,7 +44,6 @@ const Contact = () => {
     e.preventDefault();
     const newErrors = validate();
     if (Object.keys(newErrors).length === 0) {
-      // Send email using EmailJS
       emailjs
         .send(
           "service_rupt02a",
@@ -49,86 +52,125 @@ const Contact = () => {
           "8fFyWaO5kSCdQc_XC"
         )
         .then(
-          (result) => {
-            console.log("Email successfully sent!", result.text);
-            setSubmitted(true);
-            setFormData({ name: "", email: "", message: "" });
+          () => {
+            toast.success("Your message has been sent successfully!");
+            setFormData({ name: "", email: "", message: "", website: "" });
             setCaptchaValue(null);
+            setErrors({});
           },
-          (error) => {
-            console.error("Failed to send email:", error.text);
+          () => {
+            toast.error("Failed to send message. Please try again later.");
           }
         );
     } else {
       setErrors(newErrors);
+      Object.values(newErrors).forEach((msg) => {
+        if (msg !== "Bot detected.") toast.error(msg);
+      });
     }
   };
 
   return (
-    <section id="contact" className="contact-section py-5" data-aos="fade-up">
+    <section
+      id="contact"
+      className="contact-section py-5"
+      data-aos="fade-up"
+      aria-labelledby="contact-heading"
+    >
       <Container>
-        <h2 className="contact-heading text-center mb-4">Contact Us</h2>
-        {submitted && (
-          <Alert variant="success">
-            Your message has been sent successfully!
-          </Alert>
-        )}
+        <h2 id="contact-heading" className="contact-heading text-center mb-4">
+          Contact Us
+        </h2>
+
         <Form onSubmit={handleSubmit} noValidate>
-          <Form.Group controlId="formName" className="mb-3">
-            <Form.Label>Name</Form.Label>
+          {/* Honeypot field */}
+          <Form.Group controlId="website" className="visually-hidden">
+            <Form.Label>Website</Form.Label>
             <Form.Control
+              type="text"
+              name="website"
+              value={formData.website}
+              onChange={handleChange}
+              autoComplete="off"
+            />
+          </Form.Group>
+
+          <Form.Group controlId="name" className="mb-3">
+            <Form.Label htmlFor="name">Name</Form.Label>
+            <Form.Control
+              id="name"
               type="text"
               name="name"
               placeholder="Enter your name"
+              required
+              aria-required="true"
+              aria-invalid={!!errors.name}
+              aria-describedby={errors.name ? "name-error" : undefined}
               value={formData.name}
               onChange={handleChange}
-              isInvalid={!!errors.name}
-              aria-required="true"
             />
-            <Form.Control.Feedback type="invalid">
-              {errors.name}
-            </Form.Control.Feedback>
+            {errors.name && (
+              <div id="name-error" className="invalid-feedback">
+                {errors.name}
+              </div>
+            )}
           </Form.Group>
-          <Form.Group controlId="formEmail" className="mb-3">
-            <Form.Label>Email address</Form.Label>
+
+          <Form.Group controlId="email" className="mb-3">
+            <Form.Label htmlFor="email">Email address</Form.Label>
             <Form.Control
+              id="email"
               type="email"
               name="email"
               placeholder="Enter your email"
+              required
+              aria-required="true"
+              aria-invalid={!!errors.email}
+              aria-describedby={errors.email ? "email-error" : undefined}
               value={formData.email}
               onChange={handleChange}
-              isInvalid={!!errors.email}
-              aria-required="true"
             />
-            <Form.Control.Feedback type="invalid">
-              {errors.email}
-            </Form.Control.Feedback>
+            {errors.email && (
+              <div id="email-error" className="invalid-feedback">
+                {errors.email}
+              </div>
+            )}
           </Form.Group>
-          <Form.Group controlId="formMessage" className="mb-3">
-            <Form.Label>Message</Form.Label>
+
+          <Form.Group controlId="message" className="mb-3">
+            <Form.Label htmlFor="message">Message</Form.Label>
             <Form.Control
+              id="message"
               as="textarea"
               name="message"
               rows={4}
               placeholder="Your message"
+              required
+              aria-required="true"
+              aria-invalid={!!errors.message}
+              aria-describedby={errors.message ? "message-error" : undefined}
               value={formData.message}
               onChange={handleChange}
-              isInvalid={!!errors.message}
-              aria-required="true"
             />
-            <Form.Control.Feedback type="invalid">
-              {errors.message}
-            </Form.Control.Feedback>
+            {errors.message && (
+              <div id="message-error" className="invalid-feedback">
+                {errors.message}
+              </div>
+            )}
           </Form.Group>
+
           <Form.Group className="mb-3">
             <ReCAPTCHA
               sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
               onChange={handleCaptchaChange}
             />
             {errors.captcha && (
-              <div className="text-danger">{errors.captcha}</div>
+              <div id="captcha-error" className="invalid-feedback">
+                {errors.captcha}
+              </div>
             )}
           </Form.Group>
+
           <Button
             variant="primary"
             type="submit"
@@ -137,6 +179,8 @@ const Contact = () => {
             Submit
           </Button>
         </Form>
+
+        <ToastContainer position="top-right" autoClose={5000} />
       </Container>
     </section>
   );
