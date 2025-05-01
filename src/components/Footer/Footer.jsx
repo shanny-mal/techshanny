@@ -1,3 +1,4 @@
+// src/components/Footer/Footer.jsx
 import React from "react";
 import { Container } from "react-bootstrap";
 import {
@@ -6,17 +7,22 @@ import {
   FaLinkedinIn,
   FaInstagram,
 } from "react-icons/fa";
-import "./Footer.css"; // Import the custom CSS
+import "./Footer.css";
 
 const Footer = () => {
   return (
     <footer className="footer-section">
+      {/* Skip link for keyboard users */}
+      <a href="#main" className="skip-link">
+        Skip to main content
+      </a>
       <Container className="footer-container text-center">
         <div className="social-icons">
           <a
             href="https://www.facebook.com/share/1H2NoTgyQR/"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="ShannyTechSolutions on Facebook"
           >
             <FaFacebookF />
           </a>
@@ -24,6 +30,7 @@ const Footer = () => {
             href="https://x.com/shannymalvin?t=eRrkrpWEaFgBFciTLSaAGw&s=09"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="ShannyTechSolutions on Twitter"
           >
             <FaTwitter />
           </a>
@@ -31,6 +38,7 @@ const Footer = () => {
             href="https://www.linkedin.com/in/shannon-chipezeze"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="ShannyTechSolutions on LinkedIn"
           >
             <FaLinkedinIn />
           </a>
@@ -38,6 +46,7 @@ const Footer = () => {
             href="https://www.instagram.com/malshayn?igsh=ZGhmdXdyMW9vdmgx"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="ShannyTechSolutions on Instagram"
           >
             <FaInstagram />
           </a>

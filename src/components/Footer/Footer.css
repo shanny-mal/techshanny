@@ -1,16 +1,42 @@
-/* Use a mocha-inspired gradient for a unified theme */
-.footer-section {
-  background: linear-gradient(135deg, #8f5e42, #a67b5b);
-  padding: 40px 0;
-  border-top: 2px solid rgba(255, 255, 255, 0.2);
+/* src/components/Footer/Footer.css */
+:root {
+  --mocha-gradient-start: #7a5235; /* Darkened for contrast */
+  --mocha-gradient-end: #8f5e42;
 }
 
-/* Ensure text is legible on the mocha background */
-.footer-container {
+.footer-section {
+  position: relative;
+  background: linear-gradient(135deg, var(--mocha-gradient-start), var(--mocha-gradient-end));
+  padding: 40px 0;
+  border-top: 2px solid rgba(255, 255, 255, 0.2);
   color: #ffffff;
 }
 
-/* Social icons with smooth transitions and appropriate spacing */
+/* Skip link hidden offscreen, visible on focus */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 1rem;
+  background: #ffffff;
+  color: #3E2723;
+  padding: 8px 16px;
+  z-index: 1000;
+  transition: top 0.3s ease;
+  border-radius: 4px;
+  text-decoration: none;
+}
+.skip-link:focus {
+  top: 0;
+  outline: 3px solid var(--mocha-gradient-end);
+  outline-offset: 2px;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
 .social-icons {
   margin-bottom: 20px;
 }
@@ -21,39 +47,21 @@
   font-size: 1.5rem;
   transition: transform 0.3s ease, color 0.3s ease;
 }
-
-.social-icons a:hover {
+.social-icons a:hover,
+.social-icons a:focus {
   transform: scale(1.1);
+  outline: none;
 }
 
-/* Custom colors for each social media icon */
-.social-icons a:nth-child(1) {
-  color: #3b5998; /* Facebook */
-}
-.social-icons a:nth-child(1):hover {
-  color: #8b9dc3;
-}
-
-.social-icons a:nth-child(2) {
-  color: #00acee; /* Twitter */
-}
-.social-icons a:nth-child(2):hover {
-  color: #66c0f4;
-}
-
-.social-icons a:nth-child(3) {
-  color: #0077b5; /* LinkedIn */
-}
-.social-icons a:nth-child(3):hover {
-  color: #5aa3d0;
-}
-
-.social-icons a:nth-child(4) {
-  color: #e1306c; /* Instagram */
-}
-.social-icons a:nth-child(4):hover {
-  color: #f497a4;
-}
+/* Icon colors */
+.social-icons a:nth-child(1) { color: #3b5998; }
+.social-icons a:nth-child(1):hover { color: #8b9dc3; }
+.social-icons a:nth-child(2) { color: #00acee; }
+.social-icons a:nth-child(2):hover { color: #66c0f4; }
+.social-icons a:nth-child(3) { color: #0077b5; }
+.social-icons a:nth-child(3):hover { color: #5aa3d0; }
+.social-icons a:nth-child(4) { color: #e1306c; }
+.social-icons a:nth-child(4):hover { color: #f497a4; }
 
 .footer-text {
   margin: 0;
@@ -61,7 +69,6 @@
   font-weight: 400;
 }
 
-/* Responsive adjustments for smaller screens */
 @media (max-width: 576px) {
   .social-icons a {
     font-size: 1.3rem;
