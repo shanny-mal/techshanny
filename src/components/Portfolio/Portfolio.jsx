@@ -8,7 +8,7 @@ const projects = [
     id: 1,
     title: "Responsive Corporate Website",
     image: "/c1.jpg",
-    srcSet: "/c1-small.jpg 600w, /c1-medium.jpg 900w, /c1.jpg 1200w",
+    srcSet: "/c1.jpg 600w, /c1.jpg 900w, /c1.jpg 1200w",
     sizes: "(max-width: 768px) 100vw, 33vw",
     description:
       "Developed a state-of-the-art corporate website emphasizing user experience and performance.",
@@ -19,7 +19,7 @@ const projects = [
     id: 2,
     title: "E-Commerce Platform",
     image: "/e1.jpg",
-    srcSet: "/e1-small.jpg 600w, /e1-medium.jpg 900w, /e1.jpg 1200w",
+    srcSet: "/e1.jpg 600w, /e1.jpg 900w, /e1.jpg 1200w",
     sizes: "(max-width: 768px) 100vw, 33vw",
     description:
       "Engineered a robust e-commerce solution with secure payment integration and intuitive navigation.",
@@ -30,7 +30,7 @@ const projects = [
     id: 3,
     title: "Enterprise Network Infrastructure",
     image: "/n1.jpg",
-    srcSet: "/n1-small.jpg 600w, /n1-medium.jpg 900w, /n1.jpg 1200w",
+    srcSet: "/n1.jpg 600w, /n1.jpg 900w, /n1.jpg 1200w",
     sizes: "(max-width: 768px) 100vw, 33vw",
     description:
       "Designed and implemented a scalable, secure network infrastructure for large enterprises.",
