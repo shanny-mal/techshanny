@@ -22,7 +22,7 @@ const About = () => {
           <Col md={6}>
             <div className="about-img-wrapper">
               <img
-                src="/about1.jpg"
+                src="/about1.webp"
                 alt="About ShannyTechSolutions"
                 className="img-fluid about-img"
               />

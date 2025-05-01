@@ -1,31 +1,105 @@
-/* index.css */
+/* ============================
+   CSS Variables & Global Reset
+   ============================ */
+:root {
+  --mocha-light: #F5F3EE;
+  --mocha-dark:  #3E2723;
+  --mocha-primary:   #A67B5B;
+  --mocha-secondary: #8F5E42;
+  --text-color:      #333333;
+  --bg-light:        var(--mocha-light);
+  --bg-dark:         #121212;
+  --text-light:      #ffffff;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-light);
+  color: var(--text-color);
+  font-family: sans-serif;
+  line-height: 1.6;
+  scroll-behavior: smooth;
+}
+
+/* =================
+   Utility Classes
+   ================= */
+.py-5   { padding-top: 3rem;  padding-bottom: 3rem; }
+.px-4   { padding-left: 1.5rem; padding-right: 1.5rem; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+
+.text-center { text-align: center; }
+.text-right  { text-align: right; }
+
+.fs-1 { font-size: 2.5rem; }
+.fs-2 { font-size: 2rem; }
+.fs-3 { font-size: 1.75rem; }
+.fs-4 { font-size: 1.5rem; }
+
+/* ======================
+   Focus Styles for A11y
+   ====================== */
+a:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 3px solid var(--mocha-primary);
+  outline-offset: 2px;
+}
+
+/* ====================
+   Dark Mode Overrides
+   ==================== */
 body.dark-mode {
-  background-color: #121212;
-  color: #e0e0e0;
+  background-color: var(--bg-dark);
+  color: var(--text-light);
+}
+
+body.dark-mode a,
+body.dark-mode p,
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6 {
+  color: var(--text-light);
 }
 
 body.dark-mode .navbar,
 body.dark-mode .footer-section {
-  background: #1e1e1e;
+  background-color: var(--mocha-secondary);
 }
 
-body.dark-mode .card {
-  background: #1e1e1e;
-  color: #e0e0e0;
+body.dark-mode .card,
+body.dark-mode .section {
+  background-color: var(--bg-dark);
+  color: var(--text-light);
 }
 
-/* Specific overrides for navigation links */
 body.dark-mode .modern-nav .nav-link {
-  color: #e0e0e0;
-}
-body.dark-mode .modern-nav .nav-link:hover {
-  color: #ffffff;
+  color: var(--text-light);
 }
 
-/* Dark mode for sections */
-body.dark-mode .services-section,
+body.dark-mode .modern-nav .nav-link:hover,
+body.dark-mode .modern-nav .nav-link:focus {
+  color: var(--mocha-primary);
+}
+
+/* If you have additional section classes, group them here */
 body.dark-mode .about-section,
+body.dark-mode .services-section,
 body.dark-mode .portfolio-section,
-body.dark-mode .contact-section {
-  background-color: #1a1a1a;
+body.dark-mode .contact-section,
+body.dark-mode .blog-section,
+body.dark-mode .testimonials-section {
+  background-color: var(--bg-dark);
 }

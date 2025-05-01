@@ -1,63 +1,66 @@
-import React, { useState, useEffect, Suspense } from "react";
+// src/App.jsx
+import React, { useState, useEffect, Suspense, lazy } from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
+import { Routes, Route } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import { Routes, Route } from "react-router-dom";
+
+// Core (eager) imports
 import Header from "./components/Header/Header";
 import Hero from "./components/Hero/Hero";
 import About from "./components/About/About";
 import Services from "./components/Services/Services";
-import Portfolio from "./components/Portifolio/Portfolio/"; // Verify path if needed
+import Portfolio from "./components/Portfolio/Portfolio"; // fixed folder name
 import Contact from "./components/Contact/Contact";
 import Footer from "./components/Footer/Footer";
 import DarkModeToggle from "./components/DarkModeToggle/DarkModeToggle";
 
-// Lazy-load components for better performance
-const Testimonials = React.lazy(() =>
+// Lazy imports
+const Testimonials = lazy(() =>
   import("./components/Testimonials/Testimonials")
 );
-const Blog = React.lazy(() => import("./components/Blog/Blog"));
-const BlogPostDetail = React.lazy(() =>
-  import("./components/Blog/BlogPostDetail")
-);
+const Blog = lazy(() => import("./components/Blog/Blog"));
+const BlogPostDetail = lazy(() => import("./components/Blog/BlogPostDetail"));
 
-// Error Boundary to catch errors in lazy-loaded components
+// Error boundary
 class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false };
-  }
-  static getDerivedStateFromError(error) {
+  state = { hasError: false };
+  static getDerivedStateFromError() {
     return { hasError: true };
   }
-  componentDidCatch(error, errorInfo) {
-    console.error("Error caught by ErrorBoundary:", error, errorInfo);
+  componentDidCatch(err, info) {
+    console.error(err, info);
   }
   render() {
     if (this.state.hasError) {
-      return <div>Something went wrong loading this section.</div>;
+      return <div className="py-5 text-center">Oops—something went wrong.</div>;
     }
     return this.props.children;
   }
 }
 
-// Consolidate homepage content into its own component
+// Suspense + ErrorBoundary wrapper
+const AsyncSection = ({ children, fallback }) => (
+  <ErrorBoundary>
+    <Suspense fallback={<div className="py-5 text-center">{fallback}</div>}>
+      {children}
+    </Suspense>
+  </ErrorBoundary>
+);
+
+// Home page aggregator
 const HomePage = () => (
   <>
     <Hero />
     <About />
     <Services />
     <Portfolio />
-    <ErrorBoundary>
-      <Suspense fallback={<div>Loading Testimonials...</div>}>
-        <Testimonials />
-      </Suspense>
-    </ErrorBoundary>
-    <ErrorBoundary>
-      <Suspense fallback={<div>Loading Blog...</div>}>
-        <Blog />
-      </Suspense>
-    </ErrorBoundary>
+    <AsyncSection fallback={<span>Loading Testimonials…</span>}>
+      <Testimonials />
+    </AsyncSection>
+    <AsyncSection fallback={<span>Loading Blog Posts…</span>}>
+      <Blog />
+    </AsyncSection>
     <Contact />
     <Footer />
   </>
@@ -66,90 +69,78 @@ const HomePage = () => (
 function App() {
   const [darkMode, setDarkMode] = useState(false);
 
-  // Initialize AOS animations on mount
+  // AOS init
   useEffect(() => {
     AOS.init({ duration: 1000 });
   }, []);
 
-  // Retrieve dark mode preference from localStorage on load
+  // Load darkMode preference
   useEffect(() => {
-    const storedDarkMode = localStorage.getItem("darkMode") === "true";
-    setDarkMode(storedDarkMode);
+    setDarkMode(localStorage.getItem("darkMode") === "true");
   }, []);
 
-  // Update dark mode class on body and persist the preference
+  // Apply & persist darkMode
   useEffect(() => {
-    if (darkMode) {
-      document.body.classList.add("dark-mode");
-    } else {
-      document.body.classList.remove("dark-mode");
-    }
+    document.body.classList.toggle("dark-mode", darkMode);
     localStorage.setItem("darkMode", darkMode);
   }, [darkMode]);
 
   return (
     <HelmetProvider>
       <Helmet>
-        <title>ShannyTechSolutions - Cutting-edge Technology Solutions</title>
+        <title>ShannyTechSolutions – Cutting-edge Technology Solutions</title>
         <meta
           name="description"
-          content="ShannyTechSolutions provides innovative technology solutions including web development, networking, IT consulting, and more."
+          content="ShannyTechSolutions provides innovative technology solutions — from web development to IT consulting."
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Helmet>
+
       <Header />
-      {/* Dark Mode Toggle fixed at the top-right */}
       <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
+
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route
           path="/blog"
           element={
-            <ErrorBoundary>
-              <Suspense fallback={<div>Loading Blog...</div>}>
-                <Blog />
-              </Suspense>
-            </ErrorBoundary>
+            <AsyncSection fallback={<span>Loading Blog…</span>}>
+              <Blog />
+            </AsyncSection>
           }
         />
         <Route
           path="/blog/:id"
           element={
-            <ErrorBoundary>
-              <Suspense fallback={<div>Loading Blog Post...</div>}>
-                <BlogPostDetail />
-              </Suspense>
-            </ErrorBoundary>
+            <AsyncSection fallback={<span>Loading Article…</span>}>
+              <BlogPostDetail />
+            </AsyncSection>
           }
         />
       </Routes>
+
       <LiveChat />
     </HelmetProvider>
   );
 }
 
+// Tawk.to live chat integration
 const LiveChat = () => {
   useEffect(() => {
-    const propertyId = import.meta.env.VITE_TAWK_PROPERTY_ID;
-
-    if (!propertyId) {
-      console.warn(
-        "Tawk.to property ID is not set. Please check your .env file."
-      );
+    const id = import.meta.env.VITE_TAWK_PROPERTY_ID;
+    if (!id) {
+      console.warn("VITE_TAWK_PROPERTY_ID not set");
       return;
     }
+    if (document.getElementById("tawk-script")) return;
 
-    // Prevent duplicate script injection
-    if (document.getElementById("tawk-chat-script")) return;
-
-    const s1 = document.createElement("script");
-    s1.async = true;
-    s1.src = `https://embed.tawk.to/${propertyId}/1ikjpu2t1`;
-    s1.charset = "UTF-8";
-    s1.setAttribute("crossorigin", "*");
-    s1.id = "tawk-chat-script";
-
-    document.body.appendChild(s1);
+    const s = document.createElement("script");
+    s.id = "tawk-script";
+    s.async = true;
+    s.src = `https://embed.tawk.to/${id}/1ikjpu2t1`;
+    s.charset = "UTF-8";
+    s.setAttribute("crossorigin", "*");
+    document.body.appendChild(s);
   }, []);
 
   return null;

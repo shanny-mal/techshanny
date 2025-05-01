@@ -1,65 +1,87 @@
+/* src/components/Header/Header.css */
 :root {
-  --mocha-primary: #A67B5B;
-  --mocha-secondary: #8F5E42;
-  --mocha-dark: #3E2723;
-  --mocha-light: #F5F3EE;
+  --mocha-primary:    #A67B5B;
+  --mocha-secondary:  #8F5E42;
+  --mocha-dark:       #3E2723;
+  --navbar-text:      #FFFFFF;
 }
 
-/* Enable smooth scrolling globally */
-html {
-  scroll-behavior: smooth;
+/* Sticky header and shrink effect */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+header.navbar-shrink .modern-navbar {
+  padding: 0.5rem 0;
 }
 
 /* Navbar styling using mocha tones */
 .modern-navbar {
   background: linear-gradient(135deg, var(--mocha-primary), var(--mocha-secondary));
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 0.75rem 0;
-  transition: background 0.3s ease;
+  padding: 1rem 0;
+  transition: padding 0.3s ease, background 0.3s ease;
 }
 
+/* Brand */
 .modern-brand {
   display: flex;
   align-items: center;
-  color: #fff;
+  color: var(--navbar-text);
   font-weight: 700;
   font-size: 1.75rem;
   text-decoration: none;
 }
-
-/* Logo circle styling */
 .logo-circle {
   width: 60px;
   height: 60px;
   border-radius: 50%;
   overflow: hidden;
+  background-color: var(--navbar-text);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 16px;
-  background-color: #fff; /* Optional background */
 }
-
 .logo {
   width: 100%;
   height: auto;
 }
-
 .brand-text {
-  margin-left: 8px;
+  color: var(--navbar-text);
 }
 
+/* Navigation Links */
 .modern-nav .nav-link {
-  color: #fff;
+  color: var(--navbar-text);
   margin-right: 1.5rem;
   font-weight: 500;
-  transition: color 0.3s ease, transform 0.3s ease;
   font-size: 1.1rem;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+.modern-nav .nav-link:hover {
+  color: var(--mocha-secondary);
+  transform: scale(1.05);
+}
+.modern-nav .nav-link:focus {
+  outline: 3px solid var(--mocha-primary);
+  outline-offset: 2px;
+}
+.modern-nav .nav-link[aria-current="page"] {
+  border-bottom: 2px solid var(--navbar-text);
 }
 
-.modern-nav .nav-link:hover {
-  color: #d1d1d1;
-  transform: scale(1.05);
+/* Toggler button */
+.navbar-toggler {
+  border-color: var(--navbar-text);
+}
+.navbar-toggler-icon {
+  filter: invert(1);
+}
+.navbar-toggler:focus {
+  outline: 3px solid var(--mocha-primary);
+  outline-offset: 2px;
 }
 
 @media (max-width: 991.98px) {
