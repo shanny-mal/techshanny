@@ -3,13 +3,16 @@ import React, { useCallback } from "react";
 import { Container, Button } from "react-bootstrap";
 import "./Hero.css";
 
+// Note: Add the following to public/index.html for preloading the first hero image:
+// <link rel="preload" as="image" href="/image1.jpg">
+
 const slides = [
   {
     id: 1,
     src: "/image1.jpg",
     srcSet:
       "/image1.jpg 600w, /image1.jpg 900w, /image1.jpg 1200w",
-    sizes: "(max-width: 768px) 100vw, 50vw",
+    sizes: "(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw",
     alt: "Team working together",
     loading: "eager",
   },
@@ -18,7 +21,7 @@ const slides = [
     src: "/image2.jpg",
     srcSet:
       "/image2.jpg 600w, /image2.jpg 900w, /image2.jpg 1200w",
-    sizes: "(max-width: 768px) 100vw, 50vw",
+    sizes: "(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw",
     alt: "Innovative tech solutions",
     loading: "lazy",
   },
@@ -27,7 +30,7 @@ const slides = [
     src: "/image3.jpg",
     srcSet:
       "/image3.jpg 600w, /image3.jpg 900w, /image3.jpg 1200w",
-    sizes: "(max-width: 768px) 100vw, 50vw",
+    sizes: "(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw",
     alt: "Consulting session",
     loading: "lazy",
   },

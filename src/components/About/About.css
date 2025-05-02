@@ -16,19 +16,20 @@
   padding: 0 1rem;
 }
 
+/* Two-column responsive grid */
 .about-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 2rem;
   align-items: start;
 }
-
 @media (min-width: 768px) {
   .about-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
+/* Heading styling */
 .about-content h2 {
   font-size: 2.8rem;
   font-weight: 700;
@@ -46,6 +47,7 @@
   border-radius: 2px;
 }
 
+/* Bullet list styling */
 .about-list {
   list-style: none;
   padding: 0;
@@ -67,6 +69,7 @@
   margin-top: 0.25rem;
 }
 
+/* Figure styling */
 .about-figure {
   margin: 0;
 }
@@ -89,6 +92,7 @@
   text-align: center;
 }
 
+/* Responsive adjustments */
 @media (max-width: 767px) {
   .about-content h2 {
     font-size: 2.2rem;

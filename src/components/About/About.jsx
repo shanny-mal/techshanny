@@ -16,6 +16,7 @@ const About = () => {
     <section id="about" className="about-section">
       <Container className="about-container">
         <div className="about-grid">
+          {/* Text content with bullet list */}
           <div className="about-content">
             <h2>About Us</h2>
             <ul className="about-list">
@@ -27,6 +28,8 @@ const About = () => {
               ))}
             </ul>
           </div>
+
+          {/* Semantic figure for image */}
           <figure className="about-figure">
             <img
               src="/about1.webp"

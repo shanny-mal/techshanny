@@ -1,9 +1,13 @@
 /* src/components/Header/Header.css */
+/* 1. Darker gradient for WCAG 4.5:1 contrast on white text */
+/* 2. Retain primary for focus outlines */
+/* 3. Sticky + shrink + focus styles as specified */
+
 :root {
-  --mocha-primary:    #A67B5B;
-  --mocha-secondary:  #8F5E42;
-  --mocha-dark:       #3E2723;
-  --navbar-text:      #FFFFFF;
+  --mocha-gradient-start: #7A5235;
+  --mocha-gradient-end:   #8F5E42;
+  --mocha-primary:        #A67B5B;  /* used for focus outlines */
+  --navbar-text:          #FFFFFF;  /* link & brand text */
 }
 
 /* Sticky header and shrink effect */
@@ -16,9 +20,13 @@ header.navbar-shrink .modern-navbar {
   padding: 0.5rem 0;
 }
 
-/* Navbar styling using mocha tones */
+/* Navbar styling using updated mocha gradient */
 .modern-navbar {
-  background: linear-gradient(135deg, var(--mocha-primary), var(--mocha-secondary));
+  background: linear-gradient(
+    135deg,
+    var(--mocha-gradient-start),
+    var(--mocha-gradient-end)
+  );
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 1rem 0;
   transition: padding 0.3s ease, background 0.3s ease;
@@ -52,7 +60,7 @@ header.navbar-shrink .modern-navbar {
   color: var(--navbar-text);
 }
 
-/* Navigation Links */
+/* Nav links */
 .modern-nav .nav-link {
   color: var(--navbar-text);
   margin-right: 1.5rem;
@@ -61,7 +69,7 @@ header.navbar-shrink .modern-navbar {
   transition: color 0.3s ease, transform 0.3s ease;
 }
 .modern-nav .nav-link:hover {
-  color: var(--mocha-secondary);
+  color: var(--mocha-primary);
   transform: scale(1.05);
 }
 .modern-nav .nav-link:focus {
@@ -72,7 +80,7 @@ header.navbar-shrink .modern-navbar {
   border-bottom: 2px solid var(--navbar-text);
 }
 
-/* Toggler button */
+/* Toggler */
 .navbar-toggler {
   border-color: var(--navbar-text);
 }
@@ -84,6 +92,7 @@ header.navbar-shrink .modern-navbar {
   outline-offset: 2px;
 }
 
+/* Mobile adjustment */
 @media (max-width: 991.98px) {
   .modern-nav .nav-link {
     margin-right: 0;

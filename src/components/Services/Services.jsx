@@ -35,8 +35,8 @@ const Services = () => {
         </h2>
         <div className="services-grid">
           {services.map((svc) => (
-            <Card className="service-card p-4 mb-4" key={svc.title}>
-              <Card.Body>
+            <Card className="service-card mb-4" key={svc.title}>
+              <Card.Body className="p-4">
                 {svc.icon}
                 <Card.Title className="service-title">{svc.title}</Card.Title>
                 <Card.Text className="service-text">{svc.text}</Card.Text>

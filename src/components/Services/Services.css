@@ -1,7 +1,7 @@
 /* src/components/Services/Services.css */
 :root {
   --mocha-primary: #A67B5B;
-  --text-body: #555555; /* Improved contrast */
+  --text-body:    #555555;
 }
 
 .services-section {
@@ -28,6 +28,7 @@
   border-radius: 2px;
 }
 
+/* Grid layout */
 .services-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -39,6 +40,7 @@
   }
 }
 
+/* Card styling */
 .service-card {
   border: none;
   border-radius: 12px;
@@ -50,19 +52,20 @@
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.15);
 }
 
+/* Icon above title */
 .service-icon {
   font-size: 2rem;
   color: var(--mocha-primary);
   margin-bottom: 0.75rem;
 }
 
+/* Title & text */
 .service-title {
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 1rem;
   color: #1e1e1e;
 }
-
 .service-text {
   font-size: 1rem;
   color: var(--text-body);

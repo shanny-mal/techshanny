@@ -1,9 +1,9 @@
 /* src/components/Portfolio/Portfolio.css */
 :root {
-  --mocha-light: #F5F3EE;
-  --mocha-dark: #3E2723;
-  --mocha-primary: #A67B5B;
-  --card-focus-shadow: 0 0 0 3px var(--mocha-primary);
+  --mocha-light:         #F5F3EE;
+  --mocha-dark:          #3E2723;
+  --mocha-primary:       #A67B5B;
+  --card-focus-shadow:   0 0 0 3px var(--mocha-primary);
 }
 
 .portfolio-section {

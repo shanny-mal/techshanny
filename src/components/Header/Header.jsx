@@ -41,6 +41,7 @@ const Header = () => {
             aria-controls="navbar-nav"
             aria-label="Toggle navigation"
             aria-expanded={expanded}
+            className="modern-toggler"
           />
 
           <Navbar.Collapse id="navbar-nav">

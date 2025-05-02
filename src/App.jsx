@@ -10,7 +10,7 @@ import Header from "./components/Header/Header";
 import Hero from "./components/Hero/Hero";
 import About from "./components/About/About";
 import Services from "./components/Services/Services";
-import Portfolio from "./components/Portfolio/Portfolio"; // fixed folder name
+import Portfolio from "./components/Portfolio/Portfolio";
 import Contact from "./components/Contact/Contact";
 import Footer from "./components/Footer/Footer";
 import DarkModeToggle from "./components/DarkModeToggle/DarkModeToggle";
@@ -19,8 +19,8 @@ import DarkModeToggle from "./components/DarkModeToggle/DarkModeToggle";
 const Testimonials = lazy(() =>
   import("./components/Testimonials/Testimonials")
 );
-const Blog = lazy(() => import("./components/Blog/Blog"));
-const BlogPostDetail = lazy(() => import("./components/Blog/BlogPostDetail"));
+const BlogList = lazy(() => import("./components/Blog/BlogList"));
+const BlogPost = lazy(() => import("./components/Blog/BlogPost"));
 
 // Error boundary
 class ErrorBoundary extends React.Component {
@@ -59,7 +59,7 @@ const HomePage = () => (
       <Testimonials />
     </AsyncSection>
     <AsyncSection fallback={<span>Loading Blog Posts…</span>}>
-      <Blog />
+      <BlogList />
     </AsyncSection>
     <Contact />
     <Footer />
@@ -74,14 +74,22 @@ function App() {
     AOS.init({ duration: 1000 });
   }, []);
 
-  // Load darkMode preference
+  // Load darkMode preference, honor system
   useEffect(() => {
-    setDarkMode(localStorage.getItem("darkMode") === "true");
+    const stored = localStorage.getItem("darkMode");
+    if (stored === null) {
+      const prefersDark = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      ).matches;
+      setDarkMode(prefersDark);
+    } else {
+      setDarkMode(stored === "true");
+    }
   }, []);
 
-  // Apply & persist darkMode
+  // Apply & persist darkMode on <html>
   useEffect(() => {
-    document.body.classList.toggle("dark-mode", darkMode);
+    document.documentElement.classList.toggle("dark-mode", darkMode);
     localStorage.setItem("darkMode", darkMode);
   }, [darkMode]);
 
@@ -105,7 +113,7 @@ function App() {
           path="/blog"
           element={
             <AsyncSection fallback={<span>Loading Blog…</span>}>
-              <Blog />
+              <BlogList />
             </AsyncSection>
           }
         />
@@ -113,7 +121,7 @@ function App() {
           path="/blog/:id"
           element={
             <AsyncSection fallback={<span>Loading Article…</span>}>
-              <BlogPostDetail />
+              <BlogPost />
             </AsyncSection>
           }
         />
