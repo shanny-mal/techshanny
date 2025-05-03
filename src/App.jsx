@@ -164,27 +164,33 @@ function App() {
 
 // Tawk.to live chat integration
 function LiveChat() {
+  // Read the env var into a constant
+  const TAWK_PROPERTY_ID = import.meta.env.VITE_TAWK_PROPERTY_ID;
+
   useEffect(() => {
-    const id = import.meta.env.VITE_TAWK_PROPERTY_ID;
-    if (!propertyId) {
-      console.warn("Tawk.to property ID not set in .env");
+    // If missing, warn and exit
+    if (!TAWK_PROPERTY_ID) {
+      console.warn(
+        "Tawk.to property ID not set in .env (VITE_TAWK_PROPERTY_ID)"
+      );
       return;
     }
+    // Prevent multiple script inserts
     if (document.getElementById("tawk-script")) return;
 
     const s = document.createElement("script");
     s.id = "tawk-script";
     s.async = true;
-    s.src = `https://embed.tawk.to/${id}/default`;
+    s.src = `https://embed.tawk.to/${TAWK_PROPERTY_ID}/default`;
     s.charset = "UTF-8";
     s.setAttribute("crossorigin", "*");
     document.body.appendChild(s);
 
     return () => {
-      // Optional: clean up if the component unmounts
+      // Clean up if unmounted
       document.getElementById("tawk-script")?.remove();
     };
-  }, []);
+  }, [TAWK_PROPERTY_ID]);
 
   return null;
 }
