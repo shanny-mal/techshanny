@@ -6,30 +6,40 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 
 // Core (eager) imports
-import Header from "./components/Header/Header";
-import Hero from "./components/Hero/Hero";
-import About from "./components/About/About";
-import Services from "./components/Services/Services";
-import Portfolio from "./components/Portfolio/Portfolio";
-import Contact from "./components/Contact/Contact";
-import Footer from "./components/Footer/Footer";
-import DarkModeToggle from "./components/DarkModeToggle/DarkModeToggle";
+import Header from "./components/Header/Header.jsx";
+import Hero from "./components/Hero/Hero.jsx";
+import About from "./components/About/About.jsx";
+import Services from "./components/Services/Services.jsx";
+import Portfolio from "./components/Portfolio/Portfolio.jsx";
+import Contact from "./components/Contact/Contact.jsx";
+import Footer from "./components/Footer/Footer.jsx";
+import DarkModeToggle from "./components/DarkModeToggle/DarkModeToggle.jsx";
+
+// Auth & Member imports
+import Login from "./components/Auth/Login.jsx";
+import Signup from "./components/Auth/Signup.jsx";
+import RequireAuth from "./components/Auth/RequireAuth.jsx";
+import MemberDashboard from "./pages/MemberDashboard.jsx";
+import NotFound from "./pages/NotFound.jsx";
 
 // Lazy imports
 const Testimonials = lazy(() =>
-  import("./components/Testimonials/Testimonials")
+  import("./components/Testimonials/Testimonials.jsx")
 );
-const BlogList = lazy(() => import("./components/Blog/BlogList"));
-const BlogPost = lazy(() => import("./components/Blog/BlogPost"));
+const BlogList = lazy(() => import("./components/Blog/BlogList.jsx"));
+const BlogPost = lazy(() => import("./components/Blog/BlogPost.jsx"));
 
 // Error boundary
 class ErrorBoundary extends React.Component {
-  state = { hasError: false };
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
   static getDerivedStateFromError() {
     return { hasError: true };
   }
-  componentDidCatch(err, info) {
-    console.error(err, info);
+  componentDidCatch(error, info) {
+    console.error("ErrorBoundary caught an error:", error, info);
   }
   render() {
     if (this.state.hasError) {
@@ -40,57 +50,59 @@ class ErrorBoundary extends React.Component {
 }
 
 // Suspense + ErrorBoundary wrapper
-const AsyncSection = ({ children, fallback }) => (
-  <ErrorBoundary>
-    <Suspense fallback={<div className="py-5 text-center">{fallback}</div>}>
-      {children}
-    </Suspense>
-  </ErrorBoundary>
-);
+function AsyncSection({ children, fallback }) {
+  return (
+    <ErrorBoundary>
+      <Suspense fallback={<div className="py-5 text-center">{fallback}</div>}>
+        {children}
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
 
 // Home page aggregator
-const HomePage = () => (
-  <>
-    <Hero />
-    <About />
-    <Services />
-    <Portfolio />
-    <AsyncSection fallback={<span>Loading Testimonials…</span>}>
-      <Testimonials />
-    </AsyncSection>
-    <AsyncSection fallback={<span>Loading Blog Posts…</span>}>
-      <BlogList />
-    </AsyncSection>
-    <Contact />
-    <Footer />
-  </>
-);
+function HomePage() {
+  return (
+    <>
+      <Hero />
+      <About />
+      <Services />
+      <Portfolio />
+      <AsyncSection fallback={<span>Loading Testimonials…</span>}>
+        <Testimonials />
+      </AsyncSection>
+      <AsyncSection fallback={<span>Loading Blog Posts…</span>}>
+        <BlogList />
+      </AsyncSection>
+      <Contact />
+      <Footer />
+    </>
+  );
+}
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
 
-  // AOS init
+  // AOS init once
   useEffect(() => {
-    AOS.init({ duration: 1000 });
+    AOS.init({ duration: 1000, once: true });
   }, []);
 
-  // Load darkMode preference, honor system
+  // Load & honor dark mode system preference or stored setting
   useEffect(() => {
     const stored = localStorage.getItem("darkMode");
     if (stored === null) {
-      const prefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)"
-      ).matches;
-      setDarkMode(prefersDark);
+      const prefers = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      setDarkMode(prefers);
     } else {
       setDarkMode(stored === "true");
     }
   }, []);
 
-  // Apply & persist darkMode on <html>
+  // Apply to <html> & persist
   useEffect(() => {
     document.documentElement.classList.toggle("dark-mode", darkMode);
-    localStorage.setItem("darkMode", darkMode);
+    localStorage.setItem("darkMode", darkMode.toString());
   }, [darkMode]);
 
   return (
@@ -108,7 +120,22 @@ function App() {
       <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
 
       <Routes>
+        {/* Public pages */}
         <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+
+        {/* Protected member area */}
+        <Route
+          path="/member"
+          element={
+            <RequireAuth>
+              <MemberDashboard />
+            </RequireAuth>
+          }
+        />
+
+        {/* Blog pages */}
         <Route
           path="/blog"
           element={
@@ -125,6 +152,9 @@ function App() {
             </AsyncSection>
           }
         />
+
+        {/* Fallback 404 */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
 
       <LiveChat />
@@ -133,11 +163,11 @@ function App() {
 }
 
 // Tawk.to live chat integration
-const LiveChat = () => {
+function LiveChat() {
   useEffect(() => {
-    const id = import.meta.env.VITE_TAWK_PROPERTY_ID;
-    if (!id) {
-      console.warn("VITE_TAWK_PROPERTY_ID not set");
+    const propertyId = import.meta.env.VITE_TAWK_PROPERTY_ID;
+    if (!propertyId) {
+      console.warn("Tawk.to property ID not set in .env");
       return;
     }
     if (document.getElementById("tawk-script")) return;
@@ -145,13 +175,18 @@ const LiveChat = () => {
     const s = document.createElement("script");
     s.id = "tawk-script";
     s.async = true;
-    s.src = `https://embed.tawk.to/${id}/1ikjpu2t1`;
+    s.src = `https://embed.tawk.to/${propertyId}/default`;
     s.charset = "UTF-8";
     s.setAttribute("crossorigin", "*");
     document.body.appendChild(s);
+
+    return () => {
+      // Optional: clean up if the component unmounts
+      document.getElementById("tawk-script")?.remove();
+    };
   }, []);
 
   return null;
-};
+}
 
 export default App;

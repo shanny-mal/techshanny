@@ -1,0 +1,12 @@
+/* src/components/LanguageSwitcher/LanguageSwitcher.css */
+.language-switcher .dropdown-toggle {
+  color: var(--navbar-text);
+}
+.language-switcher .dropdown-menu {
+  background: var(--mocha-light);
+}
+.language-switcher .dropdown-item.active,
+.language-switcher .dropdown-item:active {
+  background: var(--mocha-primary);
+  color: var(--text-light);
+}

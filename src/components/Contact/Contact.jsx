@@ -1,28 +1,32 @@
 // src/components/Contact/Contact.jsx
 import React, { useState } from "react";
-import { Container, Form, Button } from "react-bootstrap";
+import { Container, Form, Button, Spinner } from "react-bootstrap";
 import ReCAPTCHA from "react-google-recaptcha";
 import emailjs from "emailjs-com";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./Contact.css";
 
+// Load EmailJS config from environment
+const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+const USER_ID = import.meta.env.VITE_EMAILJS_USER_ID;
+
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     message: "",
-    website: "",
+    website: "", // honeypot
   });
   const [captchaValue, setCaptchaValue] = useState(null);
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
+  // Validate form fields + honeypot + captcha
   const validate = () => {
     const newErrors = {};
-    // Honeypot
-    if (formData.website) {
-      newErrors.website = "Bot detected.";
-    }
+    if (formData.website) newErrors.website = "Bot detected."; // honeypot
     if (!formData.name) newErrors.name = "Name is required.";
     if (!formData.email) newErrors.email = "Email is required.";
     else if (!/\S+@\S+\.\S+/.test(formData.email))
@@ -32,40 +36,40 @@ const Contact = () => {
     return newErrors;
   };
 
+  // Input change handler
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // CAPTCHA change handler
   const handleCaptchaChange = (value) => {
     setCaptchaValue(value);
   };
 
-  const handleSubmit = (e) => {
+  // Form submit handler
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = validate();
+    setErrors(newErrors);
+
     if (Object.keys(newErrors).length === 0) {
-      emailjs
-        .send(
-          "service_rupt02a",
-          "template_fgddh3a",
-          formData,
-          "8fFyWaO5kSCdQc_XC"
-        )
-        .then(
-          () => {
-            toast.success("Your message has been sent successfully!");
-            setFormData({ name: "", email: "", message: "", website: "" });
-            setCaptchaValue(null);
-            setErrors({});
-          },
-          () => {
-            toast.error("Failed to send message. Please try again later.");
-          }
-        );
+      setLoading(true);
+      try {
+        await emailjs.send(SERVICE_ID, TEMPLATE_ID, formData, USER_ID);
+        toast.success("Your message has been sent successfully!");
+        setFormData({ name: "", email: "", message: "", website: "" });
+        setCaptchaValue(null);
+      } catch (err) {
+        console.error("EmailJS error:", err);
+        toast.error("Failed to send message. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
     } else {
-      setErrors(newErrors);
-      Object.values(newErrors).forEach((msg) => {
-        if (msg !== "Bot detected.") toast.error(msg);
+      // Show each validation error (except honeypot)
+      Object.entries(newErrors).forEach(([field, msg]) => {
+        if (field !== "website") toast.error(msg);
       });
     }
   };
@@ -83,31 +87,33 @@ const Contact = () => {
         </h2>
 
         <Form onSubmit={handleSubmit} noValidate>
-          {/* Honeypot field */}
-          <Form.Group controlId="website" className="visually-hidden">
-            <Form.Label>Website</Form.Label>
-            <Form.Control
+          {/* Honeypot field (hidden) */}
+          <div className="visually-hidden">
+            <label htmlFor="website">Website</label>
+            <input
+              id="website"
               type="text"
               name="website"
               value={formData.website}
               onChange={handleChange}
               autoComplete="off"
             />
-          </Form.Group>
+          </div>
 
-          <Form.Group controlId="name" className="mb-3">
+          {/* Name Field */}
+          <Form.Group className="mb-3">
             <Form.Label htmlFor="name">Name</Form.Label>
             <Form.Control
               id="name"
               type="text"
               name="name"
               placeholder="Enter your name"
+              value={formData.name}
+              onChange={handleChange}
               required
               aria-required="true"
               aria-invalid={!!errors.name}
               aria-describedby={errors.name ? "name-error" : undefined}
-              value={formData.name}
-              onChange={handleChange}
             />
             {errors.name && (
               <div id="name-error" className="invalid-feedback">
@@ -116,19 +122,20 @@ const Contact = () => {
             )}
           </Form.Group>
 
-          <Form.Group controlId="email" className="mb-3">
+          {/* Email Field */}
+          <Form.Group className="mb-3">
             <Form.Label htmlFor="email">Email address</Form.Label>
             <Form.Control
               id="email"
               type="email"
               name="email"
               placeholder="Enter your email"
+              value={formData.email}
+              onChange={handleChange}
               required
               aria-required="true"
               aria-invalid={!!errors.email}
               aria-describedby={errors.email ? "email-error" : undefined}
-              value={formData.email}
-              onChange={handleChange}
             />
             {errors.email && (
               <div id="email-error" className="invalid-feedback">
@@ -137,7 +144,8 @@ const Contact = () => {
             )}
           </Form.Group>
 
-          <Form.Group controlId="message" className="mb-3">
+          {/* Message Field */}
+          <Form.Group className="mb-3">
             <Form.Label htmlFor="message">Message</Form.Label>
             <Form.Control
               id="message"
@@ -145,12 +153,12 @@ const Contact = () => {
               name="message"
               rows={4}
               placeholder="Your message"
+              value={formData.message}
+              onChange={handleChange}
               required
               aria-required="true"
               aria-invalid={!!errors.message}
               aria-describedby={errors.message ? "message-error" : undefined}
-              value={formData.message}
-              onChange={handleChange}
             />
             {errors.message && (
               <div id="message-error" className="invalid-feedback">
@@ -159,6 +167,7 @@ const Contact = () => {
             )}
           </Form.Group>
 
+          {/* CAPTCHA */}
           <Form.Group className="mb-3">
             <ReCAPTCHA
               sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
@@ -171,15 +180,32 @@ const Contact = () => {
             )}
           </Form.Group>
 
+          {/* Submit Button */}
           <Button
             variant="primary"
             type="submit"
             aria-label="Submit Contact Form"
+            disabled={loading}
           >
-            Submit
+            {loading ? (
+              <>
+                <Spinner
+                  as="span"
+                  animation="border"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                  className="me-2"
+                />
+                Sending...
+              </>
+            ) : (
+              "Submit"
+            )}
           </Button>
         </Form>
 
+        {/* Global toast container */}
         <ToastContainer position="top-right" autoClose={5000} />
       </Container>
     </section>

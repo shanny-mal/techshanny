@@ -1,16 +1,13 @@
 /* src/components/Header/Header.css */
-/* 1. Darker gradient for WCAG 4.5:1 contrast on white text */
-/* 2. Retain primary for focus outlines */
-/* 3. Sticky + shrink + focus styles as specified */
 
 :root {
   --mocha-gradient-start: #7A5235;
   --mocha-gradient-end:   #8F5E42;
-  --mocha-primary:        #A67B5B;  /* used for focus outlines */
-  --navbar-text:          #FFFFFF;  /* link & brand text */
+  --mocha-primary:        #A67B5B;
+  --navbar-text:          #FFFFFF;
 }
 
-/* Sticky header and shrink effect */
+/* Sticky & shrinkable header */
 header {
   position: sticky;
   top: 0;
@@ -20,16 +17,16 @@ header.navbar-shrink .modern-navbar {
   padding: 0.5rem 0;
 }
 
-/* Navbar styling using updated mocha gradient */
+/* Navbar base */
 .modern-navbar {
   background: linear-gradient(
     135deg,
     var(--mocha-gradient-start),
     var(--mocha-gradient-end)
   );
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   padding: 1rem 0;
-  transition: padding 0.3s ease, background 0.3s ease;
+  transition: padding 0.3s ease;
 }
 
 /* Brand */
@@ -45,39 +42,37 @@ header.navbar-shrink .modern-navbar {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  overflow: hidden;
   background-color: var(--navbar-text);
+  margin-right: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 16px;
 }
 .logo {
   width: 100%;
   height: auto;
 }
-.brand-text {
-  color: var(--navbar-text);
-}
 
 /* Nav links */
-.modern-nav .nav-link {
-  color: var(--navbar-text);
-  margin-right: 1.5rem;
+.modern-nav .modern-nav-link {
+  color: var(--navbar-text) !important;
+  margin-right: 1rem;
   font-weight: 500;
-  font-size: 1.1rem;
   transition: color 0.3s ease, transform 0.3s ease;
 }
-.modern-nav .nav-link:hover {
-  color: var(--mocha-primary);
+.modern-nav .modern-nav-link:hover,
+.modern-nav .modern-nav-link:focus {
+  color: var(--mocha-primary) !important;
   transform: scale(1.05);
 }
-.modern-nav .nav-link:focus {
-  outline: 3px solid var(--mocha-primary);
-  outline-offset: 2px;
-}
-.modern-nav .nav-link[aria-current="page"] {
+.modern-nav .modern-nav-link.active {
   border-bottom: 2px solid var(--navbar-text);
+}
+
+/* Tools dropdown override */
+.tools-dropdown > .nav-link {
+  display: inline-flex;
+  align-items: center;
 }
 
 /* Toggler */
@@ -92,10 +87,18 @@ header.navbar-shrink .modern-navbar {
   outline-offset: 2px;
 }
 
-/* Mobile adjustment */
+/* LanguageSwitcher & DarkModeToggle alignment */
+.modern-nav .nav-item {
+  margin-left: 0.5rem;
+}
+
+/* Responsive adjustments */
 @media (max-width: 991.98px) {
-  .modern-nav .nav-link {
-    margin-right: 0;
-    padding: 0.5rem 0;
+  .modern-nav .modern-nav-link {
+    margin: 0.5rem 0;
+    padding: 0.5rem 1rem;
+  }
+  .tools-dropdown .dropdown-menu {
+    background-color: var(--mocha-gradient-start);
   }
 }
