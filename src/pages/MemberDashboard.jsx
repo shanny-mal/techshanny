@@ -9,7 +9,7 @@ import {
   Button,
 } from "react-bootstrap";
 import { AuthContext } from "../context/AuthContext.jsx";
-import { supabase } from "../services/api.js";
+import { supabase } from "../supabaseClient.js";
 import "./MemberDashboard.css";
 
 const MemberDashboard = () => {
@@ -20,20 +20,28 @@ const MemberDashboard = () => {
 
   useEffect(() => {
     if (!user) return;
+
     const fetchProjects = async () => {
       setLoading(true);
       const { data, error } = await supabase
         .from("projects")
-        .select("id, name, status, created_at")
-        .eq("user_id", user.id)
+        .select("id, name, description, link, created_at")
+        .eq("owner_id", user.id)
         .order("created_at", { ascending: false });
-      if (error) setError(error.message);
-      else setProjects(data);
+
+      if (error) {
+        console.error(error);
+        setError(error.message);
+      } else {
+        setProjects(data);
+      }
       setLoading(false);
     };
+
     fetchProjects();
   }, [user]);
 
+  // If not logged in
   if (!user) {
     return (
       <Container className="py-5">
@@ -46,14 +54,13 @@ const MemberDashboard = () => {
 
   return (
     <Container className="member-dashboard py-5">
+      {/* User card */}
       <Card className="mb-4">
-        <Card.Header>
-          <div className="d-flex justify-content-between align-items-center">
-            <h3>Welcome, {user.email}</h3>
-            <Button variant="outline-secondary" onClick={signOut}>
-              Sign Out
-            </Button>
-          </div>
+        <Card.Header className="d-flex justify-content-between align-items-center">
+          <h3>Welcome, {user.email}</h3>
+          <Button variant="outline-secondary" onClick={signOut}>
+            Sign Out
+          </Button>
         </Card.Header>
         <Card.Body>
           <p>
@@ -68,15 +75,16 @@ const MemberDashboard = () => {
         </Card.Body>
       </Card>
 
+      {/* Projects list */}
       <Card>
         <Card.Header>
           <h4>Your Projects</h4>
         </Card.Header>
         <Card.Body>
           {loading ? (
-            <Spinner animation="border" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </Spinner>
+            <div className="text-center">
+              <Spinner animation="border" role="status" />
+            </div>
           ) : error ? (
             <Alert variant="danger">Error: {error}</Alert>
           ) : projects.length === 0 ? (
@@ -86,8 +94,9 @@ const MemberDashboard = () => {
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Project Name</th>
-                  <th>Status</th>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Link</th>
                   <th>Created</th>
                 </tr>
               </thead>
@@ -96,7 +105,16 @@ const MemberDashboard = () => {
                   <tr key={proj.id}>
                     <td>{idx + 1}</td>
                     <td>{proj.name}</td>
-                    <td>{proj.status}</td>
+                    <td>{proj.description}</td>
+                    <td>
+                      {proj.link ? (
+                        <a href={proj.link} target="_blank" rel="noreferrer">
+                          View
+                        </a>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
                     <td>{new Date(proj.created_at).toLocaleDateString()}</td>
                   </tr>
                 ))}
