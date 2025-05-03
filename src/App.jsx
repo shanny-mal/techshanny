@@ -96,7 +96,7 @@ function LiveChat() {
     const s = document.createElement("script");
     s.id = "tawk-script";
     s.async = true;
-    s.src = `https://embed.tawk.to/${TAWK_ID}/default`;
+    s.src = `https://embed.tawk.to/${TAWK_ID}/1ikjpu2t1`;
     s.charset = "UTF-8";
     s.setAttribute("crossorigin", "*");
     document.body.appendChild(s);
