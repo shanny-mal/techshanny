@@ -1,0 +1,12 @@
+{
+  "welcome": "Welcome to ShannyTechSolutions",
+  "login": "Login",
+  "signup": "Sign Up",
+  "logout": "Sign Out",
+  "home": "Home",
+  "about": "About Us",
+  "contact": "Contact",
+  "blog": "Blog",
+  "loading": "Loading…",
+  "error": "An error occurred"
+}
