@@ -2,10 +2,10 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import axios from "axios";
+import { supabase } from "../../supabaseClient.js";
 import "./Blog.css";
 
-const API_URL = process.env.REACT_APP_CMS_API_URL;
+const PAGE_SIZE = 6;
 
 const BlogList = () => {
   const [posts, setPosts] = useState([]);
@@ -16,23 +16,23 @@ const BlogList = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       setLoading(true);
-      try {
-        const res = await axios.get(`${API_URL}/posts`, {
-          params: { _page: page, _limit: 6 },
-        });
-        setPosts((prev) => [...prev, ...res.data]);
-        if (res.data.length < 6) setHasMore(false);
-      } catch (err) {
-        console.error(err);
+      const from = (page - 1) * PAGE_SIZE;
+      const to = page * PAGE_SIZE - 1;
+      const { data, error } = await supabase
+        .from("posts")
+        .select("id, title, excerpt, image_url")
+        .order("created_at", { ascending: false })
+        .range(from, to);
+
+      if (error) console.error(error);
+      else {
+        setPosts((prev) => [...prev, ...data]);
+        if (data.length < PAGE_SIZE) setHasMore(false);
       }
       setLoading(false);
     };
     fetchPosts();
   }, [page]);
-
-  const prefetchNext = () => {
-    if (hasMore && !loading) setPage((prev) => prev + 1);
-  };
 
   return (
     <section id="blog" className="blog-section py-5">
@@ -49,9 +49,7 @@ const BlogList = () => {
           {posts.map((post) => (
             <article key={post.id} className="blog-card">
               <img
-                src={post.image}
-                srcSet={`${post.imageSmall} 600w, ${post.imageMedium} 900w, ${post.image} 1200w`}
-                sizes="(max-width: 600px) 100vw, 33vw"
+                src={post.image_url}
                 alt={post.title}
                 loading="lazy"
                 className="blog-card-img"
@@ -64,7 +62,9 @@ const BlogList = () => {
                 <Link
                   to={`/blog/${post.id}`}
                   className="read-more-btn"
-                  onMouseEnter={prefetchNext}
+                  onMouseEnter={() => {
+                    if (!loading && hasMore) setPage((p) => p + 1);
+                  }}
                 >
                   Read More
                 </Link>

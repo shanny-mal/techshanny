@@ -1,41 +1,65 @@
-import React from "react";
-import { Container, Card, Button } from "react-bootstrap";
+// src/components/Blog/Blog.jsx
+import React, { useState, useEffect } from "react";
+import { Container, Card, Button, Spinner } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { supabase } from "../../supabaseClient.js";
 import "./Blog.css";
 
-const blogPosts = [
-  {
-    id: 1,
-    title: "Innovative Trends in Web Development",
-    excerpt:
-      "Discover the latest trends and technologies shaping the future of web development.",
-    image: "/blog1.jpg",
-  },
-  {
-    id: 2,
-    title: "Optimizing Network Performance",
-    excerpt:
-      "Learn how to design and implement network solutions for maximum efficiency.",
-    image: "/blog2.jpg",
-  },
-  {
-    id: 3,
-    title: "Effective IT Consulting Strategies",
-    excerpt:
-      "Explore strategies that drive business success through innovative IT consulting.",
-    image: "/blog3.jpg",
-  },
-];
-
 const Blog = () => {
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchLatest = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("posts")
+        .select("id, title, excerpt, image_url")
+        .order("published_at", { ascending: false })
+        .limit(3);
+
+      if (error) {
+        console.error(error);
+        setError("Failed to load posts");
+      } else {
+        setPosts(data);
+      }
+      setLoading(false);
+    };
+
+    fetchLatest();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="blog-section py-5 text-center">
+        <Spinner animation="border" role="status" />
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="blog-section py-5 text-center">
+        <p className="text-danger">{error}</p>
+      </section>
+    );
+  }
+
   return (
     <section id="blog" className="blog-section py-5">
       <Container>
         <h2 className="blog-heading text-center mb-4">Latest Insights</h2>
         <div className="blog-grid">
-          {blogPosts.map((post) => (
+          {posts.map((post) => (
             <Card key={post.id} className="blog-card">
-              <Card.Img variant="top" src={post.image} loading="lazy" />
+              <Card.Img
+                variant="top"
+                src={post.image_url}
+                loading="lazy"
+                alt={post.title}
+              />
               <Card.Body>
                 <Card.Title>{post.title}</Card.Title>
                 <Card.Text>{post.excerpt}</Card.Text>

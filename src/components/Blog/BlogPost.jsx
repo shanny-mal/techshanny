@@ -2,28 +2,42 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import axios from "axios";
+import { supabase } from "../../supabaseClient.js";
+import { Container, Button } from "react-bootstrap";
 import "./BlogPostDetail.css";
-
-const API_URL = process.env.REACT_APP_CMS_API_URL;
 
 const BlogPost = () => {
   const { id } = useParams();
   const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get(`${API_URL}/posts/${id}`).then((res) => setPost(res.data));
+    const fetchPost = async () => {
+      const { data, error } = await supabase
+        .from("posts")
+        .select(
+          "id, title, content, excerpt, image_url, published_at, author_id ( name )"
+        )
+        .eq("id", id)
+        .single();
+
+      if (error) console.error(error);
+      else setPost(data);
+      setLoading(false);
+    };
+    fetchPost();
   }, [id]);
 
-  if (!post) return <p>Loading…</p>;
+  if (loading) return <p>Loading…</p>;
+  if (!post) return <p>Post not found</p>;
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: post.title,
-    image: post.image,
+    image: post.image_url,
     datePublished: post.published_at,
-    author: { "@type": "Person", name: post.author.name },
+    author: { "@type": "Person", name: post.author_id.name },
     mainEntityOfPage: { "@type": "WebPage", "@id": window.location.href },
   };
 
@@ -36,19 +50,19 @@ const BlogPost = () => {
       </Helmet>
       <h1>{post.title}</h1>
       <p className="meta">
-        By {post.author.name} on{" "}
+        By {post.author_id.name} on{" "}
         {new Date(post.published_at).toLocaleDateString()}
       </p>
       <img
-        src={post.image}
+        src={post.image_url}
         alt={post.title}
         className="detail-image mb-4"
         loading="lazy"
       />
       <div dangerouslySetInnerHTML={{ __html: post.content }} />
-      <Link to="/blog" className="btn btn-secondary mt-4">
+      <Button as={Link} to="/blog" variant="secondary" className="mt-4">
         Back to Blog
-      </Link>
+      </Button>
     </Container>
   );
 };
