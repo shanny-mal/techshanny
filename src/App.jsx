@@ -1,9 +1,13 @@
 // src/App.jsx
-import React, { useState, useEffect, Suspense, lazy } from "react";
+import React, { Suspense, lazy } from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Routes, Route } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css";
+
+// Contexts
+import { DarkModeProvider } from "./context/DarkModeContext";
+import { AuthProvider } from "./context/AuthContext";
 
 // Core (eager) imports
 import Header from "./components/Header/Header.jsx";
@@ -29,20 +33,17 @@ const Testimonials = lazy(() =>
 const BlogList = lazy(() => import("./components/Blog/BlogList.jsx"));
 const BlogPost = lazy(() => import("./components/Blog/BlogPost.jsx"));
 
-// Pull your Tawk.to property ID from the Vite env
-const { VITE_TAWK_PROPERTY_ID } = import.meta.env;
+// Grab your Tawk.to ID from Vite env
+const TAWK_ID = import.meta.env.VITE_TAWK_PROPERTY_ID;
 
-// Error boundary to catch any rendering errors
+// Error boundary
 class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false };
-  }
+  state = { hasError: false };
   static getDerivedStateFromError() {
     return { hasError: true };
   }
   componentDidCatch(err, info) {
-    console.error("ErrorBoundary caught an error:", err, info);
+    console.error("ErrorBoundary caught:", err, info);
   }
   render() {
     if (this.state.hasError) {
@@ -52,7 +53,7 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-// Wrapper for lazy-loaded sections
+// Wrapper for suspense + error boundary
 function AsyncSection({ children, fallback }) {
   return (
     <ErrorBoundary>
@@ -63,7 +64,7 @@ function AsyncSection({ children, fallback }) {
   );
 }
 
-// Aggregate all homepage sections
+// The home page, composed of all sections
 function HomePage() {
   return (
     <>
@@ -71,10 +72,10 @@ function HomePage() {
       <About />
       <Services />
       <Portfolio />
-      <AsyncSection fallback={<span>Loading Testimonials…</span>}>
+      <AsyncSection fallback="Loading Testimonials…">
         <Testimonials />
       </AsyncSection>
-      <AsyncSection fallback={<span>Loading Blog Posts…</span>}>
+      <AsyncSection fallback="Loading Blog…">
         <BlogList />
       </AsyncSection>
       <Contact />
@@ -83,95 +84,11 @@ function HomePage() {
   );
 }
 
-function App() {
-  const [darkMode, setDarkMode] = useState(false);
-
-  // Init AOS once
-  useEffect(() => {
-    AOS.init({ duration: 1000, once: true });
-  }, []);
-
-  // Load & honor dark mode system preference or stored setting
-  useEffect(() => {
-    const stored = localStorage.getItem("darkMode");
-    if (stored === null) {
-      const prefers = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      setDarkMode(prefers);
-    } else {
-      setDarkMode(stored === "true");
-    }
-  }, []);
-
-  // Apply to <html> & persist
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark-mode", darkMode);
-    localStorage.setItem("darkMode", darkMode.toString());
-  }, [darkMode]);
-
-  return (
-    <HelmetProvider>
-      <Helmet>
-        <title>ShannyTechSolutions – Cutting-edge Technology Solutions</title>
-        <meta
-          name="description"
-          content="ShannyTechSolutions provides innovative technology solutions — from web development to IT consulting."
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </Helmet>
-
-      <Header />
-      <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
-
-      <Routes>
-        {/* Public pages */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-
-        {/* Protected member area */}
-        <Route
-          path="/member"
-          element={
-            <RequireAuth>
-              <MemberDashboard />
-            </RequireAuth>
-          }
-        />
-
-        {/* Blog pages */}
-        <Route
-          path="/blog"
-          element={
-            <AsyncSection fallback={<span>Loading Blog…</span>}>
-              <BlogList />
-            </AsyncSection>
-          }
-        />
-        <Route
-          path="/blog/:id"
-          element={
-            <AsyncSection fallback={<span>Loading Article…</span>}>
-              <BlogPost />
-            </AsyncSection>
-          }
-        />
-
-        {/* 404 Fallback */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-
-      <LiveChat />
-    </HelmetProvider>
-  );
-}
-
-// A small component to inject the Tawk.to embed script
+// Live chat snippet injector
 function LiveChat() {
-  useEffect(() => {
-    if (!VITE_TAWK_PROPERTY_ID) {
-      console.warn(
-        "Tawk.to property ID not set in .env (VITE_TAWK_PROPERTY_ID)"
-      );
+  React.useEffect(() => {
+    if (!TAWK_ID) {
+      console.warn("Missing VITE_TAWK_PROPERTY_ID in .env");
       return;
     }
     if (document.getElementById("tawk-script")) return;
@@ -179,18 +96,84 @@ function LiveChat() {
     const s = document.createElement("script");
     s.id = "tawk-script";
     s.async = true;
-    s.src = `https://embed.tawk.to/${VITE_TAWK_PROPERTY_ID}/default`;
+    s.src = `https://embed.tawk.to/${TAWK_ID}/default`;
     s.charset = "UTF-8";
     s.setAttribute("crossorigin", "*");
     document.body.appendChild(s);
 
-    // Cleanup on unmount
-    return () => {
-      document.getElementById("tawk-script")?.remove();
-    };
+    return () => document.getElementById("tawk-script")?.remove();
   }, []);
 
   return null;
+}
+
+function App() {
+  // AOS init once
+  React.useEffect(() => {
+    AOS.init({ duration: 1000, once: true });
+  }, []);
+
+  return (
+    <HelmetProvider>
+      <Helmet>
+        <title>ShannyTechSolutions – Cutting-edge Technology Solutions</title>
+        <meta
+          name="description"
+          content="ShannyTechSolutions provides innovative technology solutions—from web development to IT consulting."
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Helmet>
+
+      {/* Wrap the entire app in both Auth and DarkMode contexts */}
+      <AuthProvider>
+        <DarkModeProvider>
+          <Header />
+          {/* Anywhere in your tree, you can render a toggle */}
+          <DarkModeToggle />
+
+          <Routes>
+            {/* Public */}
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+
+            {/* Protected */}
+            <Route
+              path="/member"
+              element={
+                <RequireAuth>
+                  <MemberDashboard />
+                </RequireAuth>
+              }
+            />
+
+            {/* Blog */}
+            <Route
+              path="/blog"
+              element={
+                <AsyncSection fallback="Loading Blog…">
+                  <BlogList />
+                </AsyncSection>
+              }
+            />
+            <Route
+              path="/blog/:id"
+              element={
+                <AsyncSection fallback="Loading Article…">
+                  <BlogPost />
+                </AsyncSection>
+              }
+            />
+
+            {/* 404 */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+
+          <LiveChat />
+        </DarkModeProvider>
+      </AuthProvider>
+    </HelmetProvider>
+  );
 }
 
 export default App;

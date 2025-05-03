@@ -1,40 +1,26 @@
 // src/components/DarkModeToggle/DarkModeToggle.jsx
-import React, { useEffect } from "react";
+import React from "react";
 import { FaSun, FaMoon } from "react-icons/fa";
 import "./DarkModeToggle.css";
 
-const DarkModeToggle = ({ darkMode, setDarkMode }) => {
-  // Detect system preference on first load if no stored preference
-  useEffect(() => {
-    const stored = localStorage.getItem("darkMode");
-    if (stored === null) {
-      const prefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)"
-      ).matches;
-      setDarkMode(prefersDark);
-    }
-  }, [setDarkMode]);
-
-  // Apply dark-mode class to <html> and persist
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark-mode", darkMode);
-    localStorage.setItem("darkMode", darkMode);
-  }, [darkMode]);
-
-  const toggleMode = () => {
-    setDarkMode((prev) => !prev);
-  };
-
+export default function DarkModeToggle({ darkMode, setDarkMode }) {
   return (
     <button
-      className="dark-mode-toggle"
-      onClick={toggleMode}
+      type="button"
+      className={`dark-mode-toggle ${darkMode ? "dark" : ""}`}
+      onClick={() => setDarkMode((prev) => !prev)}
       aria-pressed={darkMode}
-      aria-label="Toggle dark mode"
+      aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
     >
-      {darkMode ? <FaSun /> : <FaMoon />}
+      {/* visually hidden for screen readers */}
+      <span className="sr-only">
+        {darkMode ? "Switch to light mode" : "Switch to dark mode"}
+      </span>
+      <div className="toggle-track">
+        <FaSun className="icon sun" />
+        <FaMoon className="icon moon" />
+        <span className="toggle-thumb" />
+      </div>
     </button>
   );
-};
-
-export default DarkModeToggle;
+}

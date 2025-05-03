@@ -1,34 +1,117 @@
 /* src/components/DarkModeToggle/DarkModeToggle.css */
+
+/* fallback variables */
 :root {
-  --toggle-bg-light: rgba(255, 255, 255, 0.8);
-  --toggle-bg-dark: rgba(0, 0, 0, 0.6);
-  --toggle-color-light: #000000;
-  --toggle-color-dark: #ffffff;
+  --toggle-w: 3rem;
+  --toggle-h: 1.6rem;
+  --thumb-d: 1.3rem;
+  --track-bg: rgba(255, 255, 255, 0.25);
+  --track-bg-dark: rgba(0, 0, 0, 0.35);
+  --thumb-bg: #ffffff;
+  --thumb-bg-dark: #222222;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-inset: inset 0 0 6px rgba(0,0,0,0.2);
 }
 
+/* reset */
 .dark-mode-toggle {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  z-index: 999;
-  background: var(--toggle-bg-light);
-  color: var(--toggle-color-light);
+  background: none;
   border: none;
-  padding: 0.5rem;
-  border-radius: 50%;
-  font-size: 1.25rem;
+  padding: 0;
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
-}
-.dark-mode-toggle:hover,
-.dark-mode-toggle:focus {
-  transform: scale(1.1);
-  outline: 3px solid var(--mocha-primary);
-  outline-offset: 2px;
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 999;
 }
 
-/* Dark mode override */
-html.dark-mode .dark-mode-toggle {
-  background: var(--toggle-bg-dark);
-  color: var(--toggle-color-dark);
+/* track (frosted‑glass) */
+.dark-mode-toggle .toggle-track {
+  width: var(--toggle-w);
+  height: var(--toggle-h);
+  background: var(--track-bg);
+  backdrop-filter: blur(6px);
+  border-radius: var(--toggle-h);
+  box-shadow: var(--shadow-inset);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.3rem;
+  transition: background 0.3s ease;
+}
+
+/* dark mode track bg */
+.dark-mode-toggle.dark .toggle-track {
+  background: var(--track-bg-dark);
+}
+
+/* thumb */
+.dark-mode-toggle .toggle-thumb {
+  width: var(--thumb-d);
+  height: var(--thumb-d);
+  background: var(--thumb-bg);
+  border-radius: 50%;
+  box-shadow: var(--shadow-sm);
+  position: absolute;
+  top: 50%;
+  left: 0.15rem;
+  transform: translateY(-50%);
+  transition: left 0.3s ease, background 0.3s ease;
+}
+
+/* move thumb in dark mode */
+.dark-mode-toggle.dark .toggle-thumb {
+  left: calc(100% - var(--thumb-d) - 0.15rem);
+  background: var(--thumb-bg-dark);
+}
+
+/* in‑track icons */
+.dark-mode-toggle .icon {
+  font-size: 0.9rem;
+  pointer-events: none;
+  opacity: 0.6;
+  transition: color 0.3s, opacity 0.3s;
+}
+.dark-mode-toggle .icon.sun {
+  color: #f1c40f;
+}
+.dark-mode-toggle .icon.moon {
+  color: #f39c12;
+}
+/* brighten active icon */
+.dark-mode-toggle .sun {
+  opacity: 1;
+}
+.dark-mode-toggle.dark .sun {
+  opacity: 0.4;
+}
+.dark-mode-toggle.dark .moon {
+  opacity: 1;
+}
+
+/* keyboard focus */
+.dark-mode-toggle:focus-visible .toggle-track {
+  outline: 3px solid var(--thumb-bg-dark);
+  outline-offset: 3px;
+}
+
+/* responsive shrink on mobile */
+@media (max-width: 576px) {
+  :root {
+    --toggle-w: 2.5rem;
+    --toggle-h: 1.4rem;
+    --thumb-d: 1.1rem;
+  }
+  .dark-mode-toggle {
+    top: 0.5rem;
+    right: 0.5rem;
+  }
+}
+
+/* hide when printing */
+@media print {
+  .dark-mode-toggle {
+    display: none;
+  }
 }

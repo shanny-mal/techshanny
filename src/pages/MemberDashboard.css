@@ -1,96 +1,40 @@
 /* src/pages/MemberDashboard.css */
-
-/* Container for the dashboard page */
 .member-dashboard {
-  max-width: 1200px;
-  margin: 0 auto;
+  max-width: 1000px;
+  margin: auto;
   padding: 2rem 1rem;
 }
 
-/* Welcome card styling */
-.member-dashboard .card {
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  margin-bottom: 2rem;
-  background-color: var(--bg-light);
-  color: var(--text-dark);
-}
-
+/* Header card */
 .member-dashboard .card-header {
-  background-color: var(--mocha-secondary);
-  color: var(--text-light);
-  border-bottom: none;
-  padding: 1rem 1.5rem;
-  font-size: 1.25rem;
+  background: var(--bs-primary);
+  color: #fff;
 }
-
-.member-dashboard .card-body {
-  padding: 1.5rem;
-  line-height: 1.6;
-}
-
-.member-dashboard h3,
-.member-dashboard h4 {
+.member-dashboard .card-header h1 {
   margin: 0;
 }
 
-/* Table styling */
-.member-dashboard table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.95rem;
+/* Tab styling */
+.nav-tabs .nav-link {
+  font-weight: 500;
+}
+.nav-tabs .nav-link:focus {
+  outline: 3px solid var(--bs-primary);
 }
 
-.member-dashboard thead th {
-  background-color: var(--mocha-primary);
-  color: var(--text-light);
+/* Dashboard list */
+.dashboard-list {
+  list-style: none;
+  padding: 0;
+}
+.dashboard-list li {
+  margin-bottom: 1rem;
+}
+
+/* Statistic & quick actions */
+/* (re-use your existing stat-card styles if present) */
+
+/* Modal overrides */
+.modal-title {
   font-weight: 600;
-  padding: 0.75rem;
-  text-align: left;
-}
-
-.member-dashboard tbody tr:nth-child(even) {
-  background-color: var(--bg-light);
-}
-
-.member-dashboard tbody td {
-  padding: 0.75rem;
-  border-bottom: 1px solid var(--mocha-light);
-}
-
-.member-dashboard .table-responsive {
-  overflow-x: auto;
-}
-
-/* Spinner centering */
-.member-dashboard .spinner-border {
-  display: block;
-  margin: 2rem auto;
-}
-
-/* Alert overrides */
-.member-dashboard .alert {
-  margin-top: 1rem;
-}
-
-/* Sign out button alignment */
-.member-dashboard .card-header .btn-outline-secondary {
-  font-size: 0.9rem;
-  padding: 0.5rem 1rem;
-}
-
-/* Dark mode overrides */
-html.dark-mode .member-dashboard .card,
-html.dark-mode .member-dashboard tbody tr:nth-child(even) {
-  background-color: var(--bg-dark) !important;
-  color: var(--text-light);
-}
-
-html.dark-mode .member-dashboard thead th {
-  background-color: var(--mocha-secondary) !important;
-}
-
-html.dark-mode .member-dashboard tbody td,
-html.dark-mode .member-dashboard .card-body {
-  border-color: var(--mocha-light) !important;
 }
