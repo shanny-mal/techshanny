@@ -165,7 +165,7 @@ function App() {
 // Tawk.to live chat integration
 function LiveChat() {
   useEffect(() => {
-    const propertyId = import.meta.env.VITE_TAWK_PROPERTY_ID;
+    const id = import.meta.env.VITE_TAWK_PROPERTY_ID;
     if (!propertyId) {
       console.warn("Tawk.to property ID not set in .env");
       return;
@@ -175,7 +175,7 @@ function LiveChat() {
     const s = document.createElement("script");
     s.id = "tawk-script";
     s.async = true;
-    s.src = `https://embed.tawk.to/${propertyId}/default`;
+    s.src = `https://embed.tawk.to/${id}/default`;
     s.charset = "UTF-8";
     s.setAttribute("crossorigin", "*");
     document.body.appendChild(s);

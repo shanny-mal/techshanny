@@ -21,9 +21,9 @@ const BlogList = () => {
       const { data, error } = await supabase
         .from("posts")
         .select("id, title, excerpt, image_url")
-        .order("created_at", { ascending: false })
-        .range(from, to);
-
+        .order("published_at", { ascending: false })
+            .range(0, 5); // instead of offset/limit
+        
       if (error) console.error(error);
       else {
         setPosts((prev) => [...prev, ...data]);
