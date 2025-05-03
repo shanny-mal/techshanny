@@ -29,7 +29,10 @@ const Testimonials = lazy(() =>
 const BlogList = lazy(() => import("./components/Blog/BlogList.jsx"));
 const BlogPost = lazy(() => import("./components/Blog/BlogPost.jsx"));
 
-// Error boundary
+// Pull your Tawk.to property ID from the Vite env
+const { VITE_TAWK_PROPERTY_ID } = import.meta.env;
+
+// Error boundary to catch any rendering errors
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -38,8 +41,8 @@ class ErrorBoundary extends React.Component {
   static getDerivedStateFromError() {
     return { hasError: true };
   }
-  componentDidCatch(error, info) {
-    console.error("ErrorBoundary caught an error:", error, info);
+  componentDidCatch(err, info) {
+    console.error("ErrorBoundary caught an error:", err, info);
   }
   render() {
     if (this.state.hasError) {
@@ -49,7 +52,7 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-// Suspense + ErrorBoundary wrapper
+// Wrapper for lazy-loaded sections
 function AsyncSection({ children, fallback }) {
   return (
     <ErrorBoundary>
@@ -60,7 +63,7 @@ function AsyncSection({ children, fallback }) {
   );
 }
 
-// Home page aggregator
+// Aggregate all homepage sections
 function HomePage() {
   return (
     <>
@@ -83,7 +86,7 @@ function HomePage() {
 function App() {
   const [darkMode, setDarkMode] = useState(false);
 
-  // AOS init once
+  // Init AOS once
   useEffect(() => {
     AOS.init({ duration: 1000, once: true });
   }, []);
@@ -153,7 +156,7 @@ function App() {
           }
         />
 
-        {/* Fallback 404 */}
+        {/* 404 Fallback */}
         <Route path="*" element={<NotFound />} />
       </Routes>
 
@@ -162,35 +165,30 @@ function App() {
   );
 }
 
-// Tawk.to live chat integration
+// A small component to inject the Tawk.to embed script
 function LiveChat() {
-  // Read the env var into a constant
-  const TAWK_PROPERTY_ID = import.meta.env.VITE_TAWK_PROPERTY_ID;
-
   useEffect(() => {
-    // If missing, warn and exit
-    if (!TAWK_PROPERTY_ID) {
+    if (!VITE_TAWK_PROPERTY_ID) {
       console.warn(
         "Tawk.to property ID not set in .env (VITE_TAWK_PROPERTY_ID)"
       );
       return;
     }
-    // Prevent multiple script inserts
     if (document.getElementById("tawk-script")) return;
 
     const s = document.createElement("script");
     s.id = "tawk-script";
     s.async = true;
-    s.src = `https://embed.tawk.to/${TAWK_PROPERTY_ID}/default`;
+    s.src = `https://embed.tawk.to/${VITE_TAWK_PROPERTY_ID}/default`;
     s.charset = "UTF-8";
     s.setAttribute("crossorigin", "*");
     document.body.appendChild(s);
 
+    // Cleanup on unmount
     return () => {
-      // Clean up if unmounted
       document.getElementById("tawk-script")?.remove();
     };
-  }, [TAWK_PROPERTY_ID]);
+  }, []);
 
   return null;
 }
