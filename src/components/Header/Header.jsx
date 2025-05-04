@@ -12,60 +12,83 @@ const Header = () => {
   const { user, signOut } = useAuth();
   const { darkMode, setDarkMode } = useDarkMode();
   const [expanded, setExpanded] = useState(false);
-  const [shrink, setShrink] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const { pathname } = useLocation();
 
   // shrink on scroll
   useEffect(() => {
-    const onScroll = () => setShrink(window.scrollY > 40);
+    const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // auto‐close mobile menu on nav change
+  // close mobile menu on nav change
   useEffect(() => {
     setExpanded(false);
   }, [pathname]);
 
   return (
     <header
-      className={`header ${shrink ? "shrink" : ""} ${darkMode ? "dark" : ""}`}
-      role="navigation"
+      className={`header
+        ${scrolled ? "header--shrink" : ""}
+        ${darkMode ? "header--dark" : ""}`}
+      role="banner"
     >
+      {/* Skip link */}
+      <a href="#main" className="skip-to-content">
+        Skip to main content
+      </a>
+
       <Navbar
         expand="lg"
         expanded={expanded}
-        onToggle={setExpanded}
-        className="modern-navbar"
+        onToggle={() => setExpanded(!expanded)}
+        className="header__navbar"
       >
         <Container>
-          <Navbar.Brand as={Link} to="/" className="brand">
-            <div className="logo-circle">
-              <img src="/logo.png" alt="ShannyTechSolutions Logo" />
+          <Navbar.Brand as={Link} to="/" className="header__brand">
+            <div className="header__logo-circle">
+              <img
+                src="/logo.png"
+                alt="ShannyTechSolutions Logo"
+                className="header__logo"
+              />
             </div>
-            <span>ShannyTechSolutions</span>
+            <span className="header__brand-text">ShannyTechSolutions</span>
           </Navbar.Brand>
 
-          <Navbar.Toggle aria-controls="main-nav" />
+          <Navbar.Toggle
+            aria-controls="main-nav"
+            aria-expanded={expanded}
+            className="header__toggler"
+            aria-label="Toggle navigation"
+          />
 
-          <Navbar.Collapse id="main-nav" className="justify-content-end">
-            <Nav className="align-items-center">
-              {/* hide these when logged in */}
+          <Navbar.Collapse
+            id="main-nav"
+            className={`header__collapse ${expanded ? "show" : ""}`}
+          >
+            <Nav className="header__nav" role="menubar">
+              {/* only show these when NOT authenticated */}
               {!user && (
                 <>
-                  <Nav.Link as={NavLink} to="/" end className="nav-link">
+                  <Nav.Link as={NavLink} to="/" end className="header__link">
                     Home
                   </Nav.Link>
-                  <Nav.Link as={NavLink} to="/blog" className="nav-link">
+                  <Nav.Link as={NavLink} to="/blog" className="header__link">
                     Blog
                   </Nav.Link>
-                  <Nav.Link as={NavLink} to="/resources" className="nav-link">
+                  <Nav.Link
+                    as={NavLink}
+                    to="/resources"
+                    className="header__link"
+                  >
                     Resources
                   </Nav.Link>
                   <Nav.Link
                     as={NavLink}
                     to="/case-studies"
-                    className="nav-link"
+                    className="header__link"
                   >
                     Case Studies
                   </Nav.Link>
@@ -75,7 +98,8 @@ const Header = () => {
               <NavDropdown
                 title="Tools"
                 id="tools-dropdown"
-                className="nav-link"
+                className="header__link header__dropdown"
+                menuVariant={darkMode ? "dark" : "light"}
               >
                 <NavDropdown.Item as={NavLink} to="/tools/roi">
                   ROI Calculator
@@ -85,33 +109,36 @@ const Header = () => {
                 </NavDropdown.Item>
               </NavDropdown>
 
-              <Nav.Link as={NavLink} to="/member" className="nav-link">
+              <Nav.Link as={NavLink} to="/member" className="header__link">
                 {user ? "Dashboard" : "Member"}
               </Nav.Link>
 
               {user ? (
-                <Nav.Link onClick={signOut} className="nav-link">
+                <Nav.Link
+                  onClick={signOut}
+                  className="header__link header__link--action"
+                >
                   Logout
                 </Nav.Link>
               ) : (
                 <>
-                  <Nav.Link as={NavLink} to="/login" className="nav-link">
+                  <Nav.Link as={NavLink} to="/login" className="header__link">
                     Login
                   </Nav.Link>
                   <Nav.Link
                     as={NavLink}
                     to="/signup"
-                    className="nav-link signup-btn"
+                    className="header__link header__link--signup"
                   >
                     Sign Up
                   </Nav.Link>
                 </>
               )}
 
-              <div className="nav-icon">
+              <div className="header__icon">
                 <LanguageSwitcher />
               </div>
-              <div className="nav-icon">
+              <div className="header__icon">
                 <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
               </div>
             </Nav>

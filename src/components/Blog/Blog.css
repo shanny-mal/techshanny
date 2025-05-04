@@ -1,12 +1,12 @@
 .blog-section {
-  background-color: #f5f3ee; /* Light background for contrast */
+  background-color: #f5f3ee;
   padding: 80px 0;
 }
 
 .blog-heading {
   font-size: 2.8rem;
   font-weight: 700;
-  color: #3E2723;
+  color: #3e2723;
   position: relative;
   margin-bottom: 40px;
 }
@@ -15,7 +15,7 @@
   content: "";
   width: 80px;
   height: 4px;
-  background: #A67B5B; /* Mocha accent */
+  background: #a67b5b;
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
@@ -23,10 +23,9 @@
   border-radius: 2px;
 }
 
-/* Using CSS Grid for a bento-style layout */
 .blog-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 1.5rem;
 }
 
@@ -35,7 +34,7 @@
   border-radius: 12px;
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  background: #fff;
+  background: #ffffff;
 }
 
 .blog-card:hover {
@@ -43,12 +42,24 @@
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
 }
 
+.blog-card-img {
+  height: 180px;
+  object-fit: cover;
+}
+
 .read-more-btn {
-  background-color: #A67B5B;
+  background-color: #a67b5b;
   border: none;
   transition: background-color 0.3s ease;
 }
 
 .read-more-btn:hover {
-  background-color: #8F5E42;
+  background-color: #8f5e42;
+}
+
+/* Responsive tweaks */
+@media (max-width: 576px) {
+  .blog-card-img {
+    height: 140px;
+  }
 }

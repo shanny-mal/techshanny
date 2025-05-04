@@ -1,16 +1,15 @@
-import React, { useContext } from "react";
+// src/components/Auth/RequireAuth.jsx
+import React from "react";
 import { Navigate } from "react-router-dom";
-import { AuthContext } from "../../context/AuthContext";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 export default function RequireAuth({ children }) {
-  const { user, loading } = useContext(AuthContext);
+  const { user, loading } = useAuth();
 
   if (loading) {
-    // still determining auth state
     return <p>Loading…</p>;
   }
   if (!user) {
-    // not signed in → redirect to login
     return <Navigate to="/login" replace />;
   }
   return children;

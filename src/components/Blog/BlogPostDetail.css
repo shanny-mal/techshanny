@@ -1,11 +1,51 @@
 .blog-post-detail {
-  color: #3E2723;
   background-color: #f5f3ee;
+  color: #3e2723;
+  padding-bottom: 4rem;
+}
+
+.post-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.meta {
+  color: #6c757d;
+  margin-bottom: 1.5rem;
+  font-style: italic;
 }
 
 .detail-image {
   width: 100%;
   max-width: 800px;
-  margin: 20px 0;
   border-radius: 8px;
+  object-fit: cover;
+}
+
+.post-content {
+  line-height: 1.7;
+  margin-top: 1.5rem;
+}
+
+/* Formatting for markdown‑style content */
+.post-content h2,
+.post-content h3 {
+  margin-top: 1.5rem;
+  color: #5d4037;
+}
+.post-content p {
+  margin-bottom: 1rem;
+}
+.post-content blockquote {
+  border-left: 4px solid #a67b5b;
+  padding-left: 1rem;
+  color: #5d4037;
+  font-style: italic;
+}
+.post-content pre {
+  background: #eeeeee;
+  padding: 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
 }

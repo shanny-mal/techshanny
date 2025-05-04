@@ -18,16 +18,16 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const initSession = async () => {
+    // 1) get initial session
+    (async () => {
       const { data, error } = await supabase.auth.getSession();
       if (error) console.error("getSession error:", error.message);
       setSession(data.session);
       setUser(data.session?.user ?? null);
       setLoading(false);
-    };
+    })();
 
-    initSession();
-
+    // 2) subscribe to changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, newSession) => {
@@ -36,23 +36,15 @@ export const AuthProvider = ({ children }) => {
       setUser(newSession?.user ?? null);
     });
 
-    return () => {
-      subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
   const signUp = async (email, password) => {
     if (!email || !password) throw new Error("Email and password are required");
     setLoading(true);
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+    const { data, error } = await supabase.auth.signUp({ email, password });
     setLoading(false);
-    if (error) {
-      console.error("signUp error:", error.message);
-      throw error;
-    }
+    if (error) throw error;
     return data;
   };
 
@@ -64,36 +56,27 @@ export const AuthProvider = ({ children }) => {
       password,
     });
     setLoading(false);
-    if (error) {
-      console.error("signIn error:", error.message);
-      throw error;
-    }
+    if (error) throw error;
     return data;
+  };
+
+  const signInWithGoogle = async () => {
+    // redirect back to /member on success
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.origin + "/member" },
+    });
+    if (error) throw error;
   };
 
   const signOut = async () => {
     setLoading(true);
     const { error } = await supabase.auth.signOut();
     setLoading(false);
-    if (error) {
-      console.error("signOut error:", error.message);
-      throw error;
-    }
+    if (error) throw error;
   };
 
-  const signInWithGoogle = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-    });
-    if (error) {
-      console.error("Google sign-in error:", error.message);
-      throw error;
-    }
-  };
-
-  if (loading) {
-    return <p>Loading authentication…</p>;
-  }
+  if (loading) return <p>Loading authentication…</p>;
 
   return (
     <AuthContext.Provider

@@ -1,6 +1,13 @@
-// src/components/Blog/Blog.jsx
 import React, { useState, useEffect } from "react";
-import { Container, Card, Button, Spinner } from "react-bootstrap";
+import {
+  Container,
+  Card,
+  Button,
+  Spinner,
+  Alert,
+  Row,
+  Col,
+} from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { supabase } from "../../supabaseClient.js";
 import "./Blog.css";
@@ -11,24 +18,30 @@ const Blog = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    let isMounted = true;
     const fetchLatest = async () => {
       setLoading(true);
+      setError(null);
       const { data, error } = await supabase
         .from("posts")
         .select("id, title, excerpt, image_url")
         .order("published_at", { ascending: false })
         .limit(3);
 
+      if (!isMounted) return;
       if (error) {
         console.error(error);
         setError("Failed to load posts");
       } else {
-        setPosts(data);
+        setPosts(data || []);
       }
       setLoading(false);
     };
 
     fetchLatest();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   if (loading) {
@@ -42,7 +55,7 @@ const Blog = () => {
   if (error) {
     return (
       <section className="blog-section py-5 text-center">
-        <p className="text-danger">{error}</p>
+        <Alert variant="danger">{error}</Alert>
       </section>
     );
   }
@@ -51,30 +64,35 @@ const Blog = () => {
     <section id="blog" className="blog-section py-5">
       <Container>
         <h2 className="blog-heading text-center mb-4">Latest Insights</h2>
-        <div className="blog-grid">
-          {posts.map((post) => (
-            <Card key={post.id} className="blog-card">
-              <Card.Img
-                variant="top"
-                src={post.image_url}
-                loading="lazy"
-                alt={post.title}
-              />
-              <Card.Body>
-                <Card.Title>{post.title}</Card.Title>
-                <Card.Text>{post.excerpt}</Card.Text>
-                <Button
-                  variant="primary"
-                  as={Link}
-                  to={`/blog/${post.id}`}
-                  className="read-more-btn"
-                >
-                  Read More
-                </Button>
-              </Card.Body>
-            </Card>
+        <Row className="blog-grid">
+          {posts.map((post, idx) => (
+            <Col key={`${post.id}-${idx}`} xs={12} md={6} lg={4}>
+              <Card className="blog-card h-100">
+                {post.image_url && (
+                  <Card.Img
+                    variant="top"
+                    src={post.image_url}
+                    alt={post.title}
+                    loading="lazy"
+                    className="blog-card-img"
+                  />
+                )}
+                <Card.Body className="d-flex flex-column">
+                  <Card.Title>{post.title}</Card.Title>
+                  <Card.Text className="flex-grow-1">{post.excerpt}</Card.Text>
+                  <Button
+                    variant="primary"
+                    as={Link}
+                    to={`/blog/${post.id}`}
+                    className="read-more-btn mt-3 align-self-start"
+                  >
+                    Read More →
+                  </Button>
+                </Card.Body>
+              </Card>
+            </Col>
           ))}
-        </div>
+        </Row>
       </Container>
     </section>
   );

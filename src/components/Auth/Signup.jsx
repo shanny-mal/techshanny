@@ -1,5 +1,5 @@
 // src/components/Auth/Signup.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useNavigate, Link } from "react-router-dom";
 import "./Auth.css";
@@ -10,42 +10,52 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPwd] = useState("");
   const [error, setError] = useState("");
+  const errorRef = useRef();
 
-  // If already logged in, send to dashboard
+  // Redirect if already logged in
   useEffect(() => {
     if (!loading && user) {
       navigate("/member", { replace: true });
     }
   }, [user, loading, navigate]);
 
+  // Focus error
+  useEffect(() => {
+    if (error && errorRef.current) errorRef.current.focus();
+  }, [error]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     try {
-      // signUp returns { user, session }
-      const { user: newUser, session } = await signUp(email.trim(), password);
-      // On success, go straight to member area
+      await signUp(email.trim(), password);
       navigate("/member", { replace: true });
     } catch (err) {
-      // err.message contains Supabase error
       setError(err.message || "An unexpected error occurred");
     }
   };
 
-  // While checking auth state, show loading
-  if (loading) {
-    return <p>Loading…</p>;
-  }
+  if (loading) return <p>Loading…</p>;
 
   return (
     <div className="auth-container">
       <h2>Create an Account</h2>
       {error && (
-        <p role="alert" className="error">
+        <p
+          ref={errorRef}
+          role="alert"
+          aria-live="assertive"
+          tabIndex={-1}
+          className="error"
+        >
           {error}
         </p>
       )}
-      <form className="auth-form" onSubmit={handleSubmit}>
+      <form
+        className="auth-form"
+        onSubmit={handleSubmit}
+        aria-describedby={error ? "signup-error" : undefined}
+      >
         <label htmlFor="signup-email">Email</label>
         <input
           id="signup-email"

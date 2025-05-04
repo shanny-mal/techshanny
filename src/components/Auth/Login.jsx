@@ -1,5 +1,5 @@
 // src/components/Auth/Login.jsx
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
 import "./Auth.css";
@@ -10,14 +10,20 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPwd] = useState("");
   const [error, setError] = useState("");
+  const errorRef = useRef();
+
+  // Focus the error message on change
+  useEffect(() => {
+    if (error && errorRef.current) {
+      errorRef.current.focus();
+    }
+  }, [error]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     try {
-      // signIn throws on error
       await signIn(email.trim(), password);
-      // direct navigation on success
       navigate("/member", { replace: true });
     } catch (err) {
       setError(err.message);
@@ -27,9 +33,7 @@ const Login = () => {
   const handleGoogleSignIn = async () => {
     setError("");
     try {
-      // signInWithGoogle throws on error
       await signInWithGoogle();
-      // navigate on success
       navigate("/member", { replace: true });
     } catch (err) {
       setError(err.message);
@@ -39,9 +43,23 @@ const Login = () => {
   return (
     <div className="auth-container">
       <h2>Login to Your Account</h2>
-      {error && <p className="error">{error}</p>}
+      {error && (
+        <p
+          ref={errorRef}
+          role="alert"
+          aria-live="assertive"
+          tabIndex={-1}
+          className="error"
+        >
+          {error}
+        </p>
+      )}
 
-      <form className="auth-form" onSubmit={handleSubmit}>
+      <form
+        className="auth-form"
+        onSubmit={handleSubmit}
+        aria-describedby={error ? "login-error" : undefined}
+      >
         <label htmlFor="login-email">Email</label>
         <input
           id="login-email"
