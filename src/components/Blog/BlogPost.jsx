@@ -14,11 +14,12 @@ import { supabase } from "../../supabaseClient.js";
 import { useAuth } from "../../context/AuthContext.jsx";
 import "./BlogPostDetail.css";
 
-const BlogPost = () => {
+export default function BlogPost() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, updatePost, deletePost } = useAuth();
   const [post, setPost] = useState(null);
+  const [authorName, setAuthorName] = useState("");
   const [loading, setLoading] = useState(true);
   const [showEdit, setShowEdit] = useState(false);
   const [formData, setFormData] = useState({
@@ -30,28 +31,52 @@ const BlogPost = () => {
   const [error, setError] = useState(null);
   const formRef = useRef();
 
+  // Fetch post + author
   useEffect(() => {
-    const fetchPost = async () => {
+    const fetchData = async () => {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("posts")
-        .select(
-          "id, title, excerpt, content, image_url, published_at, author_id"
-        )
-        .eq("id", id)
-        .single();
-      if (error) setError(error.message);
-      else setPost(data);
-      setLoading(false);
+      try {
+        // 1) fetch the post
+        const { data: p, error: postErr } = await supabase
+          .from("posts")
+          .select(
+            "id, title, excerpt, content, image_url, published_at, author_id"
+          )
+          .eq("id", id)
+          .single();
+        if (postErr) throw postErr;
+        setPost(p);
+
+        // 2) fetch the author profile
+        const { data: prof, error: profErr } = await supabase
+          .from("profiles")
+          // your FK column is user_id in profiles
+          .select("name, full_name")
+          .eq("user_id", p.author_id)
+          .maybeSingle();
+        if (!profErr && prof) {
+          // use whichever field you actually have
+          setAuthorName(prof.full_name || prof.name || "");
+        }
+      } catch (err) {
+        console.error("Fetch error:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
     };
-    fetchPost();
+    fetchData();
   }, [id]);
 
   const handleDelete = async () => {
-    if (!window.confirm("Delete this post?")) return;
-    const { error } = await supabase.from("posts").delete().eq("id", id);
-    if (error) setError(error.message);
-    else navigate("/blog");
+    if (!window.confirm("Are you sure you want to delete this post?")) return;
+    try {
+      await deletePost(id);
+      navigate("/blog");
+    } catch (err) {
+      console.error("Delete error:", err);
+      setError(err.message);
+    }
   };
 
   const openEdit = () => {
@@ -67,18 +92,19 @@ const BlogPost = () => {
   const handleSave = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase
-      .from("posts")
-      .update({ ...formData })
-      .eq("id", id);
-    if (error) setError(error.message);
-    else {
-      setPost({ ...post, ...formData });
+    try {
+      await updatePost(id, formData);
+      setPost((prev) => ({ ...prev, ...formData }));
       setShowEdit(false);
+    } catch (err) {
+      console.error("Update error:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
+  // Trap focus when modal opens
   useEffect(() => {
     if (showEdit && formRef.current) {
       formRef.current.querySelector("input, textarea")?.focus();
@@ -86,13 +112,20 @@ const BlogPost = () => {
   }, [showEdit]);
 
   if (loading) return <Spinner className="m-5" />;
+
   if (error)
     return (
-      <Alert className="m-5" variant="danger">
-        {error}
-      </Alert>
+      <Container className="py-5">
+        <Alert variant="danger">{error}</Alert>
+      </Container>
     );
-  if (!post) return <Alert className="m-5">Post not found</Alert>;
+
+  if (!post)
+    return (
+      <Container className="py-5">
+        <Alert variant="warning">Post not found</Alert>
+      </Container>
+    );
 
   return (
     <Container className="blog-post-detail py-5">
@@ -103,19 +136,24 @@ const BlogPost = () => {
 
       <h1 className="post-title">{post.title}</h1>
       <p className="meta">
-        Published on {new Date(post.published_at).toLocaleDateString()}
+        {authorName && <>By {authorName} on </>}
+        {new Date(post.published_at).toLocaleDateString()}
       </p>
 
-      {user && user.id === post.author_id && (
-        <div className="mb-3">
+      {user?.id === post.author_id && (
+        <div className="mb-4 action-bar">
           <Button
             variant="outline-secondary"
-            className="me-2"
+            className="me-2 edit-btn"
             onClick={openEdit}
           >
             <FaEdit /> Edit
           </Button>
-          <Button variant="outline-danger" onClick={handleDelete}>
+          <Button
+            variant="outline-danger"
+            className="delete-btn"
+            onClick={handleDelete}
+          >
             <FaTrash /> Delete
           </Button>
         </div>
@@ -169,7 +207,7 @@ const BlogPost = () => {
               />
             </Form.Group>
             <Form.Group controlId="formImageUrl" className="mb-3">
-              <Form.Label>Image URL</Form.Label>
+              <Form.Label>Image URL</Form.Label>
               <Form.Control
                 type="url"
                 value={formData.image_url}
@@ -178,11 +216,11 @@ const BlogPost = () => {
                 }
               />
             </Form.Group>
-            <Form.Group controlId="formContent">
-              <Form.Label>Content</Form.Label>
+            <Form.Group controlId="formContent" className="mb-3">
+              <Form.Label>Content (HTML/Markdown)</Form.Label>
               <Form.Control
                 as="textarea"
-                rows={6}
+                rows={8}
                 value={formData.content}
                 onChange={(e) =>
                   setFormData((f) => ({ ...f, content: e.target.value }))
@@ -203,6 +241,4 @@ const BlogPost = () => {
       </Modal>
     </Container>
   );
-};
-
-export default BlogPost;
+}

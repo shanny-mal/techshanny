@@ -1,62 +1,65 @@
 .blog-post-detail {
   background-color: #f5f3ee;
   color: #3e2723;
-  padding: 3rem 1rem 4rem;
+  padding-bottom: 4rem;
 }
 
-.blog-post-detail .post-title {
+.post-title {
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
 }
 
-.blog-post-detail .meta {
+.meta {
   color: #6c757d;
   margin-bottom: 1.5rem;
   font-style: italic;
 }
 
-.blog-post-detail .detail-image {
+.action-bar {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.edit-btn,
+.delete-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.detail-image {
   width: 100%;
   max-width: 800px;
   border-radius: 8px;
   object-fit: cover;
-  margin-bottom: 1.5rem;
 }
 
-.blog-post-detail .post-content {
+.post-content {
   line-height: 1.7;
   margin-top: 1.5rem;
 }
 
-.blog-post-detail .post-content h2,
-.blog-post-detail .post-content h3 {
+.post-content h2,
+.post-content h3 {
   margin-top: 1.5rem;
   color: #5d4037;
 }
 
-.blog-post-detail .post-content p {
+.post-content p {
   margin-bottom: 1rem;
 }
 
-.blog-post-detail .post-content blockquote {
+.post-content blockquote {
   border-left: 4px solid #a67b5b;
   padding-left: 1rem;
-  margin: 1rem 0;
   color: #5d4037;
   font-style: italic;
 }
 
-.blog-post-detail .post-content pre {
+.post-content pre {
   background: #eeeeee;
   padding: 1rem;
   border-radius: 6px;
   overflow-x: auto;
-}
-
-/* Mobile tweaks */
-@media (max-width: 768px) {
-  .blog-post-detail .post-title {
-    font-size: 2rem;
-  }
 }
