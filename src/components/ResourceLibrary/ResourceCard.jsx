@@ -1,31 +1,23 @@
-// src/components/ResourceLibrary/ResourceCard.jsx
-// =======================================
-import React, { useState } from "react";
-import { Button, Modal } from "react-bootstrap";
-import NewsletterForm from "../Newsletter/NewsletterForm";
+// src/components/Resources/ResourceCard.jsx
+import React from "react";
+import { Card, Button } from "react-bootstrap";
 
-const ResourceCard = ({ resource }) => {
-  const [showModal, setShowModal] = useState(false);
-
+const ResourceCard = ({ resource, onDownload }) => {
   return (
-    <>
-      <div className="resource-card">
-        <h3>{resource.title}</h3>
-        <p>{resource.description}</p>
-        <Button onClick={() => setShowModal(true)}>Download</Button>
-      </div>
-
-      {/* Gated download modal */}
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Get Access</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>Enter your email to download:</p>
-          <NewsletterForm onSuccess={() => window.open(resource.downloadUrl)} />
-        </Modal.Body>
-      </Modal>
-    </>
+    <Card className="h-100 shadow-sm">
+      <Card.Body className="d-flex flex-column">
+        <Card.Title as="h5">{resource.title}</Card.Title>
+        <Card.Text className="flex-grow-1">{resource.description}</Card.Text>
+        <Button variant="primary" onClick={() => onDownload(resource)}>
+          Download
+        </Button>
+      </Card.Body>
+      {resource.category && (
+        <Card.Footer className="text-muted">
+          Category: {resource.category}
+        </Card.Footer>
+      )}
+    </Card>
   );
 };
 
