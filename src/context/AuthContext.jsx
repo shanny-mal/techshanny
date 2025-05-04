@@ -20,31 +20,36 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 1) Get initial session
-    supabase.auth.getSession().then(({ data, error }) => {
-      if (error) console.error("getSession error:", error.message);
-      setSession(data.session);
-      setUser(data.session?.user ?? null);
+    let mounted = true;
+
+    // 1. Initialize session (v2 API returns { data: { session }, error })
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) console.error("getSession:", error.message);
+      if (!mounted) return;
+      setSession(session);
+      setUser(session?.user ?? null);
       setLoading(false);
     });
 
-    // 2) Subscribe to auth changes
+    // 2. Listen for changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      if (!mounted) return;
       setSession(newSession);
       setUser(newSession?.user ?? null);
     });
 
-    // Cleanup on unmount
+    // 3. Clean up
     return () => {
-      subscription.unsubscribe();
+      mounted = false;
+      subscription?.unsubscribe();
     };
   }, []);
 
-  // Sign up with email+password
+  // Sign up with email & password
   const signUp = async (email, password) => {
-    if (!email || !password) throw new Error("Email and password are required");
+    if (!email || !password) throw new Error("Email and password required");
     setLoading(true);
     const { data, error } = await supabase.auth.signUp({ email, password });
     setLoading(false);
@@ -52,9 +57,9 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
-  // Sign in with email+password
+  // Sign in with email & password
   const signIn = async (email, password) => {
-    if (!email || !password) throw new Error("Email and password are required");
+    if (!email || !password) throw new Error("Email and password required");
     setLoading(true);
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -65,15 +70,6 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
-  // OAuth with Google
-  const signInWithGoogle = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: window.location.origin + "/member" },
-    });
-    if (error) throw error;
-  };
-
   // Sign out
   const signOut = async () => {
     setLoading(true);
@@ -82,22 +78,29 @@ export const AuthProvider = ({ children }) => {
     if (error) throw error;
   };
 
-  // Update a blog post
+  // OAuth (Google)
+  const signInWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.origin },
+    });
+    if (error) throw error;
+  };
+
+  // Update a post by id
   const updatePost = async (id, payload) => {
     const { error } = await supabase.from("posts").update(payload).eq("id", id);
     if (error) throw error;
   };
 
-  // Delete a blog post
+  // Delete a post by id
   const deletePost = async (id) => {
     const { error } = await supabase.from("posts").delete().eq("id", id);
     if (error) throw error;
   };
 
-  // While we're checking the session, don't render children
-  if (loading) {
-    return <p>Loading authentication…</p>;
-  }
+  // While we’re initializing…
+  if (loading) return <p>Loading authentication…</p>;
 
   return (
     <AuthContext.Provider
