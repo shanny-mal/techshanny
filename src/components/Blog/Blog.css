@@ -1,3 +1,5 @@
+/* Blog.css */
+
 .blog-section {
   background-color: #f5f3ee;
   padding: 80px 0;
@@ -7,8 +9,8 @@
   font-size: 2.8rem;
   font-weight: 700;
   color: #3e2723;
-  position: relative;
   margin-bottom: 40px;
+  position: relative;
 }
 
 .blog-heading::after {
@@ -17,16 +19,10 @@
   height: 4px;
   background: #a67b5b;
   position: absolute;
+  bottom: -10px;
   left: 50%;
   transform: translateX(-50%);
-  bottom: -10px;
   border-radius: 2px;
-}
-
-.blog-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
 }
 
 .blog-card {
@@ -34,7 +30,8 @@
   border-radius: 12px;
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  background: #ffffff;
+  display: flex;
+  flex-direction: column;
 }
 
 .blog-card:hover {
@@ -43,7 +40,7 @@
 }
 
 .blog-card-img {
-  height: 180px;
+  height: 200px;
   object-fit: cover;
 }
 
@@ -57,9 +54,44 @@
   background-color: #8f5e42;
 }
 
-/* Responsive tweaks */
+.action-icons button {
+  padding: 0.375rem;
+  line-height: 1;
+}
+
+/* Responsive adjustments */
 @media (max-width: 576px) {
-  .blog-card-img {
-    height: 140px;
+  .blog-heading { font-size: 2.2rem; }
+  .blog-card-img { height: 180px; }
+}
+
+/* src/components/Blog/Blog.css */
+/* …your existing styles… */
+
+.action-icons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.edit-btn,
+.delete-btn {
+  padding: 0.25rem;
+  border-radius: 4px;
+}
+
+/* BlogEdit form */
+.blog-edit {
+  max-width: 800px;
+  margin: auto;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 576px) {
+  .blog-edit {
+    padding: 1rem;
+    margin: 1rem;
   }
 }

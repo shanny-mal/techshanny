@@ -32,11 +32,12 @@ const Testimonials = lazy(() =>
 );
 const BlogList = lazy(() => import("./components/Blog/BlogList.jsx"));
 const BlogPost = lazy(() => import("./components/Blog/BlogPost.jsx"));
+const BlogEdit = lazy(() => import("./components/Blog/BlogEdit.jsx"));
 
 // Grab your Tawk.to ID from Vite env
 const TAWK_ID = import.meta.env.VITE_TAWK_PROPERTY_ID;
 
-// Error boundary
+// Error boundary to catch any rendering errors
 class ErrorBoundary extends React.Component {
   state = { hasError: false };
   static getDerivedStateFromError() {
@@ -53,7 +54,7 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-// Wrapper for suspense + error boundary
+// Wrapper for lazy‐loaded sections
 function AsyncSection({ children, fallback }) {
   return (
     <ErrorBoundary>
@@ -64,7 +65,7 @@ function AsyncSection({ children, fallback }) {
   );
 }
 
-// The home page, composed of all sections
+// Aggregate all homepage sections
 function HomePage() {
   return (
     <>
@@ -84,7 +85,7 @@ function HomePage() {
   );
 }
 
-// Live chat snippet injector
+// Inject Tawk.to live‐chat snippet
 function LiveChat() {
   React.useEffect(() => {
     if (!TAWK_ID) {
@@ -100,7 +101,6 @@ function LiveChat() {
     s.charset = "UTF-8";
     s.setAttribute("crossorigin", "*");
     document.body.appendChild(s);
-
     return () => document.getElementById("tawk-script")?.remove();
   }, []);
 
@@ -108,7 +108,7 @@ function LiveChat() {
 }
 
 function App() {
-  // AOS init once
+  // Init AOS once
   React.useEffect(() => {
     AOS.init({ duration: 1000, once: true });
   }, []);
@@ -116,7 +116,7 @@ function App() {
   return (
     <HelmetProvider>
       <Helmet>
-        <title>ShannyTechSolutions – Cutting-edge Technology Solutions</title>
+        <title>ShannyTechSolutions – Cutting‑edge Technology Solutions</title>
         <meta
           name="description"
           content="ShannyTechSolutions provides innovative technology solutions—from web development to IT consulting."
@@ -124,11 +124,10 @@ function App() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Helmet>
 
-      {/* Wrap the entire app in both Auth and DarkMode contexts */}
+      {/* Wrap your app in both Auth and DarkMode contexts */}
       <AuthProvider>
         <DarkModeProvider>
           <Header />
-          {/* Anywhere in your tree, you can render a toggle */}
           <DarkModeToggle />
 
           <Routes>
@@ -137,7 +136,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
 
-            {/* Protected */}
+            {/* Protected member area */}
             <Route
               path="/member"
               element={
@@ -147,7 +146,7 @@ function App() {
               }
             />
 
-            {/* Blog */}
+            {/* Blog listing */}
             <Route
               path="/blog"
               element={
@@ -156,6 +155,7 @@ function App() {
                 </AsyncSection>
               }
             />
+            {/* View a single post */}
             <Route
               path="/blog/:id"
               element={
@@ -164,8 +164,19 @@ function App() {
                 </AsyncSection>
               }
             />
+            {/* Edit a post */}
+            <Route
+              path="/blog/edit/:id"
+              element={
+                <RequireAuth>
+                  <AsyncSection fallback="Loading Editor…">
+                    <BlogEdit />
+                  </AsyncSection>
+                </RequireAuth>
+              }
+            />
 
-            {/* 404 */}
+            {/* 404 fallback */}
             <Route path="*" element={<NotFound />} />
           </Routes>
 

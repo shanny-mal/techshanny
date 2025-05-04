@@ -1,115 +1,131 @@
 // src/components/Blog/BlogList.jsx
 import React, { useState, useEffect, useCallback } from "react";
-import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import { Link, useNavigate } from "react-router-dom";
+import { Container, Card, Button, Spinner, Row, Col } from "react-bootstrap";
+import { FaTrash, FaEdit } from "react-icons/fa";
 import { supabase } from "../../supabaseClient.js";
+import { useAuth } from "../../context/AuthContext.jsx";
 import "./Blog.css";
 
 const PAGE_SIZE = 6;
 
 const BlogList = () => {
+  const { user, deletePost } = useAuth();
+  const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [error, setError] = useState("");
 
-  const fetchPosts = useCallback(async (pageNum) => {
+  const fetchPosts = useCallback(async () => {
     setLoading(true);
-    setError("");
-    try {
-      // Calculate slice
-      const from = (pageNum - 1) * PAGE_SIZE;
-      const to = pageNum * PAGE_SIZE - 1;
+    const from = (page - 1) * PAGE_SIZE;
+    const to = page * PAGE_SIZE - 1;
 
-      // Fetch a consistent slice sorted by published_at then id
-      const { data, error: supaErr } = await supabase
-        .from("posts")
-        .select("id, title, excerpt, image_url, published_at")
-        .order("published_at", { ascending: false })
-        .order("id", { ascending: false }) // secondary sort assures stability
-        .range(from, to);
+    const { data, error } = await supabase
+      .from("posts")
+      .select("id, title, excerpt, image_url, published_at, author_id")
+      .order("published_at", { ascending: false })
+      .range(from, to);
 
-      if (supaErr) throw supaErr;
-
-      // If fewer than PAGE_SIZE returned, no more pages
-      setHasMore(data.length === PAGE_SIZE);
-
-      // Append only new items
+    if (error) console.error(error);
+    else {
       setPosts((prev) => {
-        // Filter out any ids we already have (just in case)
-        const existingIds = new Set(prev.map((p) => p.id));
-        const filtered = data.filter((p) => !existingIds.has(p.id));
-        return [...prev, ...filtered];
+        const existing = new Set(prev.map((p) => p.id));
+        const newPosts = data.filter((p) => !existing.has(p.id));
+        return [...prev, ...newPosts];
       });
-    } catch (err) {
-      console.error("Error loading posts:", err);
-      setError(err.message || "Failed to load posts");
-    } finally {
-      setLoading(false);
+      if (data.length < PAGE_SIZE) setHasMore(false);
     }
-  }, []);
+    setLoading(false);
+  }, [page]);
 
-  // On mount & when `page` changes, fetch that page
   useEffect(() => {
-    fetchPosts(page);
-  }, [page, fetchPosts]);
+    fetchPosts();
+  }, [fetchPosts]);
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this post?")) return;
+    try {
+      await deletePost(id);
+      setPosts((prev) => prev.filter((p) => p.id !== id));
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete post.");
+    }
+  };
 
   return (
     <section id="blog" className="blog-section py-5">
-      <Helmet>
-        <title>Blog – ShannyTechSolutions</title>
-        <meta
-          name="description"
-          content="Latest articles and insights from ShannyTechSolutions."
-        />
-      </Helmet>
-
-      <div className="container">
+      <Container fluid>
         <h2 className="blog-heading text-center mb-4">Latest Insights</h2>
-        {error && <div className="alert alert-danger">{error}</div>}
-
-        <div className="blog-grid">
+        <Row className="g-4">
           {posts.map((post) => (
-            <article key={post.id} className="blog-card">
-              {post.image_url && (
-                <img
-                  src={post.image_url}
-                  alt={post.title}
-                  loading="lazy"
-                  className="blog-card-img"
-                />
-              )}
-              <div className="blog-card-body">
-                <h3 className="blog-card-title">
-                  <Link to={`/blog/${post.id}`}>{post.title}</Link>
-                </h3>
-                <p className="blog-card-excerpt">{post.excerpt}</p>
-                <Link to={`/blog/${post.id}`} className="read-more-btn">
-                  Read More
-                </Link>
-              </div>
-              <footer className="blog-card-footer">
-                <small className="text-muted">
-                  {new Date(post.published_at).toLocaleDateString()}
-                </small>
-              </footer>
-            </article>
+            <Col key={post.id} xs={12} sm={6} lg={4}>
+              <Card className="blog-card h-100">
+                {post.image_url && (
+                  <Card.Img
+                    variant="top"
+                    src={post.image_url}
+                    alt={post.title}
+                    loading="lazy"
+                    className="blog-card-img"
+                  />
+                )}
+                <Card.Body className="d-flex flex-column">
+                  <Card.Title as="h3" className="h5">
+                    <Link to={`/blog/${post.id}`}>{post.title}</Link>
+                  </Card.Title>
+                  <Card.Text className="flex-grow-1">{post.excerpt}</Card.Text>
+                  <div className="d-flex justify-content-between align-items-center mt-3">
+                    <Button
+                      variant="primary"
+                      as={Link}
+                      to={`/blog/${post.id}`}
+                      className="read-more-btn"
+                    >
+                      Read More
+                    </Button>
+                    {user?.id === post.author_id && (
+                      <div className="action-icons">
+                        <Button
+                          variant="outline-secondary"
+                          size="sm"
+                          as={Link}
+                          to={`/blog/edit/${post.id}`}
+                          className="edit-btn me-2"
+                        >
+                          <FaEdit />
+                        </Button>
+                        <Button
+                          variant="outline-danger"
+                          size="sm"
+                          onClick={() => handleDelete(post.id)}
+                          className="delete-btn"
+                        >
+                          <FaTrash />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
           ))}
-        </div>
+        </Row>
 
         {hasMore && (
           <div className="text-center mt-4">
-            <button
-              className="btn btn-primary"
+            <Button
+              variant="outline-primary"
               onClick={() => setPage((p) => p + 1)}
               disabled={loading}
             >
-              {loading ? "Loading…" : "Load More"}
-            </button>
+              {loading ? <Spinner size="sm" /> : "Load More"}
+            </Button>
           </div>
         )}
-      </div>
+      </Container>
     </section>
   );
 };

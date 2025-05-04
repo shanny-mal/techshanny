@@ -1,51 +1,62 @@
 .blog-post-detail {
   background-color: #f5f3ee;
   color: #3e2723;
-  padding-bottom: 4rem;
+  padding: 3rem 1rem 4rem;
 }
 
-.post-title {
+.blog-post-detail .post-title {
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
 }
 
-.meta {
+.blog-post-detail .meta {
   color: #6c757d;
   margin-bottom: 1.5rem;
   font-style: italic;
 }
 
-.detail-image {
+.blog-post-detail .detail-image {
   width: 100%;
   max-width: 800px;
   border-radius: 8px;
   object-fit: cover;
+  margin-bottom: 1.5rem;
 }
 
-.post-content {
+.blog-post-detail .post-content {
   line-height: 1.7;
   margin-top: 1.5rem;
 }
 
-/* Formatting for markdown‑style content */
-.post-content h2,
-.post-content h3 {
+.blog-post-detail .post-content h2,
+.blog-post-detail .post-content h3 {
   margin-top: 1.5rem;
   color: #5d4037;
 }
-.post-content p {
+
+.blog-post-detail .post-content p {
   margin-bottom: 1rem;
 }
-.post-content blockquote {
+
+.blog-post-detail .post-content blockquote {
   border-left: 4px solid #a67b5b;
   padding-left: 1rem;
+  margin: 1rem 0;
   color: #5d4037;
   font-style: italic;
 }
-.post-content pre {
+
+.blog-post-detail .post-content pre {
   background: #eeeeee;
   padding: 1rem;
   border-radius: 6px;
   overflow-x: auto;
+}
+
+/* Mobile tweaks */
+@media (max-width: 768px) {
+  .blog-post-detail .post-title {
+    font-size: 2rem;
+  }
 }

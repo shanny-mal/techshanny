@@ -1,53 +1,92 @@
-import React from "react";
-import { useParams, Link } from "react-router-dom";
-import { Container, Button } from "react-bootstrap";
+// src/components/Blog/BlogPostDetail.jsx
+import React, { useState, useEffect } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { Container, Button, Spinner, Alert } from "react-bootstrap";
+import { FaEdit, FaTrash } from "react-icons/fa";
+import { useAuth } from "../../context/AuthContext.jsx";
+import { supabase } from "../../supabaseClient.js";
 import "./BlogPostDetail.css";
 
-const posts = {
-  1: {
-    title: "Innovative Trends in Web Development",
-    content: "Detailed article about innovative trends in web development...",
-    image: "/blog1.jpg",
-  },
-  2: {
-    title: "Optimizing Network Performance",
-    content:
-      "In-depth discussion on optimizing network performance with modern strategies...",
-    image: "/blog2.jpg",
-  },
-  3: {
-    title: "Effective IT Consulting Strategies",
-    content:
-      "Exploration of effective IT consulting strategies that drive success...",
-    image: "/blog3.jpg",
-  },
-};
-
-const BlogPostDetail = () => {
+export default function BlogPostDetail() {
   const { id } = useParams();
-  const post = posts[id];
+  const navigate = useNavigate();
+  const { user, deletePost } = useAuth();
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  if (!post) {
+  useEffect(() => {
+    (async () => {
+      const { data, error } = await supabase
+        .from("posts")
+        .select("*")
+        .eq("id", id)
+        .single();
+      if (error) setError(error.message);
+      else setPost(data);
+      setLoading(false);
+    })();
+  }, [id]);
+
+  const handleDelete = async () => {
+    if (!window.confirm("Delete this post?")) return;
+    try {
+      await deletePost(id);
+      navigate("/blog");
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  if (loading) return <Spinner className="m-5" />;
+  if (error)
     return (
-      <Container className="py-5">
-        <h2>Post not found</h2>
-        <Button as={Link} to="/blog" variant="primary">
-          Back to Blog
-        </Button>
-      </Container>
+      <Alert className="m-5" variant="danger">
+        {error}
+      </Alert>
     );
-  }
+  if (!post) return <Alert className="m-5">Post not found</Alert>;
 
   return (
     <Container className="blog-post-detail py-5">
-      <h1>{post.title}</h1>
-      <img src={post.image} alt={post.title} className="detail-image" />
-      <p>{post.content}</p>
-      <Button as={Link} to="/blog" variant="primary">
+      <h1 className="post-title">{post.title}</h1>
+      <p className="meta">
+        Published on {new Date(post.published_at).toLocaleDateString()}
+      </p>
+
+      {user?.id === post.author_id && (
+        <div className="mb-3">
+          <Button
+            variant="outline-secondary"
+            as={Link}
+            to={`/blog/edit/${id}`}
+            className="me-2"
+          >
+            <FaEdit /> Edit
+          </Button>
+          <Button variant="outline-danger" onClick={handleDelete}>
+            <FaTrash /> Delete
+          </Button>
+        </div>
+      )}
+
+      {post.image_url && (
+        <img
+          src={post.image_url}
+          alt={post.title}
+          className="detail-image mb-4"
+          loading="lazy"
+        />
+      )}
+
+      <div
+        className="post-content"
+        dangerouslySetInnerHTML={{ __html: post.content }}
+      />
+
+      <Button as={Link} to="/blog" variant="secondary" className="mt-4">
         Back to Blog
       </Button>
     </Container>
   );
-};
-
-export default BlogPostDetail;
+}
