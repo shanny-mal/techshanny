@@ -20,16 +20,15 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 1) initialize session
-    (async () => {
-      const { data, error } = await supabase.auth.getSession();
+    // 1) Get initial session
+    supabase.auth.getSession().then(({ data, error }) => {
       if (error) console.error("getSession error:", error.message);
       setSession(data.session);
       setUser(data.session?.user ?? null);
       setLoading(false);
-    })();
+    });
 
-    // 2) subscribe to auth state changes
+    // 2) Subscribe to auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, newSession) => {
@@ -37,26 +36,23 @@ export const AuthProvider = ({ children }) => {
       setUser(newSession?.user ?? null);
     });
 
-    // cleanup
+    // Cleanup on unmount
     return () => {
       subscription.unsubscribe();
     };
   }, []);
 
-  // Sign up with email & password
+  // Sign up with email+password
   const signUp = async (email, password) => {
     if (!email || !password) throw new Error("Email and password are required");
     setLoading(true);
     const { data, error } = await supabase.auth.signUp({ email, password });
     setLoading(false);
-    if (error) {
-      console.error("signUp error:", error.message);
-      throw error;
-    }
+    if (error) throw error;
     return data;
   };
 
-  // Sign in with email & password
+  // Sign in with email+password
   const signIn = async (email, password) => {
     if (!email || !password) throw new Error("Email and password are required");
     setLoading(true);
@@ -65,11 +61,17 @@ export const AuthProvider = ({ children }) => {
       password,
     });
     setLoading(false);
-    if (error) {
-      console.error("signIn error:", error.message);
-      throw error;
-    }
+    if (error) throw error;
     return data;
+  };
+
+  // OAuth with Google
+  const signInWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.origin + "/member" },
+    });
+    if (error) throw error;
   };
 
   // Sign out
@@ -77,43 +79,22 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     const { error } = await supabase.auth.signOut();
     setLoading(false);
-    if (error) {
-      console.error("signOut error:", error.message);
-      throw error;
-    }
+    if (error) throw error;
   };
 
-  // Google OAuth
-  const signInWithGoogle = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: window.location.origin + "/member" },
-    });
-    if (error) {
-      console.error("Google sign-in error:", error.message);
-      throw error;
-    }
-  };
-
-  // Update a post
+  // Update a blog post
   const updatePost = async (id, payload) => {
     const { error } = await supabase.from("posts").update(payload).eq("id", id);
-    if (error) {
-      console.error("updatePost error:", error.message);
-      throw error;
-    }
+    if (error) throw error;
   };
 
-  // Delete a post
+  // Delete a blog post
   const deletePost = async (id) => {
     const { error } = await supabase.from("posts").delete().eq("id", id);
-    if (error) {
-      console.error("deletePost error:", error.message);
-      throw error;
-    }
+    if (error) throw error;
   };
 
-  // While loading initial session
+  // While we're checking the session, don't render children
   if (loading) {
     return <p>Loading authentication…</p>;
   }
