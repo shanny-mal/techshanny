@@ -1,0 +1,45 @@
+/* src/components/Newsletter/NewsletterForm.css */
+
+.newsletter-form {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background: var(--glass-light);
+  backdrop-filter: blur(8px);
+  border-radius: 8px;
+}
+
+.newsletter-form.dark {
+  background: var(--glass-dark);
+}
+
+.newsletter-form .form-control {
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  transition: border-color var(--transition);
+}
+
+.newsletter-form .form-control:focus {
+  border-color: var(--accent);
+  box-shadow: none;
+}
+
+.newsletter-form .submit-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background: var(--accent);
+  border: none;
+  border-radius: 4px;
+  transition: background var(--transition);
+}
+
+.newsletter-form .submit-btn:hover {
+  background: var(--gradient-end);
+}
+
+.newsletter-form .toast-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 2000;
+}
