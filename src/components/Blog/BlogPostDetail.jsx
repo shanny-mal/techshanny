@@ -11,22 +11,44 @@ export default function BlogPostDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, deletePost } = useAuth();
+
   const [post, setPost] = useState(null);
+  const [authorName, setAuthorName] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    // Fetch post and then author name
     (async () => {
-      const { data, error } = await supabase
-        .from("posts")
-        .select("*")
-        .eq("id", id)
-        .single();
-      if (error) setError(error.message);
-      else setPost(data);
-      setLoading(false);
+      setLoading(true);
+      try {
+        // 1) Load the post
+        const { data: p, error: pErr } = await supabase
+          .from("posts")
+          .select(
+            "id, title, content, excerpt, image_url, published_at, author_id"
+          )
+          .eq("id", id)
+          .single();
+        if (pErr) throw pErr;
+        setPost(p);
+
+        // 2) Load author’s profile
+        const { data: profile, error: profErr } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", p.author_id)
+          .single();
+        if (profErr && profErr.code !== "PGRST116") throw profErr;
+        setAuthorName(profile?.full_name ?? user.email);
+      } catch (err) {
+        console.error("Error loading post or author:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
     })();
-  }, [id]);
+  }, [id, user.email]);
 
   const handleDelete = async () => {
     if (!window.confirm("Delete this post?")) return;
@@ -38,20 +60,35 @@ export default function BlogPostDetail() {
     }
   };
 
-  if (loading) return <Spinner className="m-5" />;
-  if (error)
+  if (loading) {
     return (
-      <Alert className="m-5" variant="danger">
+      <div className="text-center my-5">
+        <Spinner animation="border" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Alert variant="danger" className="my-5">
         {error}
       </Alert>
     );
-  if (!post) return <Alert className="m-5">Post not found</Alert>;
+  }
+
+  if (!post) {
+    return (
+      <Alert variant="warning" className="my-5">
+        Post not found
+      </Alert>
+    );
+  }
 
   return (
     <Container className="blog-post-detail py-5">
       <h1 className="post-title">{post.title}</h1>
       <p className="meta">
-        Published on {new Date(post.published_at).toLocaleDateString()}
+        By {authorName} on {new Date(post.published_at).toLocaleDateString()}
       </p>
 
       {user?.id === post.author_id && (
@@ -85,7 +122,7 @@ export default function BlogPostDetail() {
       />
 
       <Button as={Link} to="/blog" variant="secondary" className="mt-4">
-        Back to Blog
+        ← Back to Blog
       </Button>
     </Container>
   );
