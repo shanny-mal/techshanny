@@ -1,3 +1,4 @@
+// src/App.jsx
 import React, { Suspense, lazy, useEffect } from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Routes, Route } from "react-router-dom";
@@ -5,8 +6,8 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 
 // Contexts
-import { DarkModeProvider } from "./context/DarkModeContext";
-import { AuthProvider } from "./context/AuthContext";
+import { ThemeProvider } from "./context/ThemeContext.jsx"; // dark/light theme
+import { AuthProvider } from "./context/AuthContext.jsx"; // supabase auth
 
 // Core Components
 import Header from "./components/Header/Header.jsx";
@@ -43,35 +44,29 @@ const NewsletterForm = lazy(() =>
   import("./components/Newsletter/NewsletterForm.jsx")
 );
 
-// Tawk.to Live Chat ID from ENV
+// Tawk.to Live Chat ID (env)
 const TAWK_ID = import.meta.env.VITE_TAWK_PROPERTY_ID;
 
-// -----------------
-// Error Boundary
-// -----------------
+// Error boundary for Suspense fallbacks
 class ErrorBoundary extends React.Component {
   state = { hasError: false };
   static getDerivedStateFromError() {
     return { hasError: true };
   }
-  componentDidCatch(error, info) {
-    console.error("ErrorBoundary caught:", error, info);
+  componentDidCatch(err, info) {
+    console.error("ErrorBoundary:", err, info);
   }
   render() {
-    if (this.state.hasError) {
-      return (
-        <div className="py-5 text-center text-danger">
-          Oops—something went wrong.
-        </div>
-      );
-    }
-    return this.props.children;
+    return this.state.hasError ? (
+      <div className="py-5 text-center text-secondary">
+        Oops—something went wrong.
+      </div>
+    ) : (
+      this.props.children
+    );
   }
 }
 
-// -----------------
-// Async Section Wrapper
-// -----------------
 function AsyncSection({ children, fallback }) {
   return (
     <ErrorBoundary>
@@ -82,9 +77,6 @@ function AsyncSection({ children, fallback }) {
   );
 }
 
-// -----------------
-// Homepage Sections
-// -----------------
 function HomePage() {
   return (
     <>
@@ -92,50 +84,37 @@ function HomePage() {
       <About />
       <Services />
       <Portfolio />
-
       <AsyncSection fallback="Loading Testimonials…">
         <Testimonials />
       </AsyncSection>
-
       <AsyncSection fallback="Loading Blog…">
         <BlogList />
       </AsyncSection>
-
       <Contact />
       <Footer />
     </>
   );
 }
 
-// -----------------
-// Live Chat Script Loader
-// -----------------
+// Tawk.to live-chat loader
 function LiveChat() {
   useEffect(() => {
-    if (!TAWK_ID) {
-      console.warn("Missing VITE_TAWK_PROPERTY_ID in .env");
-      return;
-    }
+    if (!TAWK_ID) return console.warn("Missing TAWK_ID");
     if (document.getElementById("tawk-script")) return;
-
-    const script = document.createElement("script");
-    script.id = "tawk-script";
-    script.async = true;
-    script.src = `https://embed.tawk.to/${TAWK_ID}/1ikjpu2t1`;
-    script.charset = "UTF-8";
-    script.setAttribute("crossorigin", "*");
-    document.body.appendChild(script);
-
+    const s = document.createElement("script");
+    s.id = "tawk-script";
+    s.async = true;
+    s.src = `https://embed.tawk.to/${TAWK_ID}/1ikjpu2t1`;
+    s.charset = "UTF-8";
+    s.setAttribute("crossorigin", "*");
+    document.body.appendChild(s);
     return () => document.getElementById("tawk-script")?.remove();
   }, []);
-
   return null;
 }
 
-// -----------------
-// Main App
-// -----------------
 function App() {
+  // Initialize scroll animations
   useEffect(() => {
     AOS.init({ duration: 1000, once: true });
   }, []);
@@ -143,7 +122,7 @@ function App() {
   return (
     <HelmetProvider>
       <Helmet>
-        <title>ShannyTechSolutions – Cutting‑edge Technology Solutions</title>
+        <title>ShannyTechSolutions – Cutting-edge Technology Solutions</title>
         <meta
           name="description"
           content="ShannyTechSolutions provides innovative technology solutions—from web development to IT consulting."
@@ -151,18 +130,22 @@ function App() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Helmet>
 
-      <AuthProvider>
-        <DarkModeProvider>
+      {/* ThemeProvider (dark/light) outermost */}
+      <ThemeProvider>
+        {/* AuthProvider (user session) */}
+        <AuthProvider>
+          {/* Persistent header + toggle */}
           <Header />
           <DarkModeToggle />
 
+          {/* All routes */}
           <Routes>
-            {/* Public Routes */}
+            {/* Public */}
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
 
-            {/* Protected Dashboard */}
+            {/* Member Dashboard */}
             <Route
               path="/member"
               element={
@@ -218,7 +201,7 @@ function App() {
               }
             />
 
-            {/* Resource Library */}
+            {/* Resources */}
             <Route
               path="/resources"
               element={
@@ -228,23 +211,23 @@ function App() {
               }
             />
 
-            {/* Newsletter Signup */}
+            {/* Newsletter */}
             <Route
               path="/newsletter"
               element={
-                <AsyncSection fallback="Loading Newsletter Form…">
+                <AsyncSection fallback="Loading Newsletter…">
                   <NewsletterForm />
                 </AsyncSection>
               }
             />
 
-            {/* Fallback 404 */}
+            {/* 404 */}
             <Route path="*" element={<NotFound />} />
           </Routes>
 
           <LiveChat />
-        </DarkModeProvider>
-      </AuthProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </HelmetProvider>
   );
 }

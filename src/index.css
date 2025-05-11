@@ -1,105 +1,106 @@
-/* ============================
-   CSS Variables & Global Reset
-   ============================ */
-:root {
-  --mocha-light: #F5F3EE;
-  --mocha-dark:  #3E2723;
-  --mocha-primary:   #A67B5B;
-  --mocha-secondary: #8F5E42;
-  --text-color:      #333333;
-  --bg-light:        var(--mocha-light);
-  --bg-dark:         #121212;
-  --text-light:      #ffffff;
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  background-color: var(--bg-light);
-  color: var(--text-color);
-  font-family: sans-serif;
-  line-height: 1.6;
-  scroll-behavior: smooth;
-}
-
-/* =================
-   Utility Classes
-   ================= */
-.py-5   { padding-top: 3rem;  padding-bottom: 3rem; }
-.px-4   { padding-left: 1.5rem; padding-right: 1.5rem; }
-.mx-auto { margin-left: auto; margin-right: auto; }
-
-.text-center { text-align: center; }
-.text-right  { text-align: right; }
-
-.fs-1 { font-size: 2.5rem; }
-.fs-2 { font-size: 2rem; }
-.fs-3 { font-size: 1.75rem; }
-.fs-4 { font-size: 1.5rem; }
-
-/* ======================
-   Focus Styles for A11y
-   ====================== */
-a:focus,
-button:focus,
-input:focus,
-select:focus,
-textarea:focus {
-  outline: 3px solid var(--mocha-primary);
-  outline-offset: 2px;
-}
-
-/* ====================
-   Dark Mode Overrides
-   ==================== */
-body.dark-mode {
-  background-color: var(--bg-dark);
-  color: var(--text-light);
-}
-
-body.dark-mode a,
-body.dark-mode p,
-body.dark-mode h1,
-body.dark-mode h2,
-body.dark-mode h3,
-body.dark-mode h4,
-body.dark-mode h5,
-body.dark-mode h6 {
-  color: var(--text-light);
-}
-
-body.dark-mode .navbar,
-body.dark-mode .footer-section {
-  background-color: var(--mocha-secondary);
-}
-
-body.dark-mode .card,
-body.dark-mode .section {
-  background-color: var(--bg-dark);
-  color: var(--text-light);
-}
-
-body.dark-mode .modern-nav .nav-link {
-  color: var(--text-light);
-}
-
-body.dark-mode .modern-nav .nav-link:hover,
-body.dark-mode .modern-nav .nav-link:focus {
-  color: var(--mocha-primary);
-}
-
-/* If you have additional section classes, group them here */
-body.dark-mode .about-section,
-body.dark-mode .services-section,
-body.dark-mode .portfolio-section,
-body.dark-mode .contact-section,
-body.dark-mode .blog-section,
-body.dark-mode .testimonials-section {
-  background-color: var(--bg-dark);
-}
+/* ===========================
+   Global Reset & Base Styles
+   =========================== */
+   *,
+   *::before,
+   *::after {
+     box-sizing: border-box;
+     margin: 0;
+     padding: 0;
+   }
+   
+   html {
+     font-size: 100%; /* 16px */
+     scroll-behavior: smooth;
+   }
+   
+   body {
+     background-color: var(--bg);
+     color: var(--text);
+     font-family: var(--font-body);
+     line-height: 1.6;
+     transition: background-color var(--t-medium), color var(--t-medium);
+   }
+   
+   /* ===========================
+      CSS Custom Properties
+      =========================== */
+   :root {
+     /* — Colors — */
+     --color-primary:    #7A5235;  /* deep mocha */
+     --color-secondary:  #A67B5B;  /* soft tan */
+     --color-accent:     #FFD983;  /* warm gold */
+     --color-highlight:  #008080;  /* teal highlight */
+     --color-bg-light:   #F5F3EE;  /* ivory */
+     --color-bg-dark:    #1A1A1A;  /* dark background */
+     --color-text-light: #FFFFFF;
+     --color-text-dark:  #333333;
+   
+     /* — Typography — */
+     --font-heading: "Montserrat", system-ui, sans-serif;
+     --font-body:    "Open Sans", system-ui, sans-serif;
+     --fw-regular: 400;
+     --fw-bold:    700;
+   
+     /* — Spacing Scale — */
+     --space-1: 4px;
+     --space-2: 8px;
+     --space-3: 16px;
+     --space-4: 24px;
+     --space-5: 32px;
+   
+     /* — Motion — */
+     --t-fast:   200ms ease-in-out;
+     --t-medium: 300ms ease-in-out;
+   }
+   
+   /* ===========================
+      Utility Classes
+      =========================== */
+   .mx-auto { margin-left: auto; margin-right: auto; }
+   .text-center { text-align: center; }
+   
+   .p-1 { padding: var(--space-1); }
+   .p-2 { padding: var(--space-2); }
+   .p-3 { padding: var(--space-3); }
+   .p-4 { padding: var(--space-4); }
+   .p-5 { padding: var(--space-5); }
+   
+   .mt-1 { margin-top: var(--space-1); }
+   .mt-2 { margin-top: var(--space-2); }
+   .mt-3 { margin-top: var(--space-3); }
+   .mt-4 { margin-top: var(--space-4); }
+   .mt-5 { margin-top: var(--space-5); }
+   
+   /* ===========================
+      Typography Scale
+      =========================== */
+   h1, .fs-1 { font-family: var(--font-heading); font-weight: var(--fw-bold); font-size: 2.5rem; }
+   h2, .fs-2 { font-family: var(--font-heading); font-weight: var(--fw-bold); font-size: 2rem; }
+   h3, .fs-3 { font-family: var(--font-heading); font-weight: var(--fw-bold); font-size: 1.75rem; }
+   h4, .fs-4 { font-family: var(--font-heading); font-weight: var(--fw-bold); font-size: 1.5rem; }
+   
+   /* ===========================
+      Focus & Accessibility
+      =========================== */
+   a:focus,
+   button:focus,
+   input:focus,
+   select:focus,
+   textarea:focus {
+     outline: 3px solid var(--color-secondary);
+     outline-offset: 2px;
+   }
+   
+   /* ===========================
+      Dark Mode Overrides
+      =========================== */
+   body.dark {
+     --bg:   var(--color-bg-dark);
+     --text: var(--color-text-light);
+   }
+   body:not(.dark) {
+     --bg:   var(--color-bg-light);
+     --text: var(--color-text-dark);
+   }
+   

@@ -1,20 +1,18 @@
-/* src/components/Header/Header.css */
-
 /*--------------------------------------
-  Variables
+  CSS Variables
 --------------------------------------*/
 :root {
-  --gradient-start:   #7a5235;
-  --gradient-end:     #8f5e42;
-  --accent:           #a67b5b;
-  --text-light:       #ffffff;
-  --glass-light:      rgba(255,255,255,0.6);
-  --glass-dark:       rgba(0,0,0,0.5);
-  --transition:       0.3s ease;
+  --gradient-start: #7a5235;
+  --gradient-end:   #8f5e42;
+  --accent:         #a67b5b;
+  --text-light:     #ffffff;
+  --glass-light:    rgba(255,255,255,0.6);
+  --glass-dark:     rgba(0,0,0,0.5);
+  --transition:     0.3s ease;
 }
 
 /*--------------------------------------
-  Skip Link
+  Skip-to-Content
 --------------------------------------*/
 .skip-to-content {
   position: absolute;
@@ -24,52 +22,67 @@
   color: #fff;
   padding: 0.5rem;
   z-index: 1001;
+  transition: left var(--transition);
 }
 .skip-to-content:focus {
   left: 1rem;
 }
 
 /*--------------------------------------
-  Header Container
+  Header Backdrop + Gradient
 --------------------------------------*/
 .header {
   position: sticky;
   top: 0;
   width: 100%;
-  backdrop-filter: blur(12px);
-  background: var(--glass-light);
-  transition: background var(--transition), padding var(--transition);
-  z-index: 1000;
   padding: 1rem 0;
+  background: var(--glass-light);
+  backdrop-filter: blur(12px);
+  transition:
+    padding var(--transition),
+    backdrop-filter var(--transition),
+    box-shadow var(--transition);
+  z-index: 1000;
+  /* allow ::before gradient */
+  position: relative;
 }
-.header--dark {
-  background: var(--glass-dark);
-}
-.header--shrink {
-  padding: 0.5rem 0 !important;
-}
-
-/*--------------------------------------
-  Navbar
---------------------------------------*/
-.header__navbar {
+.header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
   background: linear-gradient(
     135deg,
     var(--gradient-start),
     var(--gradient-end)
-  ) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  );
+  z-index: -1;
+  border-radius: inherit;
 }
-.header--dark .header__navbar {
+.header--dark {
+  background: var(--glass-dark);
+}
+.header--dark::before {
   background: linear-gradient(
     135deg,
     var(--gradient-end),
     var(--gradient-start)
-  ) !important;
+  );
+}
+.header--shrink {
+  padding: 0.5rem 0 !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 /*--------------------------------------
-  Brand
+  Navbar inside header
+--------------------------------------*/
+.header__navbar {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/*--------------------------------------
+  Brand (Logo + Text)
 --------------------------------------*/
 .header__brand {
   display: flex;
@@ -82,21 +95,21 @@
   background: var(--text-light);
   margin-right: 0.5rem;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 }
 .header__logo {
-  width: 100%;
-  height: auto;
+  width: 24px;
+  height: 24px;
 }
 .header__brand-text {
   color: var(--text-light) !important;
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   font-weight: 700;
 }
 
 /*--------------------------------------
-  Toggler Button
+  Toggler (Hamburger)
 --------------------------------------*/
 .header__toggler {
   border-color: var(--text-light) !important;
@@ -110,24 +123,30 @@
 }
 
 /*--------------------------------------
-  Collapse / Mobile Overlay
+  Collapse / Mobile Slide-in Panel
 --------------------------------------*/
 .header__collapse {
+  /* start off-screen to the right */
   transform: translateX(100%);
   transition: transform var(--transition);
   pointer-events: none;
   z-index: 1001;
 }
+
+/* when you add .show, slide it back into view */
 .header__collapse.show {
   transform: translateX(0);
   pointer-events: auto;
 }
+
+/* mobile only: fixed side-panel that is 80% wide, max 300px */
 @media (max-width: 991.98px) {
   .header__collapse {
     position: fixed;
     top: 0;
     right: 0;
-    width: 100vw;
+    width: 80vw;
+    max-width: 300px;
     height: 100vh;
     background: var(--glass-light);
     backdrop-filter: blur(12px);
@@ -138,21 +157,25 @@
     background: var(--glass-dark);
   }
 }
+
+/* desktop: revert to normal inline collapse */
 @media (min-width: 992px) {
   .header__collapse {
     position: static;
+    width: auto;
+    max-width: none;
+    height: auto;
     transform: none !important;
     pointer-events: auto;
     background: transparent;
     backdrop-filter: none;
-    transition: none;
     padding-top: 0;
     overflow: visible;
   }
 }
 
 /*--------------------------------------
-  Nav Links
+  Nav & Links
 --------------------------------------*/
 .header__nav {
   display: flex;
@@ -165,7 +188,6 @@
     padding-left: 1rem;
   }
 }
-
 .header__link {
   color: var(--text-light) !important;
   margin: 0 1rem;
@@ -195,7 +217,32 @@
   }
 }
 
-/* Sign‑up button style */
+/*--------------------------------------
+  Tools Dropdown: inline expand on mobile
+--------------------------------------*/
+.header__dropdown .dropdown-menu {
+  /* keep normal popover width on desktop */
+  min-width: auto;
+}
+@media (max-width: 991.98px) {
+  .header__dropdown .dropdown-menu {
+    position: static !important;
+    transform: none !important;
+    opacity: 1 !important;
+    display: block !important;
+    background: transparent;
+    box-shadow: none;
+    padding-left: 1rem;
+  }
+  .header__dropdown .dropdown-item {
+    color: var(--text-light) !important;
+    padding-left: 1.5rem;
+  }
+}
+
+/*--------------------------------------
+  Sign-Up & Action Links
+--------------------------------------*/
 .header__link--signup {
   background: var(--accent) !important;
   border-radius: 20px;
@@ -207,32 +254,9 @@
   background: var(--text-light) !important;
   color: var(--accent) !important;
 }
-
-/* Accent action link */
 .header__link--action {
   color: var(--accent) !important;
   margin-left: 1rem !important;
-}
-
-/*--------------------------------------
-  Dropdown
---------------------------------------*/
-.header__dropdown > .nav-link {
-  color: var(--text-light) !important;
-}
-.header__dropdown .dropdown-menu {
-  background: var(--glass-light);
-  backdrop-filter: blur(12px);
-}
-.header--dark .header__dropdown .dropdown-menu {
-  background: var(--glass-dark);
-}
-.header__dropdown .dropdown-item {
-  color: var(--text-light) !important;
-}
-.header__dropdown .dropdown-item:hover {
-  background: var(--accent);
-  color: var(--text-light) !important;
 }
 
 /*--------------------------------------

@@ -1,4 +1,3 @@
-// src/components/Header/Header.jsx
 import React, { useState, useEffect } from "react";
 import { Navbar, Nav, Container, NavDropdown } from "react-bootstrap";
 import { NavLink, Link, useLocation } from "react-router-dom";
@@ -10,47 +9,60 @@ import "./Header.css";
 
 const Header = () => {
   const { user, signOut } = useAuth();
-  const { darkMode, setDarkMode } = useDarkMode();
+  const { darkMode } = useDarkMode();
   const [expanded, setExpanded] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [toolsOpen, setToolsOpen] = useState(false);
   const { pathname } = useLocation();
 
-  // shrink on scroll
+  // Shrink header on scroll
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // close mobile menu on nav change
+  // Close everything when navigating
   useEffect(() => {
     setExpanded(false);
+    setToolsOpen(false);
   }, [pathname]);
+
+  // Toggle dropdown on mobile (click)
+  const handleToolsToggle = (e) => {
+    e.preventDefault();
+    setToolsOpen((open) => !open);
+  };
 
   return (
     <header
-      className={`header
-        ${scrolled ? "header--shrink" : ""}
-        ${darkMode ? "header--dark" : ""}`}
+      className={[
+        "header",
+        scrolled && "header--shrink",
+        darkMode && "header--dark",
+      ]
+        .filter(Boolean)
+        .join(" ")}
       role="banner"
     >
-      {/* Skip link */}
-      <a href="#main" className="skip-to-content">
+      <a href="#main-content" className="skip-to-content">
         Skip to main content
       </a>
 
       <Navbar
         expand="lg"
         expanded={expanded}
-        onToggle={() => setExpanded(!expanded)}
+        onToggle={() => setExpanded((ex) => !ex)}
         className="header__navbar"
+        role="navigation"
+        aria-label="Main navigation"
       >
-        <Container>
+        <Container fluid>
           <Navbar.Brand as={Link} to="/" className="header__brand">
             <div className="header__logo-circle">
               <img
                 src="/logo.png"
-                alt="ShannyTechSolutions Logo"
+                alt="ShannyTechSolutions logo"
                 className="header__logo"
               />
             </div>
@@ -61,7 +73,7 @@ const Header = () => {
             aria-controls="main-nav"
             aria-expanded={expanded}
             className="header__toggler"
-            aria-label="Toggle navigation"
+            aria-label="Toggle navigation menu"
           />
 
           <Navbar.Collapse
@@ -69,7 +81,6 @@ const Header = () => {
             className={`header__collapse ${expanded ? "show" : ""}`}
           >
             <Nav className="header__nav" role="menubar">
-              {/* only show these when NOT authenticated */}
               {!user && (
                 <>
                   <Nav.Link as={NavLink} to="/" end className="header__link">
@@ -98,6 +109,8 @@ const Header = () => {
               <NavDropdown
                 title="Tools"
                 id="tools-dropdown"
+                show={toolsOpen}
+                onClick={handleToolsToggle}
                 className="header__link header__dropdown"
                 menuVariant={darkMode ? "dark" : "light"}
               >
@@ -139,7 +152,7 @@ const Header = () => {
                 <LanguageSwitcher />
               </div>
               <div className="header__icon">
-                <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
+                <DarkModeToggle />
               </div>
             </Nav>
           </Navbar.Collapse>

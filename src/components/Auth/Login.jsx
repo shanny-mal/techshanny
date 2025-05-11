@@ -1,26 +1,51 @@
-// src/components/Auth/Login.jsx
 import React, { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
 import "./Auth.css";
 
-const Login = () => {
+export default function Login() {
   const navigate = useNavigate();
   const { loading, signIn, signInWithGoogle } = useAuth();
+
   const [email, setEmail] = useState("");
-  const [password, setPwd] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [emailValid, setEmailValid] = useState(null);
+  const [pwdStrength, setPwdStrength] = useState(0);
+
   const errorRef = useRef();
 
-  // Focus the error message on change
+  // Focus the error message when it appears
   useEffect(() => {
-    if (error && errorRef.current) {
-      errorRef.current.focus();
-    }
+    if (error && errorRef.current) errorRef.current.focus();
   }, [error]);
+
+  // Real-time email validation
+  useEffect(() => {
+    const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    setEmailValid(email === "" ? null : valid);
+  }, [email]);
+
+  // Simple password strength meter
+  useEffect(() => {
+    let score = 0;
+    if (password.length >= 8) score++;
+    if (/[A-Z]/.test(password)) score++;
+    if (/[0-9]/.test(password)) score++;
+    if (/[\W]/.test(password)) score++;
+    setPwdStrength(score);
+  }, [password]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!emailValid) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+    if (pwdStrength < 2) {
+      setError("Password is too weak.");
+      return;
+    }
     setError("");
     try {
       await signIn(email.trim(), password);
@@ -30,7 +55,7 @@ const Login = () => {
     }
   };
 
-  const handleGoogleSignIn = async () => {
+  const handleGoogle = async () => {
     setError("");
     try {
       await signInWithGoogle();
@@ -41,59 +66,78 @@ const Login = () => {
   };
 
   return (
-    <div className="auth-container">
-      <h2>Login to Your Account</h2>
-      {error && (
-        <p
-          ref={errorRef}
-          role="alert"
-          aria-live="assertive"
-          tabIndex={-1}
-          className="error"
+    <div className="auth-backdrop">
+      <div className="auth-modal" role="dialog" aria-labelledby="login-title">
+        <h2 id="login-title" className="auth-title">
+          Login to Your Account
+        </h2>
+
+        {error && (
+          <div
+            ref={errorRef}
+            id="login-error"
+            className="auth-alert"
+            role="alert"
+            tabIndex={-1}
+          >
+            {error}
+          </div>
+        )}
+
+        <form className="auth-form" onSubmit={handleSubmit} noValidate>
+          {/* Email Field */}
+          <div
+            className={`floating-label ${
+              emailValid === false ? "invalid" : ""
+            }`}
+          >
+            <input
+              id="login-email"
+              type="email"
+              autoComplete="username"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              aria-invalid={emailValid === false}
+            />
+            <label htmlFor="login-email">Email address</label>
+            {emailValid === false && (
+              <span className="field-error">Invalid email</span>
+            )}
+          </div>
+
+          {/* Password Field */}
+          <div className="floating-label">
+            <input
+              id="login-password"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              aria-describedby="pwd-strength"
+            />
+            <label htmlFor="login-password">Password</label>
+            <div id="pwd-strength" className="pwd-meter">
+              <div className={`bar strength-${pwdStrength}`}></div>
+            </div>
+          </div>
+
+          <button className="btn-auth primary" type="submit" disabled={loading}>
+            {loading ? "Logging in…" : "Login"}
+          </button>
+        </form>
+
+        <div className="divider">or</div>
+
+        <button
+          className="btn-auth social google"
+          onClick={handleGoogle}
+          disabled={loading}
         >
-          {error}
-        </p>
-      )}
-
-      <form
-        className="auth-form"
-        onSubmit={handleSubmit}
-        aria-describedby={error ? "login-error" : undefined}
-      >
-        <label htmlFor="login-email">Email</label>
-        <input
-          id="login-email"
-          type="email"
-          autoComplete="username"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-
-        <label htmlFor="login-password">Password</label>
-        <input
-          id="login-password"
-          type="password"
-          autoComplete="current-password"
-          value={password}
-          onChange={(e) => setPwd(e.target.value)}
-          required
-        />
-
-        <button className="btn-auth" type="submit" disabled={loading}>
-          {loading ? "Logging in…" : "Login"}
+          {loading ? "Please wait…" : "Continue with Google"}
         </button>
-      </form>
-
-      <button
-        className="btn-auth google"
-        onClick={handleGoogleSignIn}
-        disabled={loading}
-      >
-        {loading ? "Logging in…" : "Login with Google"}
-      </button>
+      </div>
     </div>
   );
-};
-
-export default Login;
+}
