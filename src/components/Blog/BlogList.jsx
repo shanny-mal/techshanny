@@ -1,7 +1,7 @@
 // src/components/Blog/BlogList.jsx
 import React, { useState, useEffect, useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Container, Card, Button, Spinner, Row, Col } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import { Container, Button, Spinner } from "react-bootstrap";
 import { FaTrash, FaEdit } from "react-icons/fa";
 import { supabase } from "../../supabaseClient.js";
 import { useAuth } from "../../context/AuthContext.jsx";
@@ -9,19 +9,17 @@ import "./Blog.css";
 
 const PAGE_SIZE = 6;
 
-const BlogList = () => {
+export default function BlogList() {
   const { user, deletePost } = useAuth();
-  const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
-  const fetchPosts = useCallback(async () => {
-    setLoading(true);
-    const from = (page - 1) * PAGE_SIZE;
-    const to = page * PAGE_SIZE - 1;
-
+  // fetch and prefetch
+  const fetchPosts = useCallback(async (pageToFetch) => {
+    const from = (pageToFetch - 1) * PAGE_SIZE;
+    const to = pageToFetch * PAGE_SIZE - 1;
     const { data, error } = await supabase
       .from("posts")
       .select("id, title, excerpt, image_url, published_at, author_id")
@@ -32,90 +30,99 @@ const BlogList = () => {
     else {
       setPosts((prev) => {
         const existing = new Set(prev.map((p) => p.id));
-        const newPosts = data.filter((p) => !existing.has(p.id));
-        return [...prev, ...newPosts];
+        const newOnes = data.filter((p) => !existing.has(p.id));
+        return [...prev, ...newOnes];
       });
       if (data.length < PAGE_SIZE) setHasMore(false);
     }
-    setLoading(false);
-  }, [page]);
+  }, []);
 
+  // initial & page changes
   useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
+    setLoading(true);
+    fetchPosts(page).finally(() => setLoading(false));
+  }, [page, fetchPosts]);
+
+  // prefetch next page
+  useEffect(() => {
+    if (hasMore) {
+      fetchPosts(page + 1).catch(() => {});
+    }
+  }, [posts]); // runs after posts append
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this post?")) return;
+    if (!window.confirm("Delete this post?")) return;
     try {
       await deletePost(id);
       setPosts((prev) => prev.filter((p) => p.id !== id));
-    } catch (err) {
-      console.error(err);
-      alert("Failed to delete post.");
+    } catch {
+      alert("Failed to delete.");
     }
   };
 
   return (
-    <section id="blog" className="blog-section py-5">
-      <Container fluid>
-        <h2 className="blog-heading text-center mb-4">Latest Insights</h2>
-        <Row className="g-4">
-          {posts.map((post) => (
-            <Col key={post.id} xs={12} sm={6} lg={4}>
-              <Card className="blog-card h-100">
-                {post.image_url && (
-                  <Card.Img
-                    variant="top"
+    <section id="blog" className="blog-section">
+      <Container>
+        <h2 className="blog-heading">Latest Insights</h2>
+
+        <div className="blog-grid">
+          {posts.map((post, idx) => (
+            <article
+              key={post.id}
+              className={`blog-card ${idx === 0 ? "featured" : ""}`}
+            >
+              {post.image_url && (
+                <picture className="card-img-container">
+                  <source
+                    type="image/webp"
+                    srcSet={`${post.image_url.replace(
+                      /\.jpg$/,
+                      ".webp"
+                    )} 600w, ${post.image_url.replace(/\.jpg$/, ".webp")} 900w`}
+                  />
+                  <img
+                    loading="lazy"
                     src={post.image_url}
                     alt={post.title}
-                    loading="lazy"
                     className="blog-card-img"
                   />
-                )}
-                <Card.Body className="d-flex flex-column">
-                  <Card.Title as="h3" className="h5">
-                    <Link to={`/blog/${post.id}`}>{post.title}</Link>
-                  </Card.Title>
-                  <Card.Text className="flex-grow-1">{post.excerpt}</Card.Text>
-                  <div className="d-flex justify-content-between align-items-center mt-3">
-                    <Button
-                      variant="primary"
-                      as={Link}
-                      to={`/blog/${post.id}`}
-                      className="read-more-btn"
-                    >
-                      Read More
-                    </Button>
+                  <div className="metadata-overlay">
+                    <time>
+                      {new Date(post.published_at).toLocaleDateString()}
+                    </time>
                     {user?.id === post.author_id && (
                       <div className="action-icons">
-                        <Button
-                          variant="outline-secondary"
-                          size="sm"
-                          as={Link}
-                          to={`/blog/edit/${post.id}`}
-                          className="edit-btn me-2"
-                        >
+                        <Link to={`/blog/edit/${post.id}`} className="edit-btn">
                           <FaEdit />
-                        </Button>
-                        <Button
-                          variant="outline-danger"
-                          size="sm"
+                        </Link>
+                        <button
                           onClick={() => handleDelete(post.id)}
                           className="delete-btn"
+                          aria-label="Delete post"
                         >
                           <FaTrash />
-                        </Button>
+                        </button>
                       </div>
                     )}
                   </div>
-                </Card.Body>
-              </Card>
-            </Col>
+                </picture>
+              )}
+
+              <div className="card-body">
+                <h3 className="card-title">
+                  <Link to={`/blog/${post.id}`}>{post.title}</Link>
+                </h3>
+                <p className="card-excerpt">{post.excerpt}</p>
+                <Link to={`/blog/${post.id}`} className="read-more">
+                  Read More →
+                </Link>
+              </div>
+            </article>
           ))}
-        </Row>
+        </div>
 
         {hasMore && (
-          <div className="text-center mt-4">
+          <div className="load-more-wrapper">
             <Button
               variant="outline-primary"
               onClick={() => setPage((p) => p + 1)}
@@ -128,6 +135,4 @@ const BlogList = () => {
       </Container>
     </section>
   );
-};
-
-export default BlogList;
+}
