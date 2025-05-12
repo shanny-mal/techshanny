@@ -20,18 +20,21 @@ import { supabase } from "../supabaseClient.js";
 import {
   BarChart,
   Bar,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { FaProjectDiagram, FaBlog, FaNewspaper, FaBook } from "react-icons/fa";
 import "./MemberDashboard.css";
 
 export default function MemberDashboard() {
   const { user, signOut } = useContext(AuthContext);
 
-  // ─── STATE ───────────────────────────────────────────────────────────────
+  // STATE
   const [isAdmin, setIsAdmin] = useState(false);
   const [projects, setProjects] = useState([]);
   const [posts, setPosts] = useState([]);
@@ -51,66 +54,49 @@ export default function MemberDashboard() {
     image_url: "",
   });
   const formRef = useRef();
-
   const norm = (arr) => (Array.isArray(arr) ? arr : []);
 
-  // ─── FETCH ALL DATA ─────────────────────────────────────────────────────────
+  // FETCH
   useEffect(() => {
     if (!user) return;
     setLoading(true);
-
     (async () => {
       try {
-        // 1) isAdmin flag
-        const { data: profile, error: profErr } = await supabase
+        const { data: profile } = await supabase
           .from("profiles")
           .select("is_admin")
           .eq("user_id", user.id)
           .maybeSingle();
-        if (profErr) throw profErr;
         setIsAdmin(Boolean(profile?.is_admin));
 
-        // 2) projects → owner_id + created_at
-        {
-          const { data, error } = await supabase
-            .from("projects")
-            .select("*")
-            .eq("owner_id", user.id)
-            .order("created_at", { ascending: false });
-          if (error) throw error;
-          setProjects(norm(data));
-        }
-
-        // 3) posts → author_id + published_at
-        {
-          const { data, error } = await supabase
-            .from("posts")
-            .select("*")
-            .eq("author_id", user.id)
-            .order("published_at", { ascending: false });
-          if (error && error.code !== "42P01") throw error;
-          setPosts(norm(data));
-        }
-
-        // 4) admin‑only tables
-        const adminFetch = async (table, setter) => {
-          const { data, error } = await supabase
+        const fetchTable = async (table, key, setter, orderBy) => {
+          const { data } = await supabase
             .from(table)
             .select("*")
-            .eq("user_id", user.id)
-            .order("created_at", { ascending: false });
-          if (error && error.code !== "42P01") throw error;
+            .eq(key, user.id)
+            .order(orderBy, { ascending: false });
           setter(norm(data));
         };
+
+        await fetchTable("projects", "owner_id", setProjects, "created_at");
+        await fetchTable("posts", "author_id", setPosts, "published_at");
         if (isAdmin) {
-          await Promise.all([
-            adminFetch("newsletters", setNewsletters),
-            adminFetch("resources", setResources),
-            adminFetch("case_studies", setCaseStudies),
-          ]);
+          await fetchTable(
+            "newsletters",
+            "user_id",
+            setNewsletters,
+            "created_at"
+          );
+          await fetchTable("resources", "user_id", setResources, "created_at");
+          await fetchTable(
+            "case_studies",
+            "user_id",
+            setCaseStudies,
+            "created_at"
+          );
         }
       } catch (err) {
-        console.error("Dashboard load error:", err);
+        console.error(err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -118,166 +104,118 @@ export default function MemberDashboard() {
     })();
   }, [user, isAdmin]);
 
-  // ─── PROJECT CHART DATA ────────────────────────────────────────────────────
-  const projectChart = useMemo(() => {
-    const counts = {};
+  // CHART DATA
+  const monthlyProjects = useMemo(() => {
+    const cnt = {};
     projects.forEach((p) => {
-      const label = new Date(p.created_at).toLocaleString("default", {
+      const m = new Date(p.created_at).toLocaleString("default", {
         month: "short",
-        year: "numeric",
       });
-      counts[label] = (counts[label] || 0) + 1;
+      cnt[m] = (cnt[m] || 0) + 1;
     });
-    return Object.entries(counts).map(([name, count]) => ({ name, count }));
+    return Object.entries(cnt).map(([name, count]) => ({ name, count }));
   }, [projects]);
 
-  // ─── CREATE / EDIT HANDLER ───────────────────────────────────────────────────
+  // CREATE / EDIT
   const handleCreate = async (e) => {
     e.preventDefault();
     if (!modalContext) return;
     setLoading(true);
 
-    try {
-      if (modalContext === "project") {
-        // Insert project
-        const { error } = await supabase.from("projects").insert([
-          {
+    const table =
+      modalContext === "project"
+        ? "projects"
+        : modalContext === "post"
+        ? "posts"
+        : modalContext === "newsletter"
+        ? "newsletters"
+        : modalContext === "resource"
+        ? "resources"
+        : "case_studies";
+
+    const payload =
+      modalContext === "project"
+        ? {
             owner_id: user.id,
             name: formData.title,
             description: formData.content,
             link: formData.image_url,
-          },
-        ]);
-        if (error) throw error;
-        const { data } = await supabase
-          .from("projects")
-          .select("*")
-          .eq("owner_id", user.id)
-          .order("created_at", { ascending: false });
-        setProjects(norm(data));
-      } else if (modalContext === "post") {
-        // Insert post
-        const { error } = await supabase.from("posts").insert([
-          {
+          }
+        : modalContext === "post"
+        ? {
             author_id: user.id,
             title: formData.title,
             excerpt: formData.excerpt,
             content: formData.content,
             image_url: formData.image_url,
-          },
-        ]);
-        if (error) throw error;
-        const { data } = await supabase
-          .from("posts")
-          .select("*")
-          .eq("author_id", user.id)
-          .order("published_at", { ascending: false });
-        setPosts(norm(data));
-      } else {
-        // Insert into admin tables
-        const table =
-          modalContext === "caseStudy" ? "case_studies" : modalContext + "s";
-        const payload = {
-          user_id: user.id,
-          title: formData.title,
-          content: formData.content,
-        };
-        const { error } = await supabase.from(table).insert([payload]);
-        if (error && error.code !== "42P01") throw error;
-        const { data } = await supabase
-          .from(table)
-          .select("*")
-          .eq("user_id", user.id)
-          .order("created_at", { ascending: false });
-        switch (modalContext) {
-          case "newsletter":
-            setNewsletters(norm(data));
-            break;
-          case "resource":
-            setResources(norm(data));
-            break;
-          case "caseStudy":
-            setCaseStudies(norm(data));
-            break;
-        }
-      }
+          }
+        : {
+            user_id: user.id,
+            title: formData.title,
+            content: formData.content,
+          };
+
+    try {
+      const { error } = await supabase.from(table).insert([payload]);
+      if (error) throw error;
+
+      // re-fetch
+      const setters = {
+        projects: setProjects,
+        posts: setPosts,
+        newsletters: setNewsletters,
+        resources: setResources,
+        case_studies: setCaseStudies,
+      };
+      const key = table === "projects" ? "owner_id" : "author_id";
+      const orderBy = table === "posts" ? "published_at" : "created_at";
+      const { data } = await supabase
+        .from(table)
+        .select("*")
+        .eq(key, user.id)
+        .order(orderBy, { ascending: false });
+      setters[table](norm(data));
     } catch (err) {
-      console.error("Create/Edit error:", err);
+      console.error(err);
       setError(err.message);
     } finally {
       setShowModal(false);
-      setFormData({
-        title: "",
-        excerpt: "",
-        content: "",
-        image_url: "",
-      });
       setLoading(false);
+      setFormData({ title: "", excerpt: "", content: "", image_url: "" });
     }
   };
 
-  // ─── DELETE HANDLER ─────────────────────────────────────────────────────────
+  // DELETE
   const handleDelete = async (ctx, id) => {
-    if (!window.confirm("Are you sure you want to delete this item?")) return;
+    if (!window.confirm("Delete this item?")) return;
     setLoading(true);
     try {
       const table = ctx === "caseStudies" ? "case_studies" : ctx;
       await supabase.from(table).delete().eq("id", id);
-
-      // re-fetch whichever list
-      let data;
-      if (table === "projects") {
-        ({ data } = await supabase
-          .from("projects")
-          .select("*")
-          .eq("owner_id", user.id)
-          .order("created_at", { ascending: false }));
-        setProjects(norm(data));
-      } else if (table === "posts") {
-        ({ data } = await supabase
-          .from("posts")
-          .select("*")
-          .eq("author_id", user.id)
-          .order("published_at", { ascending: false }));
-        setPosts(norm(data));
-      } else if (table === "newsletters") {
-        ({ data } = await supabase
-          .from("newsletters")
-          .select("*")
-          .eq("user_id", user.id)
-          .order("created_at", { ascending: false }));
-        setNewsletters(norm(data));
-      } else if (table === "resources") {
-        ({ data } = await supabase
-          .from("resources")
-          .select("*")
-          .eq("user_id", user.id)
-          .order("created_at", { ascending: false }));
-        setResources(norm(data));
-      } else if (table === "case_studies") {
-        ({ data } = await supabase
-          .from("case_studies")
-          .select("*")
-          .eq("user_id", user.id)
-          .order("created_at", { ascending: false }));
-        setCaseStudies(norm(data));
-      }
+      const setters = {
+        projects: setProjects,
+        posts: setPosts,
+        newsletters: setNewsletters,
+        resources: setResources,
+        case_studies: setCaseStudies,
+      };
+      setters[table]((prev) => prev.filter((r) => r.id !== id));
     } catch (err) {
-      console.error("Delete error:", err);
+      console.error(err);
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // trap focus in modal
+  // FOCUS trap
   useEffect(() => {
     if (showModal && formRef.current) {
       formRef.current.querySelector("input,textarea")?.focus();
     }
   }, [showModal]);
 
-  // ─── RENDER ─────────────────────────────────────────────────────────────────
+  // require login
   if (!user) {
     return (
       <Container className="py-5">
@@ -288,279 +226,328 @@ export default function MemberDashboard() {
     );
   }
 
+  // === MAIN RENDER ===
   return (
-    <Container className="member-dashboard py-5" role="main">
-      {/* Welcome & Sign‑Out */}
-      <Row className="mb-4">
-        <Col>
-          <Card className="shadow-sm">
-            <Card.Body className="d-flex justify-content-between align-items-center">
-              <div>
-                <h2>Hello, {user.email}</h2>
-                <small className="text-muted">
-                  Member since {new Date(user.created_at).toLocaleDateString()}
-                </small>
-                {isAdmin && (
-                  <Alert className="mt-2" variant="info">
-                    You have admin privileges.
-                  </Alert>
-                )}
-              </div>
-              <Button variant="outline-secondary" onClick={signOut}>
-                Sign Out
-              </Button>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Summary Cards */}
-      <Row className="gy-3 mb-4">
-        <Col xs={6} md={3}>
-          <Card className="summary-card">
-            <Card.Body>
-              <h3>{projects.length}</h3>
-              <p>Projects</p>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col xs={6} md={3}>
-          <Card className="summary-card">
-            <Card.Body>
-              <h3>{posts.length}</h3>
-              <p>Blog Posts</p>
-            </Card.Body>
-          </Card>
-        </Col>
-        {isAdmin && (
-          <>
-            <Col xs={6} md={2}>
-              <Card className="summary-card">
-                <Card.Body>
-                  <h3>{newsletters.length}</h3>
-                  <p>Newsletters</p>
-                </Card.Body>
-              </Card>
-            </Col>
-            <Col xs={6} md={2}>
-              <Card className="summary-card">
-                <Card.Body>
-                  <h3>{resources.length}</h3>
-                  <p>Resources</p>
-                </Card.Body>
-              </Card>
-            </Col>
-            <Col xs={6} md={2}>
-              <Card className="summary-card">
-                <Card.Body>
-                  <h3>{caseStudies.length}</h3>
-                  <p>Case Studies</p>
-                </Card.Body>
-              </Card>
-            </Col>
-          </>
-        )}
-      </Row>
-
-      {/* Tabs */}
+    <Container fluid className="member-dashboard">
       <Tab.Container defaultActiveKey="projects">
-        <Nav variant="pills" className="mb-3 flex-wrap">
-          <Nav.Item>
-            <Nav.Link eventKey="projects">Projects</Nav.Link>
-          </Nav.Item>
-          <Nav.Item>
-            <Nav.Link eventKey="posts">Blog Posts</Nav.Link>
-          </Nav.Item>
-          {isAdmin && (
-            <>
-              <Nav.Item>
-                <Nav.Link eventKey="newsletters">Newsletters</Nav.Link>
-              </Nav.Item>
-              <Nav.Item>
-                <Nav.Link eventKey="resources">Resources</Nav.Link>
-              </Nav.Item>
-              <Nav.Item>
-                <Nav.Link eventKey="caseStudies">Case Studies</Nav.Link>
-              </Nav.Item>
-            </>
-          )}
-        </Nav>
-
-        <Tab.Content>
-          {[
-            { key: "projects", data: projects, label: "Project" },
-            { key: "posts", data: posts, label: "Blog Post" },
-            ...(isAdmin
-              ? [
-                  {
-                    key: "newsletters",
-                    data: newsletters,
-                    label: "Newsletter",
-                  },
-                  { key: "resources", data: resources, label: "Resource" },
-                  {
-                    key: "caseStudies",
-                    data: caseStudies,
-                    label: "Case Study",
-                  },
-                ]
-              : []),
-          ].map(({ key, data, label }) => (
-            <Tab.Pane eventKey={key} key={key}>
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <h4>{label}s</h4>
-                <Button
-                  variant="primary"
-                  onClick={() => {
-                    setModalContext(
-                      key === "caseStudies" ? "caseStudy" : key.slice(0, -1)
-                    );
-                    setFormData({
-                      title: "",
-                      excerpt: "",
-                      content: "",
-                      image_url: "",
-                    });
-                    setShowModal(true);
-                  }}
-                >
-                  + New {label}
-                </Button>
-              </div>
-
-              {loading ? (
-                <div className="text-center py-5">
-                  <Spinner animation="border" />
-                </div>
-              ) : data.length === 0 ? (
-                <Alert variant="secondary">No {label}s yet.</Alert>
-              ) : (
+        <Row>
+          {/* Sidebar (desktop) */}
+          <Col lg={2} className="sidebar d-none d-lg-block">
+            <Nav variant="pills" className="flex-column">
+              <Nav.Link eventKey="projects" as="button">
+                <FaProjectDiagram /> Projects
+              </Nav.Link>
+              <Nav.Link eventKey="posts" as="button">
+                <FaBlog /> Posts
+              </Nav.Link>
+              {isAdmin && (
                 <>
-                  {key === "projects" && projectChart.length > 0 && (
-                    <div className="mb-4 chart-container">
-                      <ResponsiveContainer width="100%" height={200}>
-                        <BarChart data={projectChart}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="name" />
-                          <YAxis allowDecimals={false} />
-                          <Tooltip />
-                          <Bar dataKey="count" fill="#A67B5B" />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </div>
-                  )}
-
-                  <Table responsive hover className="mb-4 bg-white">
-                    <thead>
-                      <tr>
-                        <th>#</th>
-                        <th>Title</th>
-                        <th>
-                          {key === "posts"
-                            ? "Excerpt"
-                            : key === "projects"
-                            ? "Description"
-                            : "Created"}
-                        </th>
-                        {key === "posts" && <th>Image</th>}
-                        {key === "posts" && <th>Published</th>}
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {data.map((item, idx) => (
-                        <tr key={item.id}>
-                          <td>{idx + 1}</td>
-                          <td>{item.title || item.name}</td>
-                          <td>
-                            {key === "posts"
-                              ? item.excerpt
-                              : key === "projects"
-                              ? item.description
-                              : new Date(item.created_at).toLocaleDateString()}
-                          </td>
-
-                          {key === "posts" && (
-                            <>
-                              <td>
-                                {item.image_url ? (
-                                  <Image
-                                    src={item.image_url}
-                                    thumbnail
-                                    style={{
-                                      width: 50,
-                                      height: 50,
-                                      objectFit: "cover",
-                                    }}
-                                  />
-                                ) : (
-                                  "—"
-                                )}
-                              </td>
-                              <td>
-                                {item.published_at
-                                  ? new Date(
-                                      item.published_at
-                                    ).toLocaleDateString()
-                                  : "—"}
-                              </td>
-                            </>
-                          )}
-
-                          <td>
-                            <Button
-                              variant="outline-secondary"
-                              size="sm"
-                              onClick={() => {
-                                setModalContext(
-                                  key === "caseStudies"
-                                    ? "caseStudy"
-                                    : key.slice(0, -1)
-                                );
-                                setFormData({
-                                  title: item.title || item.name,
-                                  excerpt: item.excerpt || "",
-                                  content:
-                                    item.content || item.description || "",
-                                  image_url: item.image_url || item.link || "",
-                                });
-                                setShowModal(true);
-                              }}
-                            >
-                              Edit
-                            </Button>{" "}
-                            <Button
-                              variant="outline-danger"
-                              size="sm"
-                              onClick={() => handleDelete(key, item.id)}
-                            >
-                              Delete
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </Table>
+                  <Nav.Link eventKey="newsletters" as="button">
+                    <FaNewspaper /> Newsletters
+                  </Nav.Link>
+                  <Nav.Link eventKey="resources" as="button">
+                    <FaBook /> Resources
+                  </Nav.Link>
+                  <Nav.Link eventKey="caseStudies" as="button">
+                    <FaBook /> Case Studies
+                  </Nav.Link>
                 </>
               )}
-            </Tab.Pane>
-          ))}
-        </Tab.Content>
+            </Nav>
+          </Col>
+
+          {/* Main content */}
+          <Col lg={10}>
+            {/* Mobile pills */}
+            <Nav
+              variant="pills"
+              className="d-flex d-lg-none justify-content-around mb-3"
+            >
+              <Nav.Item>
+                <Nav.Link eventKey="projects">Projects</Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey="posts">Posts</Nav.Link>
+              </Nav.Item>
+              {isAdmin && (
+                <>
+                  <Nav.Item>
+                    <Nav.Link eventKey="newsletters">Newsletters</Nav.Link>
+                  </Nav.Item>
+                  <Nav.Item>
+                    <Nav.Link eventKey="resources">Resources</Nav.Link>
+                  </Nav.Item>
+                  <Nav.Item>
+                    <Nav.Link eventKey="caseStudies">Case Studies</Nav.Link>
+                  </Nav.Item>
+                </>
+              )}
+            </Nav>
+
+            <Tab.Content>
+              {[
+                { key: "projects", data: projects, label: "Project" },
+                { key: "posts", data: posts, label: "Blog Post" },
+                ...(isAdmin
+                  ? [
+                      {
+                        key: "newsletters",
+                        data: newsletters,
+                        label: "Newsletter",
+                      },
+                      { key: "resources", data: resources, label: "Resource" },
+                      {
+                        key: "caseStudies",
+                        data: caseStudies,
+                        label: "Case Study",
+                      },
+                    ]
+                  : []),
+              ].map(({ key, data, label }) => (
+                <Tab.Pane eventKey={key} key={key}>
+                  {/* Welcome Card on Projects */}
+                  {key === "projects" && (
+                    <Card className="welcome-card mb-4">
+                      <Card.Body className="d-flex justify-content-between">
+                        <div>
+                          <h2>Hello, {user.email}</h2>
+                          <small className="text-muted">
+                            Member since{" "}
+                            {new Date(user.created_at).toLocaleDateString()}
+                          </small>
+                          {isAdmin && (
+                            <Alert variant="info" className="mt-2">
+                              You have admin privileges.
+                            </Alert>
+                          )}
+                        </div>
+                        <Button variant="outline-secondary" onClick={signOut}>
+                          Sign Out
+                        </Button>
+                      </Card.Body>
+                    </Card>
+                  )}
+
+                  {/* Summary Cards on Projects */}
+                  {key === "projects" && (
+                    <Row className="summary-row mb-4">
+                      <Col xs={6} md={3}>
+                        <Card className="summary-card">
+                          <Card.Body>
+                            <FaProjectDiagram className="summary-icon" />
+                            <h3>{projects.length}</h3>
+                            <p>Projects</p>
+                            <ResponsiveContainer width="100%" height={50}>
+                              <LineChart data={monthlyProjects}>
+                                <Line
+                                  dataKey="count"
+                                  stroke="#A67B5B"
+                                  dot={false}
+                                  strokeWidth={2}
+                                />
+                              </LineChart>
+                            </ResponsiveContainer>
+                          </Card.Body>
+                        </Card>
+                      </Col>
+                      <Col xs={6} md={3}>
+                        <Card className="summary-card">
+                          <Card.Body>
+                            <FaBlog className="summary-icon" />
+                            <h3>{posts.length}</h3>
+                            <p>Posts</p>
+                            <ResponsiveContainer width="100%" height={50}>
+                              <BarChart data={monthlyProjects}>
+                                <Bar dataKey="count" fill="#7A5235" />
+                              </BarChart>
+                            </ResponsiveContainer>
+                          </Card.Body>
+                        </Card>
+                      </Col>
+                      {isAdmin && (
+                        <>
+                          <Col xs={6} md={2}>
+                            <Card className="summary-card">
+                              <Card.Body>
+                                <FaNewspaper className="summary-icon" />
+                                <h3>{newsletters.length}</h3>
+                                <p>Newsletters</p>
+                              </Card.Body>
+                            </Card>
+                          </Col>
+                          <Col xs={6} md={2}>
+                            <Card className="summary-card">
+                              <Card.Body>
+                                <FaBook className="summary-icon" />
+                                <h3>{resources.length}</h3>
+                                <p>Resources</p>
+                              </Card.Body>
+                            </Card>
+                          </Col>
+                          <Col xs={6} md={2}>
+                            <Card className="summary-card">
+                              <Card.Body>
+                                <FaBook className="summary-icon" />
+                                <h3>{caseStudies.length}</h3>
+                                <p>Case Studies</p>
+                              </Card.Body>
+                            </Card>
+                          </Col>
+                        </>
+                      )}
+                    </Row>
+                  )}
+
+                  {/* Section Header + “New” FAB */}
+                  <div className="d-flex justify-content-between mb-2">
+                    <h4>{label}s</h4>
+                    <Button
+                      variant="primary"
+                      className="fab"
+                      onClick={() => {
+                        setModalContext(
+                          key === "caseStudies" ? "caseStudy" : key.slice(0, -1)
+                        );
+                        setFormData({
+                          title: "",
+                          excerpt: "",
+                          content: "",
+                          image_url: "",
+                        });
+                        setShowModal(true);
+                      }}
+                    >
+                      +
+                    </Button>
+                  </div>
+
+                  {/* Loading / Empty / Table */}
+                  {loading ? (
+                    <div className="text-center py-5">
+                      <Spinner animation="border" />
+                    </div>
+                  ) : data.length === 0 ? (
+                    <Alert variant="secondary">No {label}s yet.</Alert>
+                  ) : (
+                    <Table
+                      responsive
+                      hover
+                      striped
+                      className="mb-4 bg-white table-custom"
+                    >
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Title</th>
+                          <th>
+                            {key === "posts"
+                              ? "Excerpt"
+                              : key === "projects"
+                              ? "Description"
+                              : "Created"}
+                          </th>
+                          {key === "posts" && <th>Image</th>}
+                          {key === "posts" && <th>Published</th>}
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data.map((item, idx) => (
+                          <tr key={item.id}>
+                            <td>{idx + 1}</td>
+                            <td>{item.title || item.name}</td>
+                            <td>
+                              {key === "posts"
+                                ? item.excerpt
+                                : key === "projects"
+                                ? item.description
+                                : new Date(
+                                    item.created_at
+                                  ).toLocaleDateString()}
+                            </td>
+                            {key === "posts" && (
+                              <>
+                                <td>
+                                  {item.image_url ? (
+                                    <Image
+                                      src={item.image_url}
+                                      thumbnail
+                                      style={{
+                                        width: 50,
+                                        height: 50,
+                                        objectFit: "cover",
+                                      }}
+                                    />
+                                  ) : (
+                                    "—"
+                                  )}
+                                </td>
+                                <td>
+                                  {item.published_at
+                                    ? new Date(
+                                        item.published_at
+                                      ).toLocaleDateString()
+                                    : "—"}
+                                </td>
+                              </>
+                            )}
+                            <td>
+                              <Button
+                                variant="outline-secondary"
+                                size="sm"
+                                className="me-2"
+                                onClick={() => {
+                                  setModalContext(
+                                    key === "caseStudies"
+                                      ? "caseStudy"
+                                      : key.slice(0, -1)
+                                  );
+                                  setFormData({
+                                    title: item.title || item.name,
+                                    excerpt: item.excerpt || "",
+                                    content:
+                                      item.content || item.description || "",
+                                    image_url:
+                                      item.image_url || item.link || "",
+                                  });
+                                  setShowModal(true);
+                                }}
+                              >
+                                Edit
+                              </Button>
+                              <Button
+                                variant="outline-danger"
+                                size="sm"
+                                onClick={() => handleDelete(key, item.id)}
+                              >
+                                Delete
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  )}
+                </Tab.Pane>
+              ))}
+            </Tab.Content>
+          </Col>
+        </Row>
       </Tab.Container>
 
-      {/* Create / Edit Modal */}
+      {/* Create/Edit Modal */}
       <Modal
         show={showModal}
         onHide={() => setShowModal(false)}
         centered
-        aria-labelledby="create-modal-title"
+        aria-labelledby="crud-modal"
       >
         <Form ref={formRef} onSubmit={handleCreate}>
           <Modal.Header closeButton>
-            <Modal.Title id="create-modal-title">
+            <Modal.Title id="crud-modal">
               {formData.title
-                ? `Edit ${modalContext}`
-                : `Create New ${
+                ? `Edit ${modalContext}`
+                : `Create New ${
                     modalContext === "caseStudy" ? "Case Study" : modalContext
                   }`}
             </Modal.Title>
@@ -578,7 +565,6 @@ export default function MemberDashboard() {
                 required
               />
             </Form.Group>
-
             {modalContext === "post" && (
               <>
                 <Form.Group controlId="formExcerpt" className="mb-3">
@@ -593,7 +579,7 @@ export default function MemberDashboard() {
                   />
                 </Form.Group>
                 <Form.Group controlId="formImageUrl" className="mb-3">
-                  <Form.Label>Image URL</Form.Label>
+                  <Form.Label>Image URL</Form.Label>
                   <Form.Control
                     type="url"
                     placeholder="https://..."
@@ -605,17 +591,18 @@ export default function MemberDashboard() {
                 </Form.Group>
               </>
             )}
-
             <Form.Group controlId="formContent">
               <Form.Label>
-                {modalContext === "post"
-                  ? "Content (HTML/Markdown)"
-                  : "Description"}
+                {modalContext === "post" ? "Content (HTML/MD)" : "Description"}
               </Form.Label>
               <Form.Control
                 as="textarea"
                 rows={modalContext === "post" ? 8 : 4}
-                placeholder="Enter text"
+                placeholder={
+                  modalContext === "post"
+                    ? "Full post content (HTML or Markdown)"
+                    : "Enter text"
+                }
                 value={formData.content}
                 onChange={(e) =>
                   setFormData((f) => ({ ...f, content: e.target.value }))
@@ -623,14 +610,7 @@ export default function MemberDashboard() {
               />
             </Form.Group>
           </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowModal(false)}>
-              Cancel
-            </Button>
-            <Button variant="primary" type="submit" disabled={loading}>
-              {loading ? "Saving…" : "Save"}
-            </Button>
-          </Modal.Footer>
+          <Modal.Footer>…</Modal.Footer>
         </Form>
       </Modal>
 
