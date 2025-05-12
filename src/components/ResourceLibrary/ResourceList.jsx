@@ -9,64 +9,84 @@ import {
   Modal,
   Form,
   Spinner,
-  Alert,
+  Accordion,
 } from "react-bootstrap";
 import ResourceCard from "./ResourceCard.jsx";
 import { supabase } from "../../supabaseClient.js";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "./Resources.css";
 
 const MAILCHIMP_ENDPOINT = import.meta.env.VITE_MAILCHIMP_ENDPOINT;
 
-const ResourceList = () => {
+export default function ResourceList() {
   const [resources, setResources] = useState([]);
   const [filtered, setFiltered] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [topics, setTopics] = useState([]);
+  const [years, setYears] = useState([]);
+  const [topicFilter, setTopicFilter] = useState("All");
+  const [yearFilter, setYearFilter] = useState("All");
 
   const [showModal, setShowModal] = useState(false);
-  const [pendingResource, setPendingResource] = useState(null);
+  const [pending, setPending] = useState(null);
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  // 1) Fetch resources
+  // 1) Fetch resources from Supabase
   useEffect(() => {
-    const fetchResources = async () => {
+    (async () => {
       const { data, error } = await supabase
         .from("resources")
-        .select("id, title, description, file_url, category");
+        .select("id, title, description, download_url, topic, created_at");
+
       if (error) {
         console.error("Failed to load resources:", error);
         return;
       }
+
+      // Enrich each resource with a `year` field
+      data.forEach((r) => {
+        r.year = new Date(r.created_at).getFullYear().toString();
+      });
+
       setResources(data);
       setFiltered(data);
-      const cats = Array.from(
-        new Set(data.map((r) => r.category).filter(Boolean))
+
+      // Build topic filter list
+      const uniqueTopics = Array.from(
+        new Set(data.map((r) => r.topic).filter(Boolean))
       );
-      setCategories(["All", ...cats]);
-    };
-    fetchResources();
+      setTopics(["All", ...uniqueTopics]);
+
+      // Build year filter list (sorted descending)
+      const uniqueYears = Array.from(new Set(data.map((r) => r.year)));
+      setYears(["All", ...uniqueYears.sort((a, b) => b - a)]);
+    })();
   }, []);
 
-  // 2) Filter whenever category changes
+  // 2) Apply filters whenever selection changes
   useEffect(() => {
-    if (selectedCategory === "All") {
-      setFiltered(resources);
-    } else {
-      setFiltered(resources.filter((r) => r.category === selectedCategory));
+    let out = resources;
+    if (topicFilter !== "All") {
+      out = out.filter((r) => r.topic === topicFilter);
     }
-  }, [selectedCategory, resources]);
+    if (yearFilter !== "All") {
+      out = out.filter((r) => r.year === yearFilter);
+    }
+    setFiltered(out);
+  }, [topicFilter, yearFilter, resources]);
 
-  // 3) Kick off gating modal
-  const handleDownloadClick = (resource) => {
-    setPendingResource(resource);
+  // Open the email-gate modal
+  const onDownload = (resource) => {
+    setPending(resource);
     setEmail("");
     setError("");
     setShowModal(true);
   };
 
-  // 4) On form submit, call Mailchimp then trigger download
-  const handleSignupAndDownload = async (e) => {
+  // Handle Mailchimp signup + download
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     setError("");
@@ -75,7 +95,6 @@ const ResourceList = () => {
       if (!/\S+@\S+\.\S+/.test(email)) {
         throw new Error("Please enter a valid email address.");
       }
-      // Send to your Mailchimp subscribe webhook
       const res = await fetch(MAILCHIMP_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -85,8 +104,9 @@ const ResourceList = () => {
         const body = await res.json().catch(() => ({}));
         throw new Error(body.error || "Subscription failed.");
       }
-      // After subscribe, start download
-      window.location.href = pendingResource.file_url;
+      toast.success("Subscribed! Download starting…");
+      // Trigger the actual download
+      window.location.href = pending.download_url;
       setShowModal(false);
     } catch (err) {
       console.error("Mailchimp error:", err);
@@ -97,57 +117,99 @@ const ResourceList = () => {
   };
 
   return (
-    <Container className="py-5">
+    <Container className="resources-section py-5">
       <h2 className="mb-4">Resource Library</h2>
 
-      {/* Category filters */}
-      <ButtonGroup className="mb-4">
-        {categories.map((cat) => (
-          <Button
-            key={cat}
-            variant={cat === selectedCategory ? "primary" : "outline-primary"}
-            onClick={() => setSelectedCategory(cat)}
-          >
-            {cat}
-          </Button>
-        ))}
-      </ButtonGroup>
+      {/* Desktop filters */}
+      <div className="filter-bar d-none d-md-flex mb-4">
+        <ButtonGroup className="me-3">
+          {topics.map((t) => (
+            <Button
+              key={t}
+              variant={t === topicFilter ? "primary" : "outline-primary"}
+              onClick={() => setTopicFilter(t)}
+            >
+              {t}
+            </Button>
+          ))}
+        </ButtonGroup>
+        <ButtonGroup>
+          {years.map((y) => (
+            <Button
+              key={y}
+              variant={y === yearFilter ? "primary" : "outline-primary"}
+              onClick={() => setYearFilter(y)}
+            >
+              {y}
+            </Button>
+          ))}
+        </ButtonGroup>
+      </div>
 
-      {/* Grid of cards */}
+      {/* Mobile accordion filters */}
+      <Accordion className="d-md-none mb-4">
+        <Accordion.Item eventKey="0">
+          <Accordion.Header>Filters</Accordion.Header>
+          <Accordion.Body>
+            <Form.Label>Topic</Form.Label>
+            <Form.Select
+              value={topicFilter}
+              onChange={(e) => setTopicFilter(e.target.value)}
+              className="mb-3"
+            >
+              {topics.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </Form.Select>
+
+            <Form.Label>Year</Form.Label>
+            <Form.Select
+              value={yearFilter}
+              onChange={(e) => setYearFilter(e.target.value)}
+            >
+              {years.map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
+            </Form.Select>
+          </Accordion.Body>
+        </Accordion.Item>
+      </Accordion>
+
+      {/* Resource cards */}
       <Row xs={1} sm={2} lg={3} className="g-4">
         {filtered.map((res) => (
           <Col key={res.id}>
-            <ResourceCard resource={res} onDownload={handleDownloadClick} />
+            <ResourceCard resource={res} onDownload={onDownload} />
           </Col>
         ))}
       </Row>
 
-      {/* Email‑gate modal */}
+      {/* Email-gate modal */}
       <Modal show={showModal} onHide={() => setShowModal(false)} centered>
-        <Form onSubmit={handleSignupAndDownload}>
+        <Form onSubmit={handleSubmit}>
           <Modal.Header closeButton>
-            <Modal.Title>Just one more step…</Modal.Title>
+            <Modal.Title>Unlock “{pending?.title}”</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <p>
-              Enter your email to unlock the download for{" "}
-              <strong>{pendingResource?.title}</strong>.
-            </p>
-            <Form.Group controlId="signupEmail">
+            <p>Enter your email to download:</p>
+            <Form.Group controlId="mcEmail">
               <Form.Label>Email address</Form.Label>
               <Form.Control
                 type="email"
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                isInvalid={!!error}
                 required
               />
-            </Form.Group>
-            {error && (
-              <Alert variant="danger" className="mt-3">
+              <Form.Control.Feedback type="invalid">
                 {error}
-              </Alert>
-            )}
+              </Form.Control.Feedback>
+            </Form.Group>
           </Modal.Body>
           <Modal.Footer>
             <Button
@@ -159,7 +221,7 @@ const ResourceList = () => {
             </Button>
             <Button type="submit" variant="primary" disabled={submitting}>
               {submitting ? (
-                <Spinner animation="border" size="sm" />
+                <Spinner as="span" animation="border" size="sm" />
               ) : (
                 "Unlock Download"
               )}
@@ -167,8 +229,8 @@ const ResourceList = () => {
           </Modal.Footer>
         </Form>
       </Modal>
+
+      <ToastContainer position="top-right" autoClose={5000} />
     </Container>
   );
-};
-
-export default ResourceList;
+}

@@ -1,0 +1,45 @@
+/* src/components/Tools/ROICalculator.css */
+
+:root {
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --color-primary: #A67B5B;
+    --color-bg-light: #f5f3ee;
+  }
+  
+  .roi-calculator {
+    background: var(--color-bg-light);
+    padding-bottom: var(--spacing-lg);
+  }
+  
+  .roi-calculator h2 {
+    font-size: 2.5rem;
+    color: #3e2723;
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .chart-wrapper {
+    background: white;
+    border-radius: 8px;
+    padding: var(--spacing-md);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  }
+  
+  button {
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  button:hover {
+    transform: translateY(-2px);
+  }
+  
+  @media (max-width: 576px) {
+    .roi-calculator h2 {
+      font-size: 2rem;
+    }
+    .chart-wrapper {
+      height: 250px;
+    }
+  }
+  

@@ -1,0 +1,89 @@
+/* src/components/Resources/Resources.css */
+
+/* Variables (if not already defined elsewhere) */
+:root {
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --radius: 8px;
+    --color-bg: #f5f3ee;
+    --color-primary: #A67B5B;
+    --shadow-sm: 0 4px 8px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Section wrapper */
+  .resources-section {
+    background: var(--color-bg);
+    padding: var(--spacing-lg) 0;
+  }
+  
+  /* Desktop filter bar */
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+  }
+  .filter-bar .btn {
+    margin: 0; /* gap handles spacing */
+  }
+  
+  /* Mobile accordion (always full width) */
+  .accordion .accordion-button {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--spacing-sm);
+  }
+  .accordion .accordion-body {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  /* Resource card */
+  .resource-card {
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: white;
+  }
+  .resource-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+  }
+  
+  /* Icon inside card */
+  .res-icon {
+    font-size: 2.5rem;
+    color: var(--color-primary);
+  }
+  
+  /* Card footer */
+  .resource-card .card-footer {
+    background: #fafafa;
+    border-top: 1px solid #eee;
+    font-size: 0.875rem;
+    color: #666;
+  }
+  
+  /* Hide desktop filters on small */
+  @media (max-width: 767.98px) {
+    .filter-bar {
+      display: none;
+    }
+  }
+  
+  /* Show accordion only on mobile */
+  @media (min-width: 768px) {
+    .accordion.d-md-none {
+      display: none;
+    }
+  }
+  
+  /* Toast container override (if needed) */
+  .Toastify__toast-container {
+    font-size: 0.9rem;
+  }
+  

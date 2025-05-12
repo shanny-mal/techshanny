@@ -1,5 +1,5 @@
 // src/components/Tools/ROICalculator.jsx
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import { Container, Form, Row, Col, Button, Alert } from "react-bootstrap";
 import {
   ResponsiveContainer,
@@ -9,15 +9,23 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
+  LineChart,
+  Line,
 } from "recharts";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import "./ROICalculator.css";
 
-const ROICalculator = () => {
+export default function ROICalculator() {
   const [hourlyRate, setHourlyRate] = useState("");
   const [hoursSaved, setHoursSaved] = useState("");
   const [months, setMonths] = useState("");
   const [error, setError] = useState("");
 
-  // parse inputs
+  // ref to chart area for PDF export
+  const chartRef = useRef(null);
+
+  // monthly savings
   const monthlySaving = useMemo(() => {
     const rate = parseFloat(hourlyRate);
     const hrs = parseFloat(hoursSaved);
@@ -25,54 +33,66 @@ const ROICalculator = () => {
     return rate * hrs;
   }, [hourlyRate, hoursSaved]);
 
-  // build chart data: cumulative savings
+  // build data for each month
   const chartData = useMemo(() => {
     const m = parseInt(months, 10);
-    if (isNaN(m) || m <= 0) return [];
-    const data = [];
-    for (let i = 1; i <= m; i++) {
-      data.push({
-        name: `Month ${i}`,
-        savings: parseFloat((monthlySaving * i).toFixed(2)),
-      });
-    }
-    return data;
+    if (isNaN(m) || m < 1) return [];
+    return Array.from({ length: m }, (_, i) => ({
+      name: `M${i + 1}`,
+      savings: parseFloat(((i + 1) * monthlySaving).toFixed(2)),
+    }));
   }, [monthlySaving, months]);
 
-  // total ROI
-  const totalROI = useMemo(() => {
-    return chartData.length ? chartData[chartData.length - 1].savings : 0;
-  }, [chartData]);
+  const totalROI =
+    chartData.length > 0 ? chartData[chartData.length - 1].savings : 0;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setError("");
+  // validate inputs on the fly
+  const validateInputs = () => {
     if (
       isNaN(parseFloat(hourlyRate)) ||
       isNaN(parseFloat(hoursSaved)) ||
       isNaN(parseInt(months, 10)) ||
-      parseInt(months, 10) <= 0
+      parseInt(months, 10) < 1
     ) {
-      setError("Please enter valid numeric values (months ≥ 1).");
+      setError("Please enter valid numbers (months ≥ 1).");
+    } else {
+      setError("");
     }
-    // otherwise chartData & totalROI will update automatically
+  };
+
+  // PDF export
+  const handleDownloadPDF = async () => {
+    if (!chartRef.current) return;
+    try {
+      const canvas = await html2canvas(chartRef.current, { scale: 2 });
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({ orientation: "landscape" });
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pdf.internal.pageSize.getWidth() - 20;
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      pdf.addImage(imgData, "PNG", 10, 10, pdfWidth, pdfHeight);
+      pdf.save("roi-savings.pdf");
+    } catch (err) {
+      console.error("PDF export failed:", err);
+      alert("Could not generate PDF. Please try again.");
+    }
   };
 
   return (
-    <Container className="py-5">
+    <Container className="roi-calculator py-5">
       <h2 className="mb-4">ROI Calculator</h2>
-      <Form onSubmit={handleSubmit}>
+
+      <Form onChange={validateInputs}>
         <Row className="gy-3">
           <Col md={4}>
             <Form.Group controlId="hourlyRate">
-              <Form.Label>Hourly Rate (₵)</Form.Label>
+              <Form.Label>Hourly Rate ($)</Form.Label>
               <Form.Control
                 type="number"
                 step="0.01"
                 placeholder="e.g. 50.00"
                 value={hourlyRate}
                 onChange={(e) => setHourlyRate(e.target.value)}
-                required
               />
             </Form.Group>
           </Col>
@@ -85,7 +105,6 @@ const ROICalculator = () => {
                 placeholder="e.g. 10"
                 value={hoursSaved}
                 onChange={(e) => setHoursSaved(e.target.value)}
-                required
               />
             </Form.Group>
           </Col>
@@ -97,38 +116,42 @@ const ROICalculator = () => {
                 placeholder="e.g. 12"
                 value={months}
                 onChange={(e) => setMonths(e.target.value)}
-                required
               />
             </Form.Group>
           </Col>
         </Row>
-        {error && (
-          <Alert className="mt-3" variant="danger">
-            {error}
-          </Alert>
-        )}
-        <Button className="mt-3" type="submit">
-          Calculate
-        </Button>
       </Form>
 
-      {chartData.length > 0 && (
+      {error && (
+        <Alert className="mt-3" variant="danger">
+          {error}
+        </Alert>
+      )}
+
+      {chartData.length > 0 && !error && (
         <>
-          <h4 className="mt-5">
-            Total Savings: ₵
-            {totalROI.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-          </h4>
-          <div style={{ width: "100%", height: 300 }} className="mt-4">
-            <ResponsiveContainer>
-              <BarChart
-                data={chartData}
-                margin={{ top: 20, right: 20, bottom: 20, left: 0 }}
-              >
+          <div className="d-flex align-items-center justify-content-between mt-4">
+            <h4>
+              Total Savings: $
+              {totalROI.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+            </h4>
+            <Button variant="secondary" onClick={handleDownloadPDF}>
+              Download PDF
+            </Button>
+          </div>
+
+          <div className="chart-wrapper mt-3" ref={chartRef}>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
-                <YAxis tickFormatter={(val) => `₵${val}`} />
-                <Tooltip formatter={(val) => [`₵${val}`, "Cumulative"]} />
-                <Bar dataKey="savings" fill="#A67B5B" />
+                <YAxis tickFormatter={(val) => `$${val}`} />
+                <Tooltip formatter={(val) => [`$${val}`, "Cumulative"]} />
+                <Bar
+                  dataKey="savings"
+                  fill="#A67B5B"
+                  isAnimationActive={true}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -136,6 +159,4 @@ const ROICalculator = () => {
       )}
     </Container>
   );
-};
-
-export default ROICalculator;
+}
