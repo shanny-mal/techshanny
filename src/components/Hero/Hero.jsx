@@ -3,86 +3,89 @@ import React, { useCallback } from "react";
 import { Container, Button } from "react-bootstrap";
 import "./Hero.css";
 
-// Note: Add the following to public/index.html for preloading the first hero image:
-// <link rel="preload" as="image" href="/image1.jpg">
-
 const slides = [
-  {
-    id: 1,
-    src: "/image1.jpg",
-    srcSet:
-      "/image1.jpg 600w, /image1.jpg 900w, /image1.jpg 1200w",
-    sizes: "(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw",
-    alt: "Team working together",
-    loading: "eager",
-  },
+  { id: 1, src: "/image1.jpg", alt: "Team working together", loading: "eager" },
   {
     id: 2,
     src: "/image2.jpg",
-    srcSet:
-      "/image2.jpg 600w, /image2.jpg 900w, /image2.jpg 1200w",
-    sizes: "(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw",
     alt: "Innovative tech solutions",
     loading: "lazy",
   },
-  {
-    id: 3,
-    src: "/image3.jpg",
-    srcSet:
-      "/image3.jpg 600w, /image3.jpg 900w, /image3.jpg 1200w",
-    sizes: "(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw",
-    alt: "Consulting session",
-    loading: "lazy",
-  },
+  { id: 3, src: "/image3.jpg", alt: "Consulting session", loading: "lazy" },
 ];
 
-const Hero = () => {
-  const handleGetStarted = useCallback(() => {
-    const aboutSection = document.getElementById("about");
-    if (aboutSection) {
-      aboutSection.scrollIntoView({ behavior: "smooth" });
-    }
+export default function Hero() {
+  const scrollTo = useCallback((id) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
-  const onButtonKeyDown = useCallback(
-    (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        handleGetStarted();
-      }
-    },
-    [handleGetStarted]
-  );
+  const handleRipple = (e) => {
+    const btn = e.currentTarget;
+    const circle = document.createElement("span");
+    const diameter = Math.max(btn.clientWidth, btn.clientHeight);
+    circle.style.width = circle.style.height = `${diameter}px`;
+    circle.style.left = `${e.clientX - btn.offsetLeft - diameter / 2}px`;
+    circle.style.top = `${e.clientY - btn.offsetTop - diameter / 2}px`;
+    circle.classList.add("ripple");
+    btn.appendChild(circle);
+    setTimeout(() => circle.remove(), 600);
+  };
 
   return (
     <section className="hero-section" id="home">
       <div className="hero-slider">
-        {slides.map((slide) => (
+        {slides.map((s, i) => (
           <img
-            key={slide.id}
+            key={s.id}
             className="hero-slide"
-            src={slide.src}
-            srcSet={slide.srcSet}
-            sizes={slide.sizes}
-            alt={slide.alt}
-            loading={slide.loading}
+            src={s.src}
+            alt={s.alt}
+            loading={s.loading}
           />
         ))}
       </div>
-      <div className="hero-overlay"></div>
+      <div className="hero-overlay" />
+
       <Container className="hero-content text-center">
-        <h1>Welcome to ShannyTechSolutions</h1>
-        <p>Your technology partner for innovation</p>
-        <Button
-          className="hero-btn"
-          onClick={handleGetStarted}
-          onKeyDown={onButtonKeyDown}
+        <h1>Empowering Your Digital Future</h1>
+        <p>Your technology partner for bespoke innovation &amp; growth</p>
+
+        <div className="hero-ctas">
+          <Button
+            variant="primary"
+            className="hero-btn"
+            onClick={(e) => {
+              handleRipple(e);
+              scrollTo("about");
+            }}
+          >
+            Get Started
+          </Button>
+          <Button
+            variant="outline-light"
+            className="hero-btn-secondary"
+            onClick={(e) => {
+              handleRipple(e);
+              scrollTo("contact");
+            }}
+          >
+            Request Demo
+          </Button>
+        </div>
+
+        <div
+          className="scroll-down"
+          onClick={() => scrollTo("about")}
+          role="button"
+          tabIndex={0}
+          aria-label="Scroll down to About"
+          onKeyDown={(e) =>
+            (e.key === "Enter" || e.key === " ") && scrollTo("about")
+          }
         >
-          Get Started
-        </Button>
+          ↓
+        </div>
       </Container>
     </section>
   );
-};
-
-export default Hero;
+}
