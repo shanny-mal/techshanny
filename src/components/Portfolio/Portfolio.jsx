@@ -1,5 +1,5 @@
 // src/components/Portfolio/Portfolio.jsx
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { Container, Modal, Button } from "react-bootstrap";
 import "./Portfolio.css";
 
@@ -11,9 +11,10 @@ const projects = [
     srcSet: "/c1.jpg 600w, /c1.jpg 900w, /c1.jpg 1200w",
     sizes: "(max-width: 768px) 100vw, 33vw",
     description:
-      "Developed a state-of-the-art corporate website emphasizing user experience and performance.",
+      "Developed a state-of-the-art corporate website emphasizing UX and performance.",
     details:
-      "In-depth case study: Our responsive corporate website increased engagement and conversion rates by leveraging modern design principles and robust development techniques.",
+      "Our responsive corporate website increased engagement and conversion rates by leveraging modern design principles and robust development techniques.",
+    tags: ["Web", "UI/UX"],
   },
   {
     id: 2,
@@ -22,9 +23,10 @@ const projects = [
     srcSet: "/e1.jpg 600w, /e1.jpg 900w, /e1.jpg 1200w",
     sizes: "(max-width: 768px) 100vw, 33vw",
     description:
-      "Engineered a robust e-commerce solution with secure payment integration and intuitive navigation.",
+      "Engineered a robust e-commerce solution with secure payments and intuitive navigation.",
     details:
-      "Detailed case study: Our e-commerce platform provided a seamless shopping experience that boosted online sales and improved customer retention.",
+      "Our platform provided a seamless shopping experience that boosted online sales and improved customer retention.",
+    tags: ["E-Commerce", "Backend"],
   },
   {
     id: 3,
@@ -33,38 +35,38 @@ const projects = [
     srcSet: "/n1.jpg 600w, /n1.jpg 900w, /n1.jpg 1200w",
     sizes: "(max-width: 768px) 100vw, 33vw",
     description:
-      "Designed and implemented a scalable, secure network infrastructure for large enterprises.",
+      "Designed and implemented scalable, secure network infrastructure for large enterprises.",
     details:
-      "Detailed case study: Our enterprise network infrastructure ensured maximum uptime and efficient data flow through state-of-the-art design and implementation.",
+      "Ensured maximum uptime and efficient data flow with state-of-the-art design and implementation.",
+    tags: ["Networking", "Security"],
   },
 ];
 
-const Portfolio = () => {
+export default function Portfolio() {
+  const [filter, setFilter] = useState("All");
   const [modalShow, setModalShow] = useState(false);
-  const [selectedProject, setSelectedProject] = useState(null);
+  const [selected, setSelected] = useState(null);
 
-  const handleCardClick = useCallback((project) => {
-    setSelectedProject(project);
-    setModalShow(true);
+  // derive unique tag list
+  const tagList = useMemo(() => {
+    const all = projects.flatMap((p) => p.tags);
+    return ["All", ...Array.from(new Set(all))];
   }, []);
 
-  const handleKeyDown = useCallback(
-    (e, project) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        handleCardClick(project);
-      }
-    },
-    [handleCardClick]
-  );
+  const filtered = useMemo(() => {
+    if (filter === "All") return projects;
+    return projects.filter((p) => p.tags.includes(filter));
+  }, [filter]);
 
-  const handleClose = () => setModalShow(false);
+  const openModal = useCallback((project) => {
+    setSelected(project);
+    setModalShow(true);
+  }, []);
 
   return (
     <section
       id="portfolio"
-      className="portfolio-section py-5"
-      data-aos="fade-up"
+      className="portfolio-section"
       aria-labelledby="portfolio-heading"
     >
       <Container>
@@ -74,71 +76,88 @@ const Portfolio = () => {
         >
           Our Portfolio
         </h2>
+
+        {/* Tag filter menu */}
+        <ul className="portfolio-filters">
+          {tagList.map((tag) => (
+            <li key={tag}>
+              <button
+                className={filter === tag ? "active" : ""}
+                onClick={() => setFilter(tag)}
+              >
+                {tag}
+              </button>
+            </li>
+          ))}
+        </ul>
+
         <div className="portfolio-grid">
-          {projects.map((project) => (
+          {filtered.map((proj) => (
             <div
-              key={project.id}
+              key={proj.id}
               className="portfolio-card"
               role="button"
-              tabIndex="0"
-              onClick={() => handleCardClick(project)}
-              onKeyDown={(e) => handleKeyDown(e, project)}
+              tabIndex={0}
+              onClick={() => openModal(proj)}
+              onKeyDown={(e) => {
+                if (e.key.match(/Enter| /)) {
+                  e.preventDefault();
+                  openModal(proj);
+                }
+              }}
             >
               <div className="card-img-container">
                 <img
-                  src={project.image}
-                  srcSet={project.srcSet}
-                  sizes={project.sizes}
-                  alt={project.title}
+                  src={proj.image}
+                  srcSet={proj.srcSet}
+                  sizes={proj.sizes}
+                  alt={proj.title}
                   className="portfolio-card-img"
                   loading="lazy"
                 />
+                <div className="card-overlay">
+                  <h3>{proj.title}</h3>
+                </div>
               </div>
               <div className="portfolio-card-body">
-                <h3 className="portfolio-card-title">{project.title}</h3>
-                <p className="portfolio-card-text">{project.description}</p>
+                <p className="portfolio-card-text">{proj.description}</p>
               </div>
             </div>
           ))}
         </div>
 
-        <Modal
-          show={modalShow}
-          onHide={handleClose}
-          centered
-          role="dialog"
-          aria-labelledby="project-modal-title"
-          aria-describedby="project-modal-desc"
-        >
-          {selectedProject && (
-            <>
-              <Modal.Header closeButton>
-                <Modal.Title id="project-modal-title">
-                  {selectedProject.title}
-                </Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
-                <img
-                  src={selectedProject.image}
-                  srcSet={selectedProject.srcSet}
-                  sizes={selectedProject.sizes}
-                  alt={selectedProject.title}
-                  className="img-fluid mb-3"
-                  loading="lazy"
-                />
-                <p id="project-modal-desc">{selectedProject.details}</p>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose}>
-                  Close
-                </Button>
-              </Modal.Footer>
-            </>
-          )}
-        </Modal>
+        {selected && (
+          <Modal
+            show={modalShow}
+            onHide={() => setModalShow(false)}
+            centered
+            aria-labelledby="project-modal-title"
+            aria-describedby="project-modal-desc"
+          >
+            <Modal.Header closeButton>
+              <Modal.Title id="project-modal-title">
+                {selected.title}
+              </Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <img
+                src={selected.image}
+                srcSet={selected.srcSet}
+                sizes={selected.sizes}
+                alt={selected.title}
+                className="img-fluid mb-3"
+                loading="lazy"
+              />
+              <p id="project-modal-desc">{selected.details}</p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={() => setModalShow(false)}>
+                Close
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        )}
       </Container>
     </section>
   );
-};
-
-export default Portfolio;
+}
