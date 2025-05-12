@@ -1,5 +1,5 @@
 // src/components/Tools/ServiceQuiz.jsx
-import React, { useState } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import {
   Container,
   Card,
@@ -8,9 +8,12 @@ import {
   Form,
   Alert,
 } from "react-bootstrap";
+import { CSSTransition, TransitionGroup } from "react-transition-group";
+import "./ServiceQuiz.css";
 
-const QUESTIONS = [
+const BASE_QUESTIONS = [
   {
+    id: "goal",
     question: "What is your primary goal?",
     options: [
       { label: "Increase website traffic", value: "web" },
@@ -19,6 +22,7 @@ const QUESTIONS = [
     ],
   },
   {
+    id: "team",
     question: "How big is your team?",
     options: [
       { label: "Just me / small (< 5)", value: "small" },
@@ -27,6 +31,7 @@ const QUESTIONS = [
     ],
   },
   {
+    id: "timeline",
     question: "What’s your timeline?",
     options: [
       { label: "Immediate (1-3 months)", value: "immediate" },
@@ -36,11 +41,20 @@ const QUESTIONS = [
   },
 ];
 
+const SEO_QUESTION = {
+  id: "seo",
+  question: "Are you interested in SEO optimization?",
+  options: [
+    { label: "Yes, definitely", value: "yes" },
+    { label: "Maybe later", value: "later" },
+  ],
+};
+
 const RECOMMENDATIONS = {
   web: {
-    title: "Web Development Services",
+    title: "Web Development & SEO",
     description:
-      "We’ll build or revamp your website to attract more visitors and convert them into customers.",
+      "We’ll build or revamp your website AND optimize it for search engines to drive sustainable traffic.",
   },
   security: {
     title: "Cybersecurity Assessment",
@@ -54,98 +68,137 @@ const RECOMMENDATIONS = {
   },
 };
 
-const ServiceQuiz = () => {
-  const [step, setStep] = useState(0);
+export default function ServiceQuiz() {
   const [answers, setAnswers] = useState({});
+  const [stepIndex, setStepIndex] = useState(0);
   const [showResult, setShowResult] = useState(false);
 
-  const current = QUESTIONS[step];
+  // Build dynamic steps: insert SEO question if first answer is "web"
+  const steps = useMemo(() => {
+    const w = answers.goal === "web";
+    let arr = [...BASE_QUESTIONS];
+    if (w) arr.splice(1, 0, SEO_QUESTION);
+    return arr;
+  }, [answers.goal]);
 
-  const handleOptionChange = (value) => {
-    setAnswers((prev) => ({ ...prev, [step]: value }));
-  };
+  const currentStep = steps[stepIndex];
+
+  const handleOptionChange = useCallback(
+    (value) => {
+      setAnswers((prev) => ({ ...prev, [currentStep.id]: value }));
+    },
+    [currentStep]
+  );
 
   const handleNext = () => {
-    if (answers[step] == null) return;
-    if (step < QUESTIONS.length - 1) {
-      setStep(step + 1);
+    if (!answers[currentStep.id]) return;
+    if (stepIndex + 1 < steps.length) {
+      setStepIndex((i) => i + 1);
     } else {
       setShowResult(true);
     }
   };
-
   const handlePrev = () => {
-    if (step > 0) setStep(step - 1);
+    if (stepIndex > 0) setStepIndex((i) => i - 1);
+  };
+  const handleRetake = () => {
+    setAnswers({});
+    setStepIndex(0);
+    setShowResult(false);
   };
 
-  // Simple logic: recommend by first answer
-  const recommended = RECOMMENDATIONS[answers[0]];
+  // Decide recommendation: for "web" branch use SEO answer or just web
+  const recKey = answers.goal;
+  const recommendation = RECOMMENDATIONS[recKey];
 
   return (
-    <Container className="py-5">
-      <h2 className="mb-4">Which Service Is Right for You?</h2>
-      <Card className="p-4">
+    <Container className="service-quiz py-5">
+      <h2 className="mb-4">Find Your Ideal Service</h2>
+      <Card className="p-4 quiz-card">
         {!showResult ? (
           <>
+            {/* Stepper */}
+            <div className="stepper mb-3">
+              {steps.map((s, idx) => (
+                <div
+                  key={s.id}
+                  className={`step ${idx <= stepIndex ? "active" : ""}`}
+                >
+                  <div className="circle">{idx + 1}</div>
+                  <div className="label">{s.id === "seo" ? "SEO" : ""}</div>
+                </div>
+              ))}
+            </div>
+
             <ProgressBar
-              now={((step + 1) / QUESTIONS.length) * 100}
+              now={((stepIndex + 1) / steps.length) * 100}
               className="mb-4"
             />
-            <h5>{current.question}</h5>
-            <Form className="mt-3">
-              {current.options.map((opt) => (
-                <Form.Check
-                  key={opt.value}
-                  type="radio"
-                  id={`q${step}-${opt.value}`}
-                  name={`question-${step}`}
-                  label={opt.label}
-                  value={opt.value}
-                  checked={answers[step] === opt.value}
-                  onChange={() => handleOptionChange(opt.value)}
-                  className="mb-2"
-                />
-              ))}
-            </Form>
+
+            <TransitionGroup component={null}>
+              <CSSTransition
+                key={currentStep.id}
+                classNames="fade"
+                timeout={300}
+              >
+                <div className="question-block">
+                  <h5>{currentStep.question}</h5>
+                  <Form className="mt-3">
+                    {currentStep.options.map((opt) => (
+                      <Form.Check
+                        key={opt.value}
+                        type="radio"
+                        id={`${currentStep.id}-${opt.value}`}
+                        name={currentStep.id}
+                        label={opt.label}
+                        checked={answers[currentStep.id] === opt.value}
+                        onChange={() => handleOptionChange(opt.value)}
+                        className="mb-2"
+                      />
+                    ))}
+                  </Form>
+                </div>
+              </CSSTransition>
+            </TransitionGroup>
+
             <div className="d-flex justify-content-between mt-4">
               <Button
                 variant="secondary"
                 onClick={handlePrev}
-                disabled={step === 0}
+                disabled={stepIndex === 0}
               >
                 Previous
               </Button>
               <Button
                 variant="primary"
                 onClick={handleNext}
-                disabled={answers[step] == null}
+                disabled={!answers[currentStep.id]}
               >
-                {step < QUESTIONS.length - 1 ? "Next" : "See Recommendation"}
+                {stepIndex + 1 < steps.length ? "Next" : "See Recommendation"}
               </Button>
             </div>
           </>
         ) : (
-          <div>
+          <div className="result-block">
             <h4>Your Recommended Service:</h4>
-            {recommended ? (
+            {recommendation ? (
               <>
-                <h5 className="mt-3">{recommended.title}</h5>
-                <p>{recommended.description}</p>
+                <h5 className="mt-3">{recommendation.title}</h5>
+                <p>{recommendation.description}</p>
+                <Button variant="success" className="mt-3" href="/contact">
+                  Contact Us
+                </Button>
               </>
             ) : (
               <Alert variant="info">
-                Based on your answers, we recommend discussing your needs with
-                our team to tailor the perfect solution.
+                We’d love to learn more about your needs—please{" "}
+                <a href="/contact">get in touch</a>.
               </Alert>
             )}
             <Button
               variant="outline-primary"
               className="mt-4"
-              onClick={() => {
-                setStep(0);
-                setAnswers({});
-                setShowResult(false);
-              }}
+              onClick={handleRetake}
             >
               Retake Quiz
             </Button>
@@ -154,6 +207,4 @@ const ServiceQuiz = () => {
       </Card>
     </Container>
   );
-};
-
-export default ServiceQuiz;
+}
