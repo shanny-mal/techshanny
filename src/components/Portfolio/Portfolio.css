@@ -129,17 +129,8 @@
 /* Body */
 .portfolio-card-body {
   padding: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-.client-logo {
-  width: 40px;
-  height: 40px;
-  object-fit: contain;
 }
 .portfolio-card-text {
-  flex: 1;
   color: #555;
   font-size: 0.95rem;
   line-height: 1.4;
