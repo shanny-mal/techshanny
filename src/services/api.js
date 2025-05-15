@@ -7,10 +7,12 @@ const API_BASE =
   import.meta.env.VITE_API_URL?.replace(/\/+$/, "") ||
   "http://localhost:8000/api";
 
-// If you have a dedicated logging endpoint (e.g. `/logs/`), configure it here:
+// ─── ADDITION ─── Read a custom logs endpoint from your env (e.g. VITE_LOGGING_URL=https://…/api/logs)
 const LOGGING_URL =
-  import.meta.env.VITE_LOGGING_URL?.replace(/\/+$/, "") ||
-  "https://shannytech-151dd4eec17a.herokuapp.com/api/logs/"; // e.g. "http://localhost:8000/api/logs/";
+  import.meta.env.VITE_LOGGING_URL?.replace(/\/+$/, "") || null;
+
+// ─── ADDITION ─── Optionally disable all remote logging via env
+const ENABLE_REMOTE_LOGS = import.meta.env.VITE_ENABLE_LOGS !== "false";
 
 /** Key under which we store JWT tokens in localStorage */
 export const TOKEN_KEY = "authTokens";
@@ -19,9 +21,9 @@ export const TOKEN_KEY = "authTokens";
 export const logger = {
   /** send to console and optionally to remote */
   _sendRemote: async (level, message, meta) => {
-    if (!LOGGING_URL) return;
+    if (!LOGGING_URL || !ENABLE_REMOTE_LOGS) return;
     try {
-      await fetch(LOGGING_URL, {
+      await fetch(`${LOGGING_URL}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ level, message, meta, timestamp: new Date() }),
@@ -51,7 +53,7 @@ const client = axios.create({
   withCredentials: true,
 });
 
-// Attach Access Token
+// Attach Access Token & metadata
 client.interceptors.request.use((config) => {
   const start = Date.now();
   config.metadata = { start };
@@ -102,9 +104,15 @@ client.interceptors.response.use(
       data: response?.data,
     });
 
+    // ─── ADDITION ─── retry on network errors (no response)
+    if (!response) {
+      logger.warn("Network error, retrying once...", { url: config.url });
+      return client(config);
+    }
+
     // token refresh logic…
     if (
-      response?.status === 401 &&
+      response.status === 401 &&
       !config._retry &&
       response.data?.code === "token_not_valid"
     ) {
@@ -123,11 +131,11 @@ client.interceptors.response.use(
       isRefreshing = true;
       try {
         const stored = JSON.parse(localStorage.getItem(TOKEN_KEY) || "{}");
-        const refreshRes = await axios.post(
-          `${API_BASE}/auth/refresh/`,
-          { refresh: stored.refresh },
-          { headers: { "Content-Type": "application/json" } }
-        );
+
+        // ─── ADDITION ─── use our axios instance to refresh so interceptors apply
+        const refreshRes = await client.post("/auth/refresh/", {
+          refresh: stored.refresh,
+        });
 
         const newTokens = {
           access: refreshRes.data.access,
