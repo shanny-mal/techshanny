@@ -11,14 +11,14 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const btnRef = useRef(null);
 
-  // 1) shrink on scroll
+  // 1) Shrink on scroll
   useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", handler);
-    return () => window.removeEventListener("scroll", handler);
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // 2) close menu on Escape
+  // 2) Close menu on Escape
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === "Escape" && menuOpen) {
@@ -30,12 +30,11 @@ export default function Header() {
     return () => document.removeEventListener("keydown", onKey);
   }, [menuOpen]);
 
-  // 3) lock body scroll when menu open
+  // 3) Lock body scroll when menu open
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
   }, [menuOpen]);
 
-  // nav items
   const links = [
     { to: "/", label: "Home" },
     { to: "/blog", label: "Blog" },
@@ -51,15 +50,14 @@ export default function Header() {
       <a href="#main-content" className="ht-skip">
         Skip to content
       </a>
-
       <div className="ht-toolbar">
-        {/* Hamburger (only on mobile) */}
+        {/* Mobile Hamburger */}
         <button
           ref={btnRef}
+          className={`ht-menu-btn ${menuOpen ? "open" : ""}`}
           aria-label={menuOpen ? "Close menu" : "Open menu"}
           aria-expanded={menuOpen}
-          aria-controls="ht-nav"
-          className={`ht-menu-btn ${menuOpen ? "open" : ""}`}
+          aria-controls="ht-nav-mobile"
           onClick={() => setMenuOpen((o) => !o)}
         >
           <svg width="24" height="24" viewBox="0 0 24 24">
@@ -77,14 +75,26 @@ export default function Header() {
           </NavLink>
         </div>
 
-        {/* Desktop navigation (hidden on mobile) */}
+        {/* Tablet Inline Nav */}
+        <nav className="ht-nav-tablet">
+          {links.slice(0, 3).map(({ to, label }) => (
+            <NavLink key={to} to={to} end>
+              {label}
+            </NavLink>
+          ))}
+        </nav>
+
+        {/* Desktop Full Nav */}
         <nav className="ht-nav-desktop">
           {links.map(({ to, label }) => (
             <NavLink key={to} to={to} end>
               {label}
             </NavLink>
           ))}
+        </nav>
 
+        {/* Auth / CTA */}
+        <div className="ht-auth-desktop">
           {user ? (
             <button onClick={signOut} className="ht-cta">
               Logout
@@ -99,18 +109,18 @@ export default function Header() {
               </NavLink>
             </>
           )}
-        </nav>
+        </div>
 
-        {/* Utility icons */}
+        {/* Utilities */}
         <div className="ht-utils">
           <LanguageSwitcher />
           <DarkModeToggle />
         </div>
       </div>
 
-      {/* Mobile slide-over nav (hidden on desktop) */}
+      {/* Mobile slide-over nav */}
       <nav
-        id="ht-nav"
+        id="ht-nav-mobile"
         className={`ht-nav-mobile ${menuOpen ? "open" : ""}`}
         aria-label="Mobile menu"
       >
@@ -122,9 +132,8 @@ export default function Header() {
               </NavLink>
             </li>
           ))}
-
-          {user ? (
-            <li>
+          <li>
+            {user ? (
               <button
                 onClick={() => {
                   signOut();
@@ -134,19 +143,26 @@ export default function Header() {
               >
                 Logout
               </button>
+            ) : (
+              <NavLink
+                to="/login"
+                onClick={() => setMenuOpen(false)}
+                className="ht-cta"
+              >
+                Login
+              </NavLink>
+            )}
+          </li>
+          {!user && (
+            <li>
+              <NavLink
+                to="/signup"
+                onClick={() => setMenuOpen(false)}
+                className="ht-cta"
+              >
+                Sign Up
+              </NavLink>
             </li>
-          ) : (
-            ["login", "signup"].map((p) => (
-              <li key={p}>
-                <NavLink
-                  to={`/${p}`}
-                  onClick={() => setMenuOpen(false)}
-                  className="ht-cta"
-                >
-                  {p.charAt(0).toUpperCase() + p.slice(1)}
-                </NavLink>
-              </li>
-            ))
           )}
         </ul>
       </nav>
