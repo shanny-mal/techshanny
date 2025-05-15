@@ -1,3 +1,4 @@
+// src/components/Blog/Blog.jsx
 import React, { useState, useEffect } from "react";
 import {
   Container,
@@ -9,7 +10,7 @@ import {
   Col,
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { supabase } from "../../supabaseClient.js";
+import api from "../../services/api.js";
 import "./Blog.css";
 
 const Blog = () => {
@@ -19,23 +20,22 @@ const Blog = () => {
 
   useEffect(() => {
     let isMounted = true;
+
     const fetchLatest = async () => {
       setLoading(true);
       setError(null);
-      const { data, error } = await supabase
-        .from("posts")
-        .select("id, title, excerpt, image_url")
-        .order("published_at", { ascending: false })
-        .limit(3);
-
-      if (!isMounted) return;
-      if (error) {
-        console.error(error);
-        setError("Failed to load posts");
-      } else {
-        setPosts(data || []);
+      try {
+        // Fetch all posts (backend orders by -published_at by default)
+        const data = await api.getList("posts");
+        if (!isMounted) return;
+        // Take the first three
+        setPosts(data.slice(0, 3));
+      } catch (err) {
+        console.error("Failed to load posts:", err);
+        if (isMounted) setError("Failed to load posts");
+      } finally {
+        if (isMounted) setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchLatest();
@@ -66,7 +66,7 @@ const Blog = () => {
         <h2 className="blog-heading text-center mb-4">Latest Insights</h2>
         <Row className="blog-grid">
           {posts.map((post, idx) => (
-            <Col key={`${post.id}-${idx}`} xs={12} md={6} lg={4}>
+            <Col key={post.id} xs={12} md={6} lg={4}>
               <Card className="blog-card h-100">
                 {post.image_url && (
                   <Card.Img

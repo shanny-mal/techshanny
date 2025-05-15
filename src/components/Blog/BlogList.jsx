@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { Container, Button, Spinner } from "react-bootstrap";
 import { FaTrash, FaEdit } from "react-icons/fa";
-import { supabase } from "../../supabaseClient.js";
+import api from "../../services/api.js";
 import { useAuth } from "../../context/AuthContext.jsx";
 import "./Blog.css";
 
@@ -12,50 +12,55 @@ const PAGE_SIZE = 6;
 export default function BlogList() {
   const { user, deletePost } = useAuth();
   const [posts, setPosts] = useState([]);
-  const [page, setPage] = useState(1);
+  const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
-  // fetch and prefetch
-  const fetchPosts = useCallback(async (pageToFetch) => {
-    const from = (pageToFetch - 1) * PAGE_SIZE;
-    const to = pageToFetch * PAGE_SIZE - 1;
-    const { data, error } = await supabase
-      .from("posts")
-      .select("id, title, excerpt, image_url, published_at, author_id")
-      .order("published_at", { ascending: false })
-      .range(from, to);
-
-    if (error) console.error(error);
-    else {
+  // Fetch a page of posts from DRF: GET /posts/?limit=PAGE_SIZE&offset=offset
+  const fetchPosts = useCallback(async (currentOffset) => {
+    setLoading(true);
+    try {
+      const data = await api.getList("posts", {
+        limit: PAGE_SIZE,
+        offset: currentOffset,
+      });
+      if (data.length < PAGE_SIZE) {
+        setHasMore(false);
+      }
+      // Append de‐duplicated
       setPosts((prev) => {
-        const existing = new Set(prev.map((p) => p.id));
-        const newOnes = data.filter((p) => !existing.has(p.id));
+        const existingIds = new Set(prev.map((p) => p.id));
+        const newOnes = data.filter((p) => !existingIds.has(p.id));
         return [...prev, ...newOnes];
       });
-      if (data.length < PAGE_SIZE) setHasMore(false);
+    } catch (err) {
+      console.error("Failed to load posts:", err);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
-  // initial & page changes
+  // Initial load & whenever offset changes
   useEffect(() => {
-    setLoading(true);
-    fetchPosts(page).finally(() => setLoading(false));
-  }, [page, fetchPosts]);
+    fetchPosts(offset);
+  }, [offset, fetchPosts]);
 
-  // prefetch next page
+  // Prefetch next page
   useEffect(() => {
-    if (hasMore) {
-      fetchPosts(page + 1).catch(() => {});
+    if (hasMore && !loading) {
+      fetchPosts(offset + PAGE_SIZE).catch(() => {});
     }
-  }, [posts]); // runs after posts append
+  }, [posts, hasMore, loading, offset, fetchPosts]);
 
+  // Delete handler
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this post?")) return;
     try {
+      // call your context deletePost (which invokes api.remove under the hood)
       await deletePost(id);
       setPosts((prev) => prev.filter((p) => p.id !== id));
-    } catch {
+    } catch (err) {
+      console.error("Delete failed:", err);
       alert("Failed to delete.");
     }
   };
@@ -90,9 +95,13 @@ export default function BlogList() {
                     <time>
                       {new Date(post.published_at).toLocaleDateString()}
                     </time>
-                    {user?.id === post.author_id && (
+                    {user?.id === post.author.id && (
                       <div className="action-icons">
-                        <Link to={`/blog/edit/${post.id}`} className="edit-btn">
+                        <Link
+                          to={`/blog/edit/${post.id}`}
+                          className="edit-btn"
+                          aria-label="Edit post"
+                        >
                           <FaEdit />
                         </Link>
                         <button
@@ -125,7 +134,7 @@ export default function BlogList() {
           <div className="load-more-wrapper">
             <Button
               variant="outline-primary"
-              onClick={() => setPage((p) => p + 1)}
+              onClick={() => setOffset((o) => o + PAGE_SIZE)}
               disabled={loading}
             >
               {loading ? <Spinner size="sm" /> : "Load More"}

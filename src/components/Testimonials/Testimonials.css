@@ -1,55 +1,84 @@
-/* src/components/Testimonials/Testimonials.css */
+:root {
+  --testimonial-bg: #ffffff;
+  --testimonial-border: #e0e0e0;
+  --testimonial-accent: #7a5235;
+  --testimonial-text: #333333;
+  --transition-fast: 0.3s ease-in-out;
+}
 
 .testimonials-section {
-  background-color: #fff;
-  padding: 80px 0;
+  background: #f9f9f9;
 }
 
 .testimonials-heading {
-  font-size: 2.8rem;
+  font-size: 2.5rem;
   font-weight: 700;
-  color: #333;
-  margin-bottom: 40px;
   position: relative;
+  color: var(--testimonial-text);
 }
-
 .testimonials-heading::after {
   content: "";
-  width: 80px;
+  width: 60px;
   height: 4px;
-  background: #1e3c72;
+  background: var(--testimonial-accent);
   position: absolute;
+  bottom: -10px;
   left: 50%;
   transform: translateX(-50%);
-  bottom: -10px;
   border-radius: 2px;
 }
 
-.testimonial-item {
-  padding: 20px;
+.testimonial-card {
+  background: var(--testimonial-bg);
+  border: 1px solid var(--testimonial-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+.testimonial-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
 }
 
 .testimonial-message {
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   font-style: italic;
-  margin-bottom: 10px;
-  color: #444; /* Darkened for better contrast */
+  color: var(--testimonial-text);
+  margin-bottom: 1rem;
+  flex-grow: 1;
 }
-
 @media (min-width: 768px) {
   .testimonial-message {
-    font-size: 1.25rem; /* Larger size on desktop */
+    font-size: 1.2rem;
   }
 }
 
 .testimonial-name {
-  font-size: 1.25rem;
   font-weight: 600;
-  color: #1e1e1e;
-  margin-bottom: 0.5rem;
+  color: var(--testimonial-text);
+  margin-bottom: 0.25rem;
 }
 
 .testimonial-role {
-  font-size: 1rem;
-  color: #888;
+  font-size: 0.9rem;
+  color: #777;
+}
+
+/* Carousel controls styling */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  display: none; /* hide default */
+}
+.carousel-control-prev,
+.carousel-control-next {
+  width: auto;
+  color: var(--testimonial-accent);
+}
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+  color: darken(var(--testimonial-accent), 10%);
 }

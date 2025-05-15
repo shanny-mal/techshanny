@@ -1,5 +1,4 @@
-// src/components/Resources/ResourceList.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Container,
   Row,
@@ -10,9 +9,10 @@ import {
   Form,
   Spinner,
   Accordion,
+  Alert,
 } from "react-bootstrap";
 import ResourceCard from "./ResourceCard.jsx";
-import { supabase } from "../../supabaseClient.js";
+import api from "../../services/api.js";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./Resources.css";
@@ -21,100 +21,126 @@ const MAILCHIMP_ENDPOINT = import.meta.env.VITE_MAILCHIMP_ENDPOINT;
 
 export default function ResourceList() {
   const [resources, setResources] = useState([]);
-  const [filtered, setFiltered] = useState([]);
-  const [topics, setTopics] = useState([]);
-  const [years, setYears] = useState([]);
   const [topicFilter, setTopicFilter] = useState("All");
   const [yearFilter, setYearFilter] = useState("All");
 
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  // Modal state
   const [showModal, setShowModal] = useState(false);
   const [pending, setPending] = useState(null);
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
+  const [mailError, setMailError] = useState("");
 
-  // 1) Fetch resources from Supabase
+  // 1) Load & transform
   useEffect(() => {
-    (async () => {
-      const { data, error } = await supabase
-        .from("resources")
-        .select("id, title, description, download_url, topic, created_at");
+    let isActive = true;
+    const loadResources = async () => {
+      setLoading(true);
+      try {
+        const data = await api.getList("resources");
+        if (!isActive) return;
 
-      if (error) {
-        console.error("Failed to load resources:", error);
-        return;
+        // Transform fields
+        const enriched = data.map((r) => ({
+          id: r.id,
+          title: r.title,
+          description: r.description,
+          download_url: r.file_url,
+          topic: r.category || "General",
+          year: new Date(r.published_at).getFullYear().toString(),
+        }));
+        setResources(enriched);
+      } catch (err) {
+        console.error(err);
+        if (isActive) setError("Failed to load resources.");
+      } finally {
+        if (isActive) setLoading(false);
       }
+    };
 
-      // Enrich each resource with a `year` field
-      data.forEach((r) => {
-        r.year = new Date(r.created_at).getFullYear().toString();
-      });
-
-      setResources(data);
-      setFiltered(data);
-
-      // Build topic filter list
-      const uniqueTopics = Array.from(
-        new Set(data.map((r) => r.topic).filter(Boolean))
-      );
-      setTopics(["All", ...uniqueTopics]);
-
-      // Build year filter list (sorted descending)
-      const uniqueYears = Array.from(new Set(data.map((r) => r.year)));
-      setYears(["All", ...uniqueYears.sort((a, b) => b - a)]);
-    })();
+    loadResources();
+    return () => {
+      isActive = false;
+    };
   }, []);
 
-  // 2) Apply filters whenever selection changes
-  useEffect(() => {
-    let out = resources;
-    if (topicFilter !== "All") {
-      out = out.filter((r) => r.topic === topicFilter);
-    }
-    if (yearFilter !== "All") {
-      out = out.filter((r) => r.year === yearFilter);
-    }
-    setFiltered(out);
-  }, [topicFilter, yearFilter, resources]);
+  // 2) Compute filter options
+  const topics = useMemo(() => {
+    const uniq = Array.from(new Set(resources.map((r) => r.topic)));
+    return ["All", ...uniq];
+  }, [resources]);
+  const years = useMemo(() => {
+    const uniq = Array.from(new Set(resources.map((r) => r.year)));
+    return ["All", ...uniq.sort((a, b) => b - a)];
+  }, [resources]);
 
-  // Open the email-gate modal
-  const onDownload = (resource) => {
-    setPending(resource);
+  // 3) Filtered list
+  const filtered = useMemo(() => {
+    return resources.filter((r) => {
+      return (
+        (topicFilter === "All" || r.topic === topicFilter) &&
+        (yearFilter === "All" || r.year === yearFilter)
+      );
+    });
+  }, [resources, topicFilter, yearFilter]);
+
+  // 4) Handle download click
+  const onDownload = (res) => {
+    setPending(res);
     setEmail("");
-    setError("");
+    setMailError("");
     setShowModal(true);
   };
 
-  // Handle Mailchimp signup + download
+  // 5) Mailchimp signup + download
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-    setError("");
-
+    setMailError("");
     try {
       if (!/\S+@\S+\.\S+/.test(email)) {
         throw new Error("Please enter a valid email address.");
       }
-      const res = await fetch(MAILCHIMP_ENDPOINT, {
+      const resp = await fetch(MAILCHIMP_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
+      if (!resp.ok) {
+        const body = await resp.json().catch(() => ({}));
         throw new Error(body.error || "Subscription failed.");
       }
-      toast.success("Subscribed! Download starting…");
-      // Trigger the actual download
+      toast.success("Subscribed! Downloading now…");
       window.location.href = pending.download_url;
       setShowModal(false);
     } catch (err) {
-      console.error("Mailchimp error:", err);
-      setError(err.message);
+      console.error(err);
+      setMailError(err.message);
     } finally {
       setSubmitting(false);
     }
   };
+
+  // 6) Render
+  if (loading) {
+    return (
+      <section className="resources-section py-5 text-center">
+        <Spinner animation="border" role="status" />
+      </section>
+    );
+  }
+  if (error) {
+    return (
+      <section className="resources-section py-5">
+        <Alert variant="danger" className="text-center">
+          {error}
+        </Alert>
+      </section>
+    );
+  }
 
   return (
     <Container className="resources-section py-5">
@@ -146,7 +172,7 @@ export default function ResourceList() {
         </ButtonGroup>
       </div>
 
-      {/* Mobile accordion filters */}
+      {/* Mobile accordion */}
       <Accordion className="d-md-none mb-4">
         <Accordion.Item eventKey="0">
           <Accordion.Header>Filters</Accordion.Header>
@@ -179,35 +205,47 @@ export default function ResourceList() {
         </Accordion.Item>
       </Accordion>
 
-      {/* Resource cards */}
-      <Row xs={1} sm={2} lg={3} className="g-4">
-        {filtered.map((res) => (
-          <Col key={res.id}>
-            <ResourceCard resource={res} onDownload={onDownload} />
-          </Col>
-        ))}
-      </Row>
+      {/* Results */}
+      {filtered.length === 0 ? (
+        <Alert variant="secondary" className="text-center py-5">
+          No resources match your filters.
+        </Alert>
+      ) : (
+        <Row xs={1} sm={2} lg={3} className="g-4">
+          {filtered.map((res) => (
+            <Col key={res.id}>
+              <ResourceCard resource={res} onDownload={onDownload} />
+            </Col>
+          ))}
+        </Row>
+      )}
 
       {/* Email-gate modal */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+      <Modal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        centered
+        aria-labelledby="download-modal-title"
+      >
         <Form onSubmit={handleSubmit}>
           <Modal.Header closeButton>
-            <Modal.Title>Unlock “{pending?.title}”</Modal.Title>
+            <Modal.Title id="download-modal-title">
+              Unlock “{pending?.title}”
+            </Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <p>Enter your email to download:</p>
+            <Form.Label>Enter your email to download:</Form.Label>
             <Form.Group controlId="mcEmail">
-              <Form.Label>Email address</Form.Label>
               <Form.Control
                 type="email"
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                isInvalid={!!error}
+                isInvalid={!!mailError}
                 required
               />
               <Form.Control.Feedback type="invalid">
-                {error}
+                {mailError}
               </Form.Control.Feedback>
             </Form.Group>
           </Modal.Body>

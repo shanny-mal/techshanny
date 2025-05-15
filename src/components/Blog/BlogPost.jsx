@@ -1,5 +1,6 @@
+// src/components/Blog/BlogPost.jsx
 import React, { useState, useEffect, useRef } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import {
   Container,
@@ -10,54 +11,40 @@ import {
   Form,
 } from "react-bootstrap";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import { supabase } from "../../supabaseClient.js";
 import { useAuth } from "../../context/AuthContext.jsx";
+import api from "../../services/api.js";
 import "./BlogPostDetail.css";
 
 export default function BlogPost() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, updatePost, deletePost } = useAuth();
+
   const [post, setPost] = useState(null);
   const [authorName, setAuthorName] = useState("");
   const [loading, setLoading] = useState(true);
   const [showEdit, setShowEdit] = useState(false);
+  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
     excerpt: "",
     content: "",
     image_url: "",
   });
-  const [error, setError] = useState(null);
   const formRef = useRef();
 
-  // Fetch post + author
+  // ─── Fetch post (with nested author) ────────────────────────────────────────
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchPost = async () => {
       setLoading(true);
       try {
-        // 1) fetch the post
-        const { data: p, error: postErr } = await supabase
-          .from("posts")
-          .select(
-            "id, title, excerpt, content, image_url, published_at, author_id"
-          )
-          .eq("id", id)
-          .single();
-        if (postErr) throw postErr;
-        setPost(p);
-
-        // 2) fetch the author profile
-        const { data: prof, error: profErr } = await supabase
-          .from("profiles")
-          // your FK column is user_id in profiles
-          .select("name, full_name")
-          .eq("user_id", p.author_id)
-          .maybeSingle();
-        if (!profErr && prof) {
-          // use whichever field you actually have
-          setAuthorName(prof.full_name || prof.name || "");
-        }
+        const data = await api.getOne("posts", id);
+        setPost(data);
+        // author is nested UserSerializer
+        const { first_name, last_name, email } = data.author || {};
+        setAuthorName(
+          first_name || last_name ? `${first_name} ${last_name}`.trim() : email
+        );
       } catch (err) {
         console.error("Fetch error:", err);
         setError(err.message);
@@ -65,9 +52,10 @@ export default function BlogPost() {
         setLoading(false);
       }
     };
-    fetchData();
+    fetchPost();
   }, [id]);
 
+  // ─── Delete ─────────────────────────────────────────────────────────────────
   const handleDelete = async () => {
     if (!window.confirm("Are you sure you want to delete this post?")) return;
     try {
@@ -79,6 +67,7 @@ export default function BlogPost() {
     }
   };
 
+  // ─── Open edit modal ────────────────────────────────────────────────────────
   const openEdit = () => {
     setFormData({
       title: post.title,
@@ -89,11 +78,17 @@ export default function BlogPost() {
     setShowEdit(true);
   };
 
+  // ─── Save edits ─────────────────────────────────────────────────────────────
   const handleSave = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await updatePost(id, formData);
+      await updatePost(id, {
+        title: formData.title,
+        excerpt: formData.excerpt,
+        content: formData.content,
+        image_url: formData.image_url,
+      });
       setPost((prev) => ({ ...prev, ...formData }));
       setShowEdit(false);
     } catch (err) {
@@ -104,28 +99,34 @@ export default function BlogPost() {
     }
   };
 
-  // Trap focus when modal opens
+  // ─── Trap focus on modal open ───────────────────────────────────────────────
   useEffect(() => {
     if (showEdit && formRef.current) {
-      formRef.current.querySelector("input, textarea")?.focus();
+      const first = formRef.current.querySelector("input, textarea");
+      first?.focus();
     }
   }, [showEdit]);
 
-  if (loading) return <Spinner className="m-5" />;
+  // ─── Render states ─────────────────────────────────────────────────────────
+  if (loading) {
+    return <Spinner className="m-5" animation="border" role="status" />;
+  }
 
-  if (error)
+  if (error) {
     return (
       <Container className="py-5">
         <Alert variant="danger">{error}</Alert>
       </Container>
     );
+  }
 
-  if (!post)
+  if (!post) {
     return (
       <Container className="py-5">
-        <Alert variant="warning">Post not found</Alert>
+        <Alert variant="warning">Post not found.</Alert>
       </Container>
     );
+  }
 
   return (
     <Container className="blog-post-detail py-5">
@@ -140,20 +141,16 @@ export default function BlogPost() {
         {new Date(post.published_at).toLocaleDateString()}
       </p>
 
-      {user?.id === post.author_id && (
+      {user?.id === post.author.id && (
         <div className="mb-4 action-bar">
           <Button
             variant="outline-secondary"
-            className="me-2 edit-btn"
+            className="me-2"
             onClick={openEdit}
           >
             <FaEdit /> Edit
           </Button>
-          <Button
-            variant="outline-danger"
-            className="delete-btn"
-            onClick={handleDelete}
-          >
+          <Button variant="outline-danger" onClick={handleDelete}>
             <FaTrash /> Delete
           </Button>
         </div>
@@ -173,7 +170,7 @@ export default function BlogPost() {
         dangerouslySetInnerHTML={{ __html: post.content }}
       />
 
-      {/* Edit Modal */}
+      {/* ─── Edit Modal ─────────────────────────────────────────────────────── */}
       <Modal
         show={showEdit}
         onHide={() => setShowEdit(false)}
@@ -217,7 +214,7 @@ export default function BlogPost() {
               />
             </Form.Group>
             <Form.Group controlId="formContent" className="mb-3">
-              <Form.Label>Content (HTML/Markdown)</Form.Label>
+              <Form.Label>Content</Form.Label>
               <Form.Control
                 as="textarea"
                 rows={8}

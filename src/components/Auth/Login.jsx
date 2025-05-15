@@ -1,11 +1,12 @@
+// src/pages/Login.jsx
 import React, { useState, useRef, useEffect } from "react";
-import { useAuth } from "../../context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext.jsx";
 import "./Auth.css";
 
 export default function Login() {
   const navigate = useNavigate();
-  const { loading, signIn, signInWithGoogle } = useAuth();
+  const { loading, signIn } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,7 +18,9 @@ export default function Login() {
 
   // Focus the error message when it appears
   useEffect(() => {
-    if (error && errorRef.current) errorRef.current.focus();
+    if (error && errorRef.current) {
+      errorRef.current.focus();
+    }
   }, [error]);
 
   // Real-time email validation
@@ -29,15 +32,17 @@ export default function Login() {
   // Simple password strength meter
   useEffect(() => {
     let score = 0;
-    if (password.length >= 8) score++;
-    if (/[A-Z]/.test(password)) score++;
-    if (/[0-9]/.test(password)) score++;
-    if (/[\W]/.test(password)) score++;
+    if (password.length >= 8) score += 1;
+    if (/[A-Z]/.test(password)) score += 1;
+    if (/[0-9]/.test(password)) score += 1;
+    if (/[\W]/.test(password)) score += 1;
     setPwdStrength(score);
   }, [password]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Inline validations
     if (!emailValid) {
       setError("Please enter a valid email address.");
       return;
@@ -47,21 +52,13 @@ export default function Login() {
       return;
     }
     setError("");
-    try {
-      await signIn(email.trim(), password);
-      navigate("/member", { replace: true });
-    } catch (err) {
-      setError(err.message);
-    }
-  };
 
-  const handleGoogle = async () => {
-    setError("");
     try {
-      await signInWithGoogle();
+      // **Changed** to match new AuthContext signature
+      await signIn({ email: email.trim(), password });
       navigate("/member", { replace: true });
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Login failed. Please try again.");
     }
   };
 
@@ -127,16 +124,6 @@ export default function Login() {
             {loading ? "Logging in…" : "Login"}
           </button>
         </form>
-
-        <div className="divider">or</div>
-
-        <button
-          className="btn-auth social google"
-          onClick={handleGoogle}
-          disabled={loading}
-        >
-          {loading ? "Please wait…" : "Continue with Google"}
-        </button>
       </div>
     </div>
   );

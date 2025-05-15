@@ -1,184 +1,125 @@
-/*======================================
-  1. Backdrop + Centered Modal
-======================================*/
+/* Auth.css */
+
 .auth-backdrop {
   position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.4);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
-  z-index: 1050;
 }
 
 .auth-modal {
   background: #fff;
-  max-width: 400px;
-  width: 100%;
   border-radius: 8px;
-  overflow: hidden;
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
   box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-  animation: fadeIn 300ms ease-in-out;
-  position: relative;
-  padding: 2rem 1.5rem;
 }
 
-/* Stepped background panels */
-.auth-modal::before,
-.auth-modal::after {
-  content: "";
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 50%;
-  background: #f5f3ee;
-  transform-origin: top;
-  z-index: -1;
-}
-.auth-modal::before {
-  transform: skewY(-2deg) translateY(-10%);
-}
-.auth-modal::after {
-  top: 50%; background: #fff;
-  transform: skewY(2deg) translateY(10%);
-}
-
-/* Modal title */
 .auth-title {
-  text-align: center;
-  font-size: 1.5rem;
   margin-bottom: 1rem;
-  font-weight: 700;
+  font-size: 1.75rem;
+  text-align: center;
 }
 
-/*======================================
-  2. Accessible Alert
-======================================*/
 .auth-alert {
-  background: #ffe3e3;
-  color: #a00;
+  background: #fdecea;
+  color: #611a15;
   padding: 0.75rem 1rem;
   border-radius: 4px;
   margin-bottom: 1rem;
-  font-weight: 500;
 }
 
-/*======================================
-  3. Floating Labels & Inputs
-======================================*/
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
 .floating-label {
   position: relative;
-  margin-bottom: 1.5rem;
 }
+
 .floating-label input {
   width: 100%;
   padding: 0.75rem 0.5rem;
   border: 1px solid #ccc;
   border-radius: 4px;
   background: none;
-  transition: border-color 200ms ease-in-out;
-}
-.floating-label input:focus {
   outline: none;
-  border-color: var(--accent);
+  transition: border-color 0.2s ease;
 }
+
+.floating-label input:focus {
+  border-color: #a67b5b;
+}
+
 .floating-label label {
   position: absolute;
   top: 50%;
-  left: 0.5rem;
+  left: 0.75rem;
   transform: translateY(-50%);
-  pointer-events: none;
+  background: #fff;
+  padding: 0 0.25rem;
   color: #777;
-  transition: transform 200ms ease-in-out, font-size 200ms ease-in-out;
+  pointer-events: none;
+  transition: top 0.2s ease, font-size 0.2s ease;
 }
+
 .floating-label input:not(:placeholder-shown) + label,
 .floating-label input:focus + label {
-  transform: translateY(-125%);
+  top: -0.6rem;
   font-size: 0.85rem;
-  color: var(--accent);
+  color: #a67b5b;
 }
+
 .field-error {
-  color: #a00;
-  font-size: 0.75rem;
+  color: #d9534f;
+  font-size: 0.85rem;
   margin-top: 0.25rem;
   display: block;
 }
 
-/*======================================
-  4. Password Strength Meter
-======================================*/
 .pwd-meter {
-  margin-top: 0.25rem;
-  height: 4px;
-  background: #eee;
-  border-radius: 2px;
-  overflow: hidden;
+  display: flex;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
 }
-.pwd-meter .bar {
-  height: 100%;
-  width: 0;
-  transition: width 200ms ease-in-out, background 200ms ease-in-out;
-}
-.pwd-meter .strength-0 { width: 0; background: transparent; }
-.pwd-meter .strength-1 { width: 25%; background: #e74c3c; }
-.pwd-meter .strength-2 { width: 50%; background: #f1c40f; }
-.pwd-meter .strength-3 { width: 75%; background: #2ecc71; }
-.pwd-meter .strength-4 { width: 100%; background: #27ae60; }
 
-/*======================================
-  5. Buttons & Divider
-======================================*/
-.btn-auth {
-  width: 100%;
-  padding: 0.75rem;
+.pwd-meter .bar {
+  flex: 1;
+  height: 6px;
+  background: #e0e0e0;
+  border-radius: 3px;
+  transition: background 0.3s ease;
+}
+
+.pwd-meter .strength-0 { background: #e0e0e0; }
+.pwd-meter .strength-1 { background: #ff4d4f; }
+.pwd-meter .strength-2 { background: #faad14; }
+.pwd-meter .strength-3 { background: #52c41a; }
+.pwd-meter .strength-4 { background: #237804; }
+
+.btn-auth.primary {
+  background: #a67b5b;
+  color: #fff;
+  padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 4px;
   font-size: 1rem;
   cursor: pointer;
-  transition: background 200ms ease-in-out;
+  transition: background 0.3s ease, transform 0.2s ease;
 }
-.btn-auth.primary {
-  background: var(--accent);
-  color: #fff;
-  margin-top: 0.5rem;
-}
-.btn-auth.primary:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-}
-.btn-auth.social {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 1rem;
-  background: #db4437;
-  color: #fff;
-}
-.btn-auth.social.google:hover {
-  background: #c33d2e;
-}
-.divider {
-  text-align: center;
-  margin: 1rem 0;
-  color: #aaa;
-  position: relative;
-}
-.divider::before,
-.divider::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  width: 30%;
-  height: 1px;
-  background: #ddd;
-}
-.divider::before { left: 0; }
-.divider::after { right: 0; }
 
-/*======================================
-  6. Animations
-======================================*/
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to   { opacity: 1; transform: translateY(0); }
+.btn-auth.primary:hover {
+  background: #8f5e42;
+  transform: translateY(-2px);
+}
+
+.small .link {
+  color: #a67b5b;
+  text-decoration: underline;
 }

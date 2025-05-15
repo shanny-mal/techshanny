@@ -1,46 +1,47 @@
-// src/components/LanguageSwitcher/LanguageSwitcher.jsx
-
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { NavDropdown } from "react-bootstrap";
+import { Dropdown } from "react-bootstrap";
+import { FaGlobe } from "react-icons/fa";
 import "./LanguageSwitcher.css";
 
-// List of supported languages — match your src/locales/<code>.json filenames
+// Supported languages — match your src/locales/<code>.json files
 const LANGUAGES = [
   { code: "en", label: "English" },
   { code: "fr", label: "Français" },
   { code: "es", label: "Español" },
 ];
 
-const LanguageSwitcher = () => {
+export default function LanguageSwitcher() {
   const { i18n } = useTranslation();
-
-  // Determine which label to show based on current language
   const current =
     LANGUAGES.find((lang) => lang.code === i18n.language) || LANGUAGES[0];
 
-  const handleSelect = (langCode) => {
-    i18n.changeLanguage(langCode);
+  const handleSelect = (code) => {
+    i18n.changeLanguage(code);
   };
 
   return (
-    <NavDropdown
-      title={current.label}
-      id="language-switcher"
-      className="language-switcher"
-      align="end"
-    >
-      {LANGUAGES.map((lang) => (
-        <NavDropdown.Item
-          key={lang.code}
-          active={i18n.language === lang.code}
-          onClick={() => handleSelect(lang.code)}
-        >
-          {lang.label}
-        </NavDropdown.Item>
-      ))}
-    </NavDropdown>
-  );
-};
+    <Dropdown align="end" className="language-switcher">
+      <Dropdown.Toggle
+        id="language-switcher-toggle"
+        variant="link"
+        className="language-switcher-toggle"
+        aria-label="Select language"
+      >
+        <FaGlobe className="lang-icon" /> {current.label}
+      </Dropdown.Toggle>
 
-export default LanguageSwitcher;
+      <Dropdown.Menu className="language-switcher-menu">
+        {LANGUAGES.map(({ code, label }) => (
+          <Dropdown.Item
+            key={code}
+            active={i18n.language === code}
+            onClick={() => handleSelect(code)}
+          >
+            {label}
+          </Dropdown.Item>
+        ))}
+      </Dropdown.Menu>
+    </Dropdown>
+  );
+}

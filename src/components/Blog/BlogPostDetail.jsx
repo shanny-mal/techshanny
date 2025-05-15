@@ -1,75 +1,113 @@
 // src/components/Blog/BlogPostDetail.jsx
+
 import React, { useState, useEffect, useRef } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
-import { Container, Button, Spinner, Alert } from "react-bootstrap";
+import { useParams, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import {
-  FaEdit,
-  FaTrash,
-  FaFacebookF,
-  FaTwitter,
-  FaLinkedinIn,
-} from "react-icons/fa";
+  Container,
+  Button,
+  Spinner,
+  Alert,
+  Modal,
+  Form,
+} from "react-bootstrap";
+import { FaEdit, FaTrash } from "react-icons/fa";
+import api from "../../services/api.js";
 import { useAuth } from "../../context/AuthContext.jsx";
-import { supabase } from "../../supabaseClient.js";
-import Prism from "prismjs";
-import "prismjs/themes/prism.css";
 import "./BlogPostDetail.css";
 
 export default function BlogPostDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, deletePost } = useAuth();
-  const [post, setPost] = useState(null);
-  const [author, setAuthor] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const contentRef = useRef();
+  const { user, updatePost, deletePost } = useAuth();
 
+  const [post, setPost] = useState(null);
+  const [authorName, setAuthorName] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  const [showEdit, setShowEdit] = useState(false);
+  const [formData, setFormData] = useState({
+    title: "",
+    excerpt: "",
+    content: "",
+    image_url: "",
+  });
+  const [error, setError] = useState(null);
+  const formRef = useRef();
+
+  // ─── Fetch the post & author on mount ───────────────────────────────────────
   useEffect(() => {
-    (async () => {
+    const fetchData = async () => {
       setLoading(true);
+      setError(null);
       try {
-        // Fetch post
-        let { data: p, error: pErr } = await supabase
-          .from("posts")
-          .select(
-            `id, title, content, excerpt, image_url, published_at, author_id`
-          )
-          .eq("id", id)
-          .single();
-        if (pErr) throw pErr;
+        // 1) get the post
+        const p = await api.getOne("posts", id);
         setPost(p);
 
-        // Fetch author profile
-        let { data: prof, error: profErr } = await supabase
-          .from("profiles")
-          .select(`full_name, avatar_url, bio`)
-          .eq("user_id", p.author_id)
-          .single();
-        if (profErr) throw profErr;
-        setAuthor(prof);
-
-        // Highlight code blocks and build TOC
-        Prism.highlightAll();
+        // 2) get the author details
+        const author = await api.getOne("users", p.author.id);
+        setAuthorName(
+          [author.first_name, author.last_name].filter(Boolean).join(" ") ||
+            author.email
+        );
       } catch (err) {
-        console.error(err);
+        console.error("Fetch error:", err);
         setError(err.message);
       } finally {
         setLoading(false);
       }
-    })();
+    };
+    fetchData();
   }, [id]);
 
+  // ─── Delete handler ─────────────────────────────────────────────────────────
   const handleDelete = async () => {
-    if (!window.confirm("Delete this post?")) return;
+    if (!window.confirm("Are you sure you want to delete this post?")) return;
     try {
       await deletePost(id);
       navigate("/blog");
     } catch (err) {
+      console.error("Delete error:", err);
       setError(err.message);
     }
   };
 
+  // ─── Open edit modal and prefill ────────────────────────────────────────────
+  const openEdit = () => {
+    setFormData({
+      title: post.title,
+      excerpt: post.excerpt,
+      content: post.content,
+      image_url: post.image_url,
+    });
+    setShowEdit(true);
+  };
+
+  // ─── Save edits ─────────────────────────────────────────────────────────────
+  const handleSave = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await updatePost(id, formData);
+      setPost((prev) => ({ ...prev, ...formData }));
+      setShowEdit(false);
+    } catch (err) {
+      console.error("Update error:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ─── Trap focus in modal ────────────────────────────────────────────────────
+  useEffect(() => {
+    if (showEdit && formRef.current) {
+      formRef.current.querySelector("input,textarea")?.focus();
+    }
+  }, [showEdit]);
+
+  // ─── Loading / error / missing ──────────────────────────────────────────────
   if (loading)
     return (
       <div className="text-center my-5">
@@ -78,126 +116,129 @@ export default function BlogPostDetail() {
     );
   if (error)
     return (
-      <Alert variant="danger" className="my-5">
-        {error}
-      </Alert>
+      <Container className="py-5">
+        <Alert variant="danger">{error}</Alert>
+      </Container>
     );
   if (!post)
     return (
-      <Alert variant="warning" className="my-5">
-        Post not found
-      </Alert>
+      <Container className="py-5">
+        <Alert variant="warning">Post not found</Alert>
+      </Container>
     );
 
-  // Generate a simple Table of Contents
-  const headings = Array.from(
-    contentRef.current?.querySelectorAll("h2, h3") || []
-  ).map((h) => ({
-    id: (h.id = h.textContent.toLowerCase().replace(/\s+/g, "-")),
-    text: h.textContent,
-    tag: h.tagName,
-  }));
-
+  // ─── Render ─────────────────────────────────────────────────────────────────
   return (
-    <Container fluid className="blog-post-detail">
-      {/* Featured Image */}
-      {post.image_url && (
-        <div className="featured-img-wrapper">
-          <img
-            src={post.image_url}
-            alt={post.title}
-            className="featured-image"
-          />
+    <Container className="blog-post-detail py-5">
+      <Helmet>
+        <title>{post.title} – ShannyTechSolutions</title>
+        <meta name="description" content={post.excerpt} />
+      </Helmet>
+
+      <h1 className="post-title">{post.title}</h1>
+      <p className="meta">
+        {authorName && <>By {authorName} on </>}
+        {new Date(post.published_at).toLocaleDateString()}
+      </p>
+
+      {user?.id === post.author.id && (
+        <div className="mb-4 action-bar">
+          <Button
+            variant="outline-secondary"
+            className="me-2"
+            onClick={openEdit}
+          >
+            <FaEdit /> Edit
+          </Button>
+          <Button variant="outline-danger" onClick={handleDelete}>
+            <FaTrash /> Delete
+          </Button>
         </div>
       )}
 
-      <Container className="post-layout">
-        {/* TOC sidebar */}
-        <nav className="toc-sidebar">
-          <h5>On this page</h5>
-          <ul>
-            {headings.map((h) => (
-              <li key={h.id} className={h.tag.toLowerCase()}>
-                <a href={`#${h.id}`}>{h.text}</a>
-              </li>
-            ))}
-          </ul>
-        </nav>
+      {post.image_url && (
+        <img
+          src={post.image_url}
+          alt={post.title}
+          className="detail-image mb-4"
+          loading="lazy"
+        />
+      )}
 
-        {/* Main content */}
-        <article className="post-main">
-          <h1 className="post-title">{post.title}</h1>
-          <p className="post-meta">
-            By <strong>{author.full_name || "Unknown"}</strong> on{" "}
-            {new Date(post.published_at).toLocaleDateString()}
-          </p>
+      <div
+        className="post-content"
+        dangerouslySetInnerHTML={{ __html: post.content }}
+      />
 
-          {/* Action buttons */}
-          {user?.id === post.author_id && (
-            <div className="action-bar">
-              <Button
-                variant="outline-secondary"
-                as={Link}
-                to={`/blog/edit/${id}`}
-              >
-                <FaEdit /> Edit
-              </Button>
-              <Button variant="outline-danger" onClick={handleDelete}>
-                <FaTrash /> Delete
-              </Button>
-            </div>
-          )}
+      {/* ─── Edit Modal ──────────────────────────────────────────────────────────── */}
+      <Modal
+        show={showEdit}
+        onHide={() => setShowEdit(false)}
+        centered
+        aria-labelledby="edit-modal-title"
+      >
+        <Form ref={formRef} onSubmit={handleSave}>
+          <Modal.Header closeButton>
+            <Modal.Title id="edit-modal-title">Edit Post</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form.Group controlId="formTitle" className="mb-3">
+              <Form.Label>Title</Form.Label>
+              <Form.Control
+                type="text"
+                value={formData.title}
+                onChange={(e) =>
+                  setFormData((f) => ({ ...f, title: e.target.value }))
+                }
+                required
+              />
+            </Form.Group>
 
-          {/* Content */}
-          <div
-            className="post-content"
-            ref={contentRef}
-            dangerouslySetInnerHTML={{ __html: post.content }}
-          />
+            <Form.Group controlId="formExcerpt" className="mb-3">
+              <Form.Label>Excerpt</Form.Label>
+              <Form.Control
+                type="text"
+                value={formData.excerpt}
+                onChange={(e) =>
+                  setFormData((f) => ({ ...f, excerpt: e.target.value }))
+                }
+              />
+            </Form.Group>
 
-          {/* Pull-quote example */}
-          <blockquote className="pull-quote">“{post.excerpt}”</blockquote>
+            <Form.Group controlId="formImageUrl" className="mb-3">
+              <Form.Label>Image URL</Form.Label>
+              <Form.Control
+                type="url"
+                value={formData.image_url}
+                onChange={(e) =>
+                  setFormData((f) => ({ ...f, image_url: e.target.value }))
+                }
+              />
+            </Form.Group>
 
-          {/* Back link */}
-          <Button as={Link} to="/blog" variant="secondary" className="mt-4">
-            ← Back to Blog
-          </Button>
-        </article>
-
-        {/* Sticky social share */}
-        <aside className="social-share">
-          <a
-            href={`https://facebook.com/sharer/sharer.php?u=${window.location.href}`}
-            target="_blank"
-            rel="noopener"
-          >
-            <FaFacebookF />
-          </a>
-          <a
-            href={`https://twitter.com/intent/tweet?url=${window.location.href}`}
-            target="_blank"
-            rel="noopener"
-          >
-            <FaTwitter />
-          </a>
-          <a
-            href={`https://www.linkedin.com/shareArticle?url=${window.location.href}`}
-            target="_blank"
-            rel="noopener"
-          >
-            <FaLinkedinIn />
-          </a>
-        </aside>
-
-        {/* Author bio */}
-        <aside className="author-bio">
-          {author.avatar_url && (
-            <img src={author.avatar_url} alt={author.full_name} />
-          )}
-          <h5>{author.full_name}</h5>
-          <p>{author.bio}</p>
-        </aside>
-      </Container>
+            <Form.Group controlId="formContent" className="mb-3">
+              <Form.Label>Content (HTML/Markdown)</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={8}
+                value={formData.content}
+                onChange={(e) =>
+                  setFormData((f) => ({ ...f, content: e.target.value }))
+                }
+                required
+              />
+            </Form.Group>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowEdit(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" type="submit" disabled={loading}>
+              {loading ? "Saving…" : "Save Changes"}
+            </Button>
+          </Modal.Footer>
+        </Form>
+      </Modal>
     </Container>
   );
 }
