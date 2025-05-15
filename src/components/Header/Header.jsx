@@ -9,16 +9,16 @@ export default function Header() {
   const { user, signOut } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const btnRef = useRef(null);
+  const btnRef = useRef();
 
-  // 1) Shrink on scroll
+  // Shrink header on scroll
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // 2) Close menu on Escape
+  // Close on Escape
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === "Escape" && menuOpen) {
@@ -30,7 +30,7 @@ export default function Header() {
     return () => document.removeEventListener("keydown", onKey);
   }, [menuOpen]);
 
-  // 3) Lock body scroll when menu open
+  // Lock body scroll when menu open
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
   }, [menuOpen]);
@@ -42,19 +42,20 @@ export default function Header() {
     { to: "/case-studies", label: "Case Studies" },
     { to: "/tools/roi", label: "ROI Calculator" },
     { to: "/tools/quiz", label: "Service Quiz" },
-    { to: "/member", label: "Member" },
+    { to: "/member", label: "Dashboard" },
   ];
 
   return (
-    <header className={`ht-header ${scrolled ? "ht-shrink" : ""}`}>
+    <header className={`ht-header${scrolled ? " ht-shrink" : ""}`}>
       <a href="#main-content" className="ht-skip">
         Skip to content
       </a>
+
       <div className="ht-toolbar">
         {/* Mobile Hamburger */}
         <button
           ref={btnRef}
-          className={`ht-menu-btn ${menuOpen ? "open" : ""}`}
+          className={`ht-menu-btn${menuOpen ? " open" : ""}`}
           aria-label={menuOpen ? "Close menu" : "Open menu"}
           aria-expanded={menuOpen}
           aria-controls="ht-nav-mobile"
@@ -70,31 +71,25 @@ export default function Header() {
         {/* Logo */}
         <div className="ht-logo">
           <NavLink to="/" aria-label="Home">
-            <img src="/logo.png" alt="Logo" />
+            <img src="/logo.png" alt="ShannyTechSolutions logo" />
             <span>ShannyTechSolutions</span>
           </NavLink>
         </div>
 
-        {/* Tablet Inline Nav */}
-        <nav className="ht-nav-tablet">
-          {links.slice(0, 3).map(({ to, label }) => (
-            <NavLink key={to} to={to} end>
-              {label}
-            </NavLink>
-          ))}
-        </nav>
-
         {/* Desktop Full Nav */}
         <nav className="ht-nav-desktop">
           {links.map(({ to, label }) => (
-            <NavLink key={to} to={to} end>
+            <NavLink
+              key={to}
+              to={to}
+              end
+              className={({ isActive }) =>
+                "ht-nav-link" + (isActive ? " active" : "")
+              }
+            >
               {label}
             </NavLink>
           ))}
-        </nav>
-
-        {/* Auth / CTA */}
-        <div className="ht-auth-desktop">
           {user ? (
             <button onClick={signOut} className="ht-cta">
               Logout
@@ -109,7 +104,7 @@ export default function Header() {
               </NavLink>
             </>
           )}
-        </div>
+        </nav>
 
         {/* Utilities */}
         <div className="ht-utils">
@@ -118,20 +113,25 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile slide-over nav */}
+      {/* Mobile Slide-Over Nav */}
       <nav
         id="ht-nav-mobile"
-        className={`ht-nav-mobile ${menuOpen ? "open" : ""}`}
+        className={`ht-nav-mobile${menuOpen ? " open" : ""}`}
         aria-label="Mobile menu"
       >
         <ul>
           {links.map(({ to, label }) => (
             <li key={to}>
-              <NavLink to={to} onClick={() => setMenuOpen(false)}>
+              <NavLink
+                to={to}
+                onClick={() => setMenuOpen(false)}
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
                 {label}
               </NavLink>
             </li>
           ))}
+
           <li>
             {user ? (
               <button
