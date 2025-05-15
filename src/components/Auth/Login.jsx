@@ -1,8 +1,7 @@
-// src/pages/Login.jsx
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
-import "./Auth.css";
+import "./Login.css";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -42,7 +41,6 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Inline validations
     if (!emailValid) {
       setError("Please enter a valid email address.");
       return;
@@ -54,7 +52,6 @@ export default function Login() {
     setError("");
 
     try {
-      // **Changed** to match new AuthContext signature
       await signIn({ email: email.trim(), password });
       navigate("/member", { replace: true });
     } catch (err) {
@@ -63,64 +60,59 @@ export default function Login() {
   };
 
   return (
-    <div className="auth-backdrop">
-      <div className="auth-modal" role="dialog" aria-labelledby="login-title">
-        <h2 id="login-title" className="auth-title">
-          Login to Your Account
-        </h2>
+    <div className="login-container">
+      <div className="login-card" role="dialog" aria-labelledby="login-title">
+        <h1 id="login-title" className="login-title">
+          Welcome Back
+        </h1>
 
         {error && (
           <div
             ref={errorRef}
-            id="login-error"
-            className="auth-alert"
-            role="alert"
             tabIndex={-1}
+            className="login-error"
+            role="alert"
           >
             {error}
           </div>
         )}
 
-        <form className="auth-form" onSubmit={handleSubmit} noValidate>
-          {/* Email Field */}
+        <form className="login-form" onSubmit={handleSubmit} noValidate>
           <div
-            className={`floating-label ${
-              emailValid === false ? "invalid" : ""
-            }`}
+            className={`field-group ${emailValid === false ? "invalid" : ""}`}
           >
+            <label htmlFor="login-email">Email</label>
             <input
               id="login-email"
               type="email"
               autoComplete="username"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
               aria-invalid={emailValid === false}
+              required
             />
-            <label htmlFor="login-email">Email address</label>
             {emailValid === false && (
-              <span className="field-error">Invalid email</span>
+              <small className="field-error">Invalid email</small>
             )}
           </div>
 
-          {/* Password Field */}
-          <div className="floating-label">
+          <div className="field-group">
+            <label htmlFor="login-password">Password</label>
             <input
               id="login-password"
               type="password"
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
               aria-describedby="pwd-strength"
+              required
             />
-            <label htmlFor="login-password">Password</label>
             <div id="pwd-strength" className="pwd-meter">
               <div className={`bar strength-${pwdStrength}`}></div>
             </div>
           </div>
 
-          <button className="btn-auth primary" type="submit" disabled={loading}>
+          <button type="submit" className="btn-login" disabled={loading}>
             {loading ? "Logging in…" : "Login"}
           </button>
         </form>
