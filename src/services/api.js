@@ -9,7 +9,8 @@ const API_BASE =
 
 // If you have a dedicated logging endpoint (e.g. `/logs/`), configure it here:
 const LOGGING_URL =
-  import.meta.env.VITE_LOGGING_URL?.replace(/\/+$/, "") || null; // e.g. "http://localhost:8000/api/logs/";
+  import.meta.env.VITE_LOGGING_URL?.replace(/\/+$/, "") ||
+  "https://shannytech-151dd4eec17a.herokuapp.com/api/logs/"; // e.g. "http://localhost:8000/api/logs/";
 
 /** Key under which we store JWT tokens in localStorage */
 export const TOKEN_KEY = "authTokens";
