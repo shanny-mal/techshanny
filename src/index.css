@@ -10,7 +10,7 @@
    }
    
    html {
-     font-size: 100%; /* 16px */
+     font-size: 100%; /* 16px base */
      scroll-behavior: smooth;
    }
    
@@ -32,9 +32,13 @@
      --color-accent:     #FFD983;  /* warm gold */
      --color-highlight:  #008080;  /* teal highlight */
      --color-bg-light:   #F5F3EE;  /* ivory */
-     --color-bg-dark:    #1A1A1A;  /* dark background */
+     --color-bg-dark:    #1A1A1A;  /* almost black */
      --color-text-light: #FFFFFF;
      --color-text-dark:  #333333;
+   
+     /* — Default background & text — */
+     --bg:   var(--color-bg-light);
+     --text: var(--color-text-dark);
    
      /* — Typography — */
      --font-heading: "Montserrat", system-ui, sans-serif;
@@ -52,33 +56,96 @@
      /* — Motion — */
      --t-fast:   200ms ease-in-out;
      --t-medium: 300ms ease-in-out;
+     --t-slow:   500ms ease-in-out;
+   }
+   
+   /* ===========================
+      Dark Mode Overrides
+      =========================== */
+   body.dark {
+     --bg:   var(--color-bg-dark);
+     --text: var(--color-text-light);
    }
    
    /* ===========================
       Utility Classes
       =========================== */
+   /* Horizontal centering */
    .mx-auto { margin-left: auto; margin-right: auto; }
+   /* Text alignment */
    .text-center { text-align: center; }
    
+   /* Padding shorthand */
    .p-1 { padding: var(--space-1); }
    .p-2 { padding: var(--space-2); }
    .p-3 { padding: var(--space-3); }
    .p-4 { padding: var(--space-4); }
    .p-5 { padding: var(--space-5); }
    
+   /* Margin top shorthand */
    .mt-1 { margin-top: var(--space-1); }
    .mt-2 { margin-top: var(--space-2); }
    .mt-3 { margin-top: var(--space-3); }
    .mt-4 { margin-top: var(--space-4); }
    .mt-5 { margin-top: var(--space-5); }
    
+   /* Flex helpers */
+   .d-flex { display: flex; }
+   .flex-center { display: flex; align-items: center; justify-content: center; }
+   .flex-column { display: flex; flex-direction: column; }
+   
+   /* Container max-width */
+   .container {
+     width: 100%;
+     max-width: 1200px;
+     margin-left: auto;
+     margin-right: auto;
+     padding-left: var(--space-3);
+     padding-right: var(--space-3);
+   }
+   
    /* ===========================
-      Typography Scale
+      Typography Scale (fluid headings)
       =========================== */
-   h1, .fs-1 { font-family: var(--font-heading); font-weight: var(--fw-bold); font-size: 2.5rem; }
-   h2, .fs-2 { font-family: var(--font-heading); font-weight: var(--fw-bold); font-size: 2rem; }
-   h3, .fs-3 { font-family: var(--font-heading); font-weight: var(--fw-bold); font-size: 1.75rem; }
-   h4, .fs-4 { font-family: var(--font-heading); font-weight: var(--fw-bold); font-size: 1.5rem; }
+   h1, .fs-1 {
+     font-family: var(--font-heading);
+     font-weight: var(--fw-bold);
+     font-size: clamp(2rem, 5vw, 2.5rem);
+   }
+   h2, .fs-2 {
+     font-family: var(--font-heading);
+     font-weight: var(--fw-bold);
+     font-size: clamp(1.75rem, 4vw, 2rem);
+   }
+   h3, .fs-3 {
+     font-family: var(--font-heading);
+     font-weight: var(--fw-bold);
+     font-size: clamp(1.5rem, 3vw, 1.75rem);
+   }
+   h4, .fs-4 {
+     font-family: var(--font-heading);
+     font-weight: var(--fw-bold);
+     font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+   }
+   h5, .fs-5 {
+     font-family: var(--font-heading);
+     font-weight: var(--fw-bold);
+     font-size: clamp(1.1rem, 2vw, 1.25rem);
+   }
+   
+   /* ===========================
+      Links & Buttons
+      =========================== */
+   a {
+     color: var(--color-primary);
+     text-decoration: none;
+     transition: color var(--t-fast);
+   }
+   a:hover,
+   a:focus {
+     color: var(--color-accent);
+     text-decoration: underline;
+   }
    
    /* ===========================
       Focus & Accessibility
@@ -93,14 +160,15 @@
    }
    
    /* ===========================
-      Dark Mode Overrides
+      Optional: Utility for text truncation
       =========================== */
-   body.dark {
-     --bg:   var(--color-bg-dark);
-     --text: var(--color-text-light);
+   .text-truncate {
+     overflow: hidden;
+     display: -webkit-box;
+     -webkit-box-orient: vertical;
    }
-   body:not(.dark) {
-     --bg:   var(--color-bg-light);
-     --text: var(--color-text-dark);
-   }
+   
+   /* ===========================
+      End of Global Styles
+      =========================== */
    
