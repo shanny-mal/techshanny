@@ -1,4 +1,4 @@
-:root {
+:root { 
   --clr-grad-start: #2b1607;
   --clr-grad-end:   #c19d84;
   --clr-accent:     #7a5235;
@@ -86,34 +86,65 @@
   border-radius:999px; text-decoration:none;
 }
 
-/* inline nav (desktop) */
+/* inline nav (tablet & desktop) */
 .ht-inline-nav { display:none; }
-@media (min-width:768px) {
-  .ht-menu-btn { display:none; }
-  .ht-nav { display:none; }
-  .ht-inline-nav { display:block; }
+/* ------------------------------------------------------------ */
+/* 1) Mobile first: up to 767px — default state above covers it   */
+/* ------------------------------------------------------------ */
+
+/* ------------------------------------------------------------ */
+/* 2) Tablet: 768px–1023px — show inline links, but keep spacing */
+/* ------------------------------------------------------------ */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .ht-menu-btn { display: none; }
+  .ht-nav { display: none; }
+  .ht-inline-nav { display: block; }
   .ht-inline-nav ul {
-    display:flex; gap:2rem; align-items:center; padding:0; margin:0;
+    display: flex; gap: 1.5rem; align-items: center; padding: 0; margin: 0;
   }
   .ht-inline-link {
-    color:var(--clr-light); text-decoration:none; font-weight:500;
-    transition: color .2s;
+    color: var(--clr-light); text-decoration: none; font-weight: 500;
+    font-size: 1rem; transition: color .2s;
   }
-  .ht-inline-link:hover { color:var(--clr-accent); }
-  .ht-inline-dropdown { position:relative; }
+  .ht-inline-link:hover { color: var(--clr-accent); }
+
+  /* Dropdown */
+  .ht-inline-dropdown { position: relative; }
   .ht-inline-submenu {
-    position:absolute; top:100%; left:0;
-    background:var(--bg-glass); padding:.5rem 0; list-style:none;
-    display:flex; flex-direction:column;
+    position: absolute; top: 2.2rem; left: 0;
+    background: var(--bg-glass); padding: .5rem 0; list-style: none;
+    display: flex; flex-direction: column;
   }
   .ht-inline-sublink {
-    padding:.5rem 1rem; color:var(--clr-light); text-decoration:none;
+    padding: .5rem 1rem; color: var(--clr-light); text-decoration: none;
+    font-size: .95rem;
   }
-  .ht-inline-sublink:hover { color:var(--clr-accent); }
+  .ht-inline-sublink:hover { color: var(--clr-accent); }
+
   .ht-inline-cta {
-    padding:.5rem 1rem; background:var(--clr-accent); color:#000;
-    border-radius:999px; text-decoration:none;
+    padding: .5rem 1rem; background: var(--clr-accent); color: #000;
+    border-radius: 999px; text-decoration: none; font-size: .95rem;
     transition: transform .2s;
   }
-  .ht-inline-cta:hover { transform:scale(1.05); }
+  .ht-inline-cta:hover { transform: scale(1.05); }
+}
+
+/* ------------------------------------------------------------ */
+/* 3) Desktop: 1024px+ — more generous spacing, bump up font-sizes */
+/* ------------------------------------------------------------ */
+@media (min-width: 1024px) {
+  .ht-menu-btn, .ht-nav { display: none; }
+  .ht-inline-nav { display: block; }
+  .ht-inline-nav ul {
+    display: flex; gap: 2.5rem; align-items: center; padding: 0; margin: 0;
+  }
+  .ht-inline-link {
+    font-size: 1.1rem;
+  }
+  .ht-inline-sublink {
+    font-size: 1rem;
+  }
+  .ht-inline-cta {
+    padding: .6rem 1.2rem; font-size: 1rem;
+  }
 }

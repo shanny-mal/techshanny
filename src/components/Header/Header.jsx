@@ -12,14 +12,14 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const menuBtnRef = useRef();
 
-  // 1) shrink on scroll
+  // 1) Shrink header on scroll
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // 2) keyboard & outside-click
+  // 2) Close on Escape or outside click
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === "Escape") {
@@ -29,11 +29,13 @@ export default function Header() {
       }
     };
     const onClick = (e) => {
-      // outside main menu
-      if (menuOpen && !e.target.closest(".ht-nav") && !e.target.closest(".ht-menu-btn")) {
+      if (
+        menuOpen &&
+        !e.target.closest(".ht-nav") &&
+        !e.target.closest(".ht-menu-btn")
+      ) {
         setMenuOpen(false);
       }
-      // outside tools submenu
       if (toolsOpen && !e.target.closest(".ht-nav__dropdown")) {
         setToolsOpen(false);
       }
@@ -46,7 +48,7 @@ export default function Header() {
     };
   }, [menuOpen, toolsOpen]);
 
-  // 3) lock body scroll
+  // 3) Lock body scroll when mobile menu is open
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
   }, [menuOpen]);
@@ -62,9 +64,25 @@ export default function Header() {
     { to: "/tools/quiz", label: "Service Quiz" },
   ];
 
+  // When switching between mobile & desktop, close dropdown
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const handler = () => {
+      if (mq.matches) setMenuOpen(false);
+    };
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
   return (
-    <header className={`ht-header ${scrolled ? "ht-header--shrink" : ""}`}>
-      <a href="#main-content" className="ht-skip">Skip to main content</a>
+    <header
+      role="banner"
+      className={`ht-header ${scrolled ? "ht-header--shrink" : ""}`}
+    >
+      <a href="#main-content" className="ht-skip">
+        Skip to main content
+      </a>
+
       <div className="ht-toolbar">
         <button
           ref={menuBtnRef}
@@ -72,7 +90,7 @@ export default function Header() {
           aria-label={menuOpen ? "Close menu" : "Open menu"}
           aria-expanded={menuOpen}
           onClick={() => {
-            setMenuOpen((o) => !o);
+            setMenuOpen((open) => !open);
             setToolsOpen(false);
           }}
         >
@@ -81,8 +99,12 @@ export default function Header() {
           <span className="bar" />
         </button>
 
-        <NavLink to="/" className="ht-logo" aria-label="Home">
-          <img src="/logo.png" alt="" className="ht-logo__img" />
+        <NavLink to="/" className="ht-logo" aria-label="Go to homepage">
+          <img
+            src="/logo.png"
+            alt="ShannyTechSolutions logo"
+            className="ht-logo__img"
+          />
           <span className="ht-logo__text">ShannyTechSolutions</span>
         </NavLink>
 
@@ -92,8 +114,9 @@ export default function Header() {
         </div>
       </div>
 
-      {/* ─── Slide-over (MOBILE ONLY) ─────────────────── */}
+      {/* ─── Slide-over nav (mobile) ─────────────────── */}
       <nav
+        role="navigation"
         className={`ht-nav ${menuOpen ? "open" : ""}`}
         aria-hidden={!menuOpen}
       >
@@ -104,6 +127,7 @@ export default function Header() {
                 to={to}
                 className="ht-nav__link"
                 onClick={() => setMenuOpen(false)}
+                end
               >
                 {label}
               </NavLink>
@@ -141,7 +165,10 @@ export default function Header() {
             {user ? (
               <button
                 className="ht-nav__cta"
-                onClick={() => { signOut(); setMenuOpen(false); }}
+                onClick={() => {
+                  signOut();
+                  setMenuOpen(false);
+                }}
               >
                 Logout
               </button>
@@ -167,18 +194,26 @@ export default function Header() {
         </ul>
       </nav>
 
-      {/* ─── Inline nav (DESKTOP ONLY) ───────────────── */}
-      <nav className="ht-inline-nav">
+      {/* ─── Inline nav (tablet & desktop) ───────────────── */}
+      <nav role="navigation" className="ht-inline-nav">
         <ul>
           {mainLinks.map(({ to, label }) => (
             <li key={to}>
-              <NavLink to={to} className="ht-inline-link">
+              <NavLink to={to} className="ht-inline-link" end>
                 {label}
               </NavLink>
             </li>
           ))}
+
           <li className="ht-inline-dropdown">
-            <NavLink to="#" onClick={(e) => { e.preventDefault(); setToolsOpen((o) => !o); }} className="ht-inline-link">
+            <NavLink
+              to="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setToolsOpen((o) => !o);
+              }}
+              className="ht-inline-link"
+            >
               Tools ▾
             </NavLink>
             {toolsOpen && (
@@ -193,14 +228,24 @@ export default function Header() {
               </ul>
             )}
           </li>
+
           <li>
-            {user
-              ? <button onClick={signOut} className="ht-inline-link">Logout</button>
-              : <NavLink to="/login" className="ht-inline-link">Login</NavLink>}
+            {user ? (
+              <button onClick={signOut} className="ht-inline-link">
+                Logout
+              </button>
+            ) : (
+              <NavLink to="/login" className="ht-inline-link">
+                Login
+              </NavLink>
+            )}
           </li>
+
           {!user && (
             <li>
-              <NavLink to="/signup" className="ht-inline-cta">Sign Up</NavLink>
+              <NavLink to="/signup" className="ht-inline-cta">
+                Sign Up
+              </NavLink>
             </li>
           )}
         </ul>
