@@ -1,52 +1,43 @@
-import { motion } from "framer-motion";
-import { useDocumentMeta } from "../hooks/useDocumentMeta";
+import { Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import Navbar from "./components/layout/Navbar.jsx";
+import Footer from "./components/layout/Footer.jsx";
+import HomePage from "./pages/Home.jsx";
+import AboutPage from "./pages/AboutPage.jsx";
+import ServicesPage from "./pages/ServicesPage.jsx";
+import ServiceDetailPage from "./pages/ServiceDetailPage.jsx";
+import ContactPage from "./pages/ContactPage.jsx";
+import PrivacyPolicyPage from "./pages/PrivacyPolicyPage.jsx";
+import TermsAndConditionsPage from "./pages/TermsAndConditionsPage.jsx";
+import NotFoundPage from "./pages/NotFoundPage.jsx";
 
-export default function TermsAndConditionsPage() {
-  useDocumentMeta({
-    title: "Terms & Conditions | shannyTech",
-    description: "Read shannyTech Terms & Conditions.",
-    og: {
-      title: "Terms & Conditions | shannyTech",
-      description: "Read shannyTech Terms & Conditions.",
-      url: window.location.href,
-    },
-    twitter: {
-      card: "summary",
-      title: "Terms & Conditions | shannyTech",
-      description: "Read shannyTech Terms & Conditions.",
-    },
-  });
-  const container = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
-  };
-  const item = {
-    hidden: { opacity: 0, y: 10 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  };
+export default function App() {
+  const location = useLocation();
   return (
-    <motion.main
-      initial="hidden"
-      animate="visible"
-      variants={container}
-      className="py-16 bg-gradient-to-b from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800"
-    >
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        <motion.h1
-          variants={item}
-          className="text-3xl font-bold text-indigo-600 dark:text-indigo-400"
+    <>
+      <Navbar />
+      <AnimatePresence mode="wait">
+        <motion.main
+          key={location.pathname}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.5 }}
+          className="flex-grow"
         >
-          Terms & Conditions
-        </motion.h1>
-        <motion.p variants={item} className="text-gray-700 dark:text-gray-300">
-          Your terms and conditions content goes here. Outline user
-          responsibilities, disclaimers, limitations of liability, governing
-          law, etc.
-        </motion.p>
-        <motion.p variants={item} className="text-gray-700 dark:text-gray-300">
-          Replace with full legal text as appropriate.
-        </motion.p>
-      </div>
-    </motion.main>
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/services" element={<ServicesPage />} />
+            <Route path="/services/:id" element={<ServiceDetailPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/privacy" element={<PrivacyPolicyPage />} />
+            <Route path="/terms" element={<TermsAndConditionsPage />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </motion.main>
+      </AnimatePresence>
+      <Footer />
+    </>
   );
 }
