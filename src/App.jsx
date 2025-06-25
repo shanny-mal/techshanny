@@ -10,6 +10,11 @@ import ContactPage from "./pages/ContactPage.jsx";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage.jsx";
 import TermsAndConditionsPage from "./pages/TermsAndConditionsPage.jsx";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
+import {
+  CyberSecurityPage,
+  MobileAppDevelopmentPage,
+  WebAppDevelopmentPage,
+} from "./pages/ServiceSubPages.jsx";
 
 export default function App() {
   const location = useLocation();
@@ -29,6 +34,18 @@ export default function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/services" element={<ServicesPage />} />
+            <Route
+              path="/services/cyber-security"
+              element={<CyberSecurityPage />}
+            />
+            <Route
+              path="/services/mobile-app-development"
+              element={<MobileAppDevelopmentPage />}
+            />
+            <Route
+              path="/services/web-app-development"
+              element={<WebAppDevelopmentPage />}
+            />
             <Route path="/services/:id" element={<ServiceDetailPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/privacy" element={<PrivacyPolicyPage />} />
