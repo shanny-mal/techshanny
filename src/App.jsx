@@ -47,6 +47,8 @@ export default function App() {
               element={<WebAppDevelopmentPage />}
             />
             <Route path="/services/:id" element={<ServiceDetailPage />} />
+            <Route path="/services/:slug" element={<ServiceDetailPage />} />
+            <Route path="/services" element={<ServicesPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/privacy" element={<PrivacyPolicyPage />} />
             <Route path="/terms" element={<TermsAndConditionsPage />} />
