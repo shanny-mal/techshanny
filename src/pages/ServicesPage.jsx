@@ -1,30 +1,35 @@
-import { Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
+import { services } from "../data/servicesData";
 import { motion } from "framer-motion";
 import { useDocumentMeta } from "../hooks/useDocumentMeta";
-import ServiceCard from "../components/sections/ServiceCard";
-import { services } from "../data/servicesData";
 
-export default function ServicesPage() {
+export default function ServiceDetailPage() {
+  const { id } = useParams();
+  const svc = services.find((s) => s.id === id);
+  if (!svc) {
+    return (
+      <Link to="/services" className="text-teal-600">
+        Back to Services
+      </Link>
+    );
+  }
   useDocumentMeta({
-    title: "Services | shannyTech",
-    description:
-      "Explore shannyTech services: web development, mobile apps, cloud solutions, cybersecurity, data engineering, and more.",
+    title: `${svc.title} | shannyTech`,
+    description: svc.shortDescription,
     og: {
-      title: "Services | shannyTech",
-      description:
-        "Explore shannyTech services: web development, mobile apps, cloud solutions, cybersecurity, data engineering, and more.",
+      title: `${svc.title} | shannyTech`,
+      description: svc.shortDescription,
       url: window.location.href,
     },
     twitter: {
       card: "summary_large_image",
-      title: "Services | shannyTech",
-      description:
-        "Explore shannyTech services: web development, mobile apps, cloud solutions, cybersecurity, data engineering, and more.",
+      title: `${svc.title} | shannyTech`,
+      description: svc.shortDescription,
     },
   });
   const container = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
+    visible: { opacity: 1, transition: { staggerChildren: 0.3 } },
   };
   const item = {
     hidden: { opacity: 0, y: 20 },
@@ -37,32 +42,38 @@ export default function ServicesPage() {
       variants={container}
       className="py-16 bg-gradient-to-b from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.h1
           variants={item}
-          className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 text-center mb-8"
+          className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-4"
         >
-          Our Services
+          {svc.title}
         </motion.h1>
-        <motion.div
-          variants={container}
-          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+        <motion.p
+          variants={item}
+          className="text-gray-700 dark:text-gray-300 mb-6"
         >
-          {services.map((svc) => {
-            const IconComp = svc.icon;
-            const link = `/services/${svc.id}`;
-            return (
-              <motion.div key={svc.id} variants={item}>
-                <ServiceCard
-                  icon={IconComp}
-                  title={svc.title}
-                  description={svc.shortDescription}
-                  link={link}
-                />
-              </motion.div>
-            );
-          })}
-        </motion.div>
+          {svc.detailedDescription || svc.shortDescription}
+        </motion.p>
+        {svc.features && (
+          <motion.ul
+            variants={container}
+            className="list-disc list-inside space-y-2 mb-6"
+          >
+            {svc.features.map((feat, idx) => (
+              <motion.li
+                key={idx}
+                variants={item}
+                className="text-gray-700 dark:text-gray-300"
+              >
+                {feat}
+              </motion.li>
+            ))}
+          </motion.ul>
+        )}
+        <Link to="/services" className="text-teal-600 hover:underline">
+          ← Back to Services
+        </Link>
       </div>
     </motion.main>
   );

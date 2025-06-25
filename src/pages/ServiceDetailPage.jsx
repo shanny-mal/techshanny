@@ -8,9 +8,11 @@ export default function ServiceDetailPage() {
   const svc = services.find((s) => s.id === id);
   if (!svc) {
     return (
-      <Link to="/services" className="text-teal-600">
-        Back to Services
-      </Link>
+      <div className="py-16 flex flex-col items-center">
+        <Link to="/services" className="text-teal-600 hover:underline">
+          Back to Services
+        </Link>
+      </div>
     );
   }
   useDocumentMeta({
@@ -55,7 +57,7 @@ export default function ServiceDetailPage() {
         >
           {svc.detailedDescription || svc.shortDescription}
         </motion.p>
-        {svc.features && (
+        {Array.isArray(svc.features) && svc.features.length > 0 && (
           <motion.ul
             variants={container}
             className="list-disc list-inside space-y-2 mb-6"
@@ -71,13 +73,9 @@ export default function ServiceDetailPage() {
             ))}
           </motion.ul>
         )}
-        <motion.Link
-          to="/services"
-          variants={item}
-          className="text-teal-600 hover:underline"
-        >
+        <Link to="/services" className="text-teal-600 hover:underline">
           ← Back to Services
-        </motion.Link>
+        </Link>
       </div>
     </motion.main>
   );
