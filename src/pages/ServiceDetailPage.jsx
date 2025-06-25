@@ -1,3 +1,4 @@
+// src/pages/ServiceDetailPage.jsx
 import { useParams, Link } from "react-router-dom";
 import { services } from "../data/servicesData";
 import { motion } from "framer-motion";
@@ -5,14 +6,19 @@ import { useDocumentMeta } from "../hooks/useDocumentMeta";
 
 export default function ServiceDetailPage() {
   const { id } = useParams();
-  const svc = services.find((s) => s.id === id);
+  const svc = services.find((s) => (s.slug || s.id) === id);
   if (!svc) {
     return (
-      <div className="py-16 flex flex-col items-center">
+      <motion.main
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="py-16 flex flex-col items-center justify-center bg-gradient-to-b from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800"
+      >
         <Link to="/services" className="text-teal-600 hover:underline">
           Back to Services
         </Link>
-      </div>
+      </motion.main>
     );
   }
   useDocumentMeta({

@@ -1,3 +1,4 @@
+// src/pages/ServicesPage.jsx
 import { motion } from "framer-motion";
 import { useDocumentMeta } from "../hooks/useDocumentMeta";
 import ServiceCard from "../components/sections/ServiceCard";
@@ -63,11 +64,10 @@ export default function ServicesPage() {
         >
           {services.map((svc) => {
             const IconComp = svc.icon;
-            const link = svc.slug
-              ? `/services/${svc.slug}`
-              : `/services/${svc.id}`;
+            const slug = svc.slug || svc.id;
+            const link = `/services/${slug}`;
             return (
-              <motion.div key={svc.id} variants={item}>
+              <motion.div key={slug} variants={item}>
                 <ServiceCard
                   icon={IconComp}
                   title={svc.title}
