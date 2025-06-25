@@ -1,21 +1,19 @@
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import Navbar from "./components/layout/Navbar.jsx";
-import Footer from "./components/layout/Footer.jsx";
-import HomePage from "./pages/Home.jsx";
-import AboutPage from "./pages/AboutPage.jsx";
-import ServicesPage from "./pages/ServicesPage.jsx";
-import ServiceDetailPage from "./pages/ServiceDetailPage.jsx";
-import ContactPage from "./pages/ContactPage.jsx";
-import PrivacyPolicyPage from "./pages/PrivacyPolicyPage.jsx";
-import TermsAndConditionsPage from "./pages/TermsAndConditionsPage.jsx";
-import NotFoundPage from "./pages/NotFoundPage.jsx";
+import HomePage from "./Home.jsx";
+import AboutPage from "./AboutPage.jsx";
+import ServicesPage from "./ServicesPage.jsx";
+import ServiceDetailPage from "./ServiceDetailPage.jsx";
+import ContactPage from "./ContactPage.jsx";
+import PrivacyPolicyPage from "./PrivacyPolicyPage.jsx";
+import TermsAndConditionsPage from "./TermsAndConditionsPage.jsx";
+import NotFoundPage from "./NotFoundPage.jsx";
 
 export default function App() {
   const location = useLocation();
   return (
     <>
-      <Navbar />
+      
       <AnimatePresence mode="wait">
         <motion.main
           key={location.pathname}
@@ -37,7 +35,7 @@ export default function App() {
           </Routes>
         </motion.main>
       </AnimatePresence>
-      <Footer />
+    
     </>
   );
 }

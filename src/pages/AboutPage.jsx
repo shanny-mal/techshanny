@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { useDocumentMeta } from "../hooks/useDocumentMeta";
 import AboutSection from "../components/sections/AboutSection";
-import TeamSection from "../components/sections/TeamSection";
 
 export default function AboutPage() {
   useDocumentMeta({
@@ -37,7 +36,7 @@ export default function AboutPage() {
         <AboutSection />
       </motion.div>
       <motion.div variants={item}>
-        <TeamSection />
+       
       </motion.div>
     </motion.main>
   );
