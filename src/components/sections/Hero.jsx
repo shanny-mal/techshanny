@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import heroImage from "../../assets/images/hero-image.jpg";
 
-export default function Hero() {
+export default function Hero({ backgroundImage = heroImage }) {
   const container = {
     hidden: {},
     visible: { transition: { staggerChildren: 0.3 } },
@@ -16,7 +17,7 @@ export default function Hero() {
       animate="visible"
       variants={container}
       className="relative flex items-center justify-center h-screen bg-cover bg-center"
-      style={{ backgroundImage: "url('src/assets/images/hero-image.jpg')" }}
+      style={{ backgroundImage: `url(${backgroundImage})` }}
       aria-labelledby="hero-heading"
     >
       <div className="absolute inset-0 bg-black opacity-50"></div>
