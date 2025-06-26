@@ -69,30 +69,13 @@ export default function Footer() {
           animate="visible"
           variants={footerVariants}
           className="flex items-center space-x-2 mb-6 md:mb-0"
-        >
-          <Link
-            to="/"
-            aria-label="shannyTech Home"
-            className="flex items-center"
-          >
-            <div className="h-10 w-10 rounded-full overflow-hidden bg-white dark:bg-gray-700 flex items-center justify-center">
-              <img
-                src={logo}
-                alt="shannyTech Logo"
-                className="h-8 w-8 object-cover"
-              />
-            </div>
-            <span className="ml-2 text-xl font-semibold text-white">
-              shannyTech
-            </span>
-          </Link>
-        </motion.div>
+        ></motion.div>
         <motion.nav
           initial="hidden"
           animate="visible"
           variants={footerVariants}
           aria-label="Footer navigation"
-          className="flex flex-wrap justify-center md:justify-start space-x-4 mb-6 md:mb-0"
+          className="flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-4 mb-6 md:mb-0"
         >
           {navLinks.map(({ to, label }) => (
             <motion.div key={to} whileHover="hover" variants={linkVariants}>
@@ -119,7 +102,7 @@ export default function Footer() {
               rel="noopener noreferrer"
               aria-label={label}
               whileHover={{ scale: 1.2 }}
-              className="text-gray-200"
+              className="p-2 rounded-full bg-indigo-800 dark:bg-gray-700"
             >
               <IconComp
                 className="w-5 h-5"

@@ -22,7 +22,6 @@ function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const dropdownRef = useRef(null);
   const mobileMenuRef = useRef(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     function onScroll() {
@@ -43,30 +42,24 @@ function Navbar() {
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [servicesDropdownOpen]);
 
   useEffect(() => {
     function handleEsc(event) {
       if (event.key === "Escape") {
-        if (servicesDropdownOpen) setServicesDropdownOpen(false);
-        if (mobileOpen) setMobileOpen(false);
-        if (mobileServicesOpen) setMobileServicesOpen(false);
+        setServicesDropdownOpen(false);
+        setMobileOpen(false);
+        setMobileServicesOpen(false);
       }
     }
     document.addEventListener("keydown", handleEsc);
-    return () => {
-      document.removeEventListener("keydown", handleEsc);
-    };
+    return () => document.removeEventListener("keydown", handleEsc);
   }, [servicesDropdownOpen, mobileOpen, mobileServicesOpen]);
 
   const handleMobileToggle = () => {
     setMobileOpen((prev) => !prev);
-    if (mobileOpen) {
-      setMobileServicesOpen(false);
-    }
+    if (mobileOpen) setMobileServicesOpen(false);
   };
 
   const handleNavLinkClick = () => {
@@ -75,18 +68,13 @@ function Navbar() {
     setServicesDropdownOpen(false);
   };
 
-  const handleServicesToggle = () => {
-    setServicesDropdownOpen((prev) => !prev);
-  };
-
+  const handleServicesToggle = () => setServicesDropdownOpen((prev) => !prev);
   const handleServicesKeyDown = (e) => {
-    if (e.key === "Enter" || e.key === " ") {
+    if (["Enter", " "].includes(e.key)) {
       e.preventDefault();
       setServicesDropdownOpen((prev) => !prev);
     }
-    if (e.key === "Escape") {
-      setServicesDropdownOpen(false);
-    }
+    if (e.key === "Escape") setServicesDropdownOpen(false);
   };
 
   const renderServiceItems = (onClickItem) =>
@@ -102,9 +90,7 @@ function Navbar() {
           to={`/services/${svc.id}`}
           className="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
           role="menuitem"
-          onClick={() => {
-            onClickItem();
-          }}
+          onClick={onClickItem}
         >
           {svc.title}
         </Link>
@@ -155,8 +141,7 @@ function Navbar() {
                 end={to === "/"}
                 className={({ isActive }) =>
                   classNames(
-                    "px-2 py-1 transition-colors",
-                    "text-white hover:text-teal-200",
+                    "px-2 py-1 transition-colors text-white hover:text-teal-200",
                     { "font-semibold underline": isActive }
                   )
                 }
@@ -183,9 +168,9 @@ function Navbar() {
                 </span>
                 <span className="ml-1">
                   {servicesDropdownOpen ? (
-                    <FaChevronUp className="w-4 h-4" aria-hidden="true" />
+                    <FaChevronUp className="w-4 h-4" />
                   ) : (
-                    <FaChevronDown className="w-4 h-4" aria-hidden="true" />
+                    <FaChevronDown className="w-4 h-4" />
                   )}
                 </span>
               </button>
@@ -199,9 +184,7 @@ function Navbar() {
                     className="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg"
                     role="menu"
                   >
-                    {renderServiceItems(() => {
-                      setServicesDropdownOpen(false);
-                    })}
+                    {renderServiceItems(() => setServicesDropdownOpen(false))}
                   </motion.ul>
                 )}
               </AnimatePresence>
@@ -210,12 +193,12 @@ function Navbar() {
               onClick={toggleTheme}
               aria-label="Toggle dark mode"
               whileHover={{ scale: 1.1 }}
-              className="p-2 rounded hover:bg-teal-500 dark:hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-300 transition-colors text-white"
+              className="p-3 rounded hover:bg-teal-500 dark:hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-300 transition-colors text-white"
             >
               {isDark ? (
-                <FaSun className="w-5 h-5" aria-hidden="true" />
+                <FaSun className="w-5 h-5" />
               ) : (
-                <FaMoon className="w-5 h-5" aria-hidden="true" />
+                <FaMoon className="w-5 h-5" />
               )}
             </motion.button>
           </div>
@@ -224,24 +207,24 @@ function Navbar() {
               onClick={toggleTheme}
               aria-label="Toggle dark mode"
               whileHover={{ scale: 1.1 }}
-              className="p-2 rounded hover:bg-teal-500 dark:hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-300 mr-2 transition-colors text-white"
+              className="p-3 rounded hover:bg-teal-500 dark:hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-300 mr-2 transition-colors text-white"
             >
               {isDark ? (
-                <FaSun className="w-5 h-5" aria-hidden="true" />
+                <FaSun className="w-5 h-5" />
               ) : (
-                <FaMoon className="w-5 h-5" aria-hidden="true" />
+                <FaMoon className="w-5 h-5" />
               )}
             </motion.button>
             <motion.button
               onClick={handleMobileToggle}
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
               whileHover={{ scale: 1.1 }}
-              className="p-2 rounded hover:bg-teal-500 dark:hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-300 transition-colors text-white"
+              className="p-3 rounded hover:bg-teal-500 dark:hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-300 transition-colors text-white"
             >
               {mobileOpen ? (
-                <FaTimes className="w-6 h-6" aria-hidden="true" />
+                <FaTimes className="w-6 h-6" />
               ) : (
-                <FaBars className="w-6 h-6" aria-hidden="true" />
+                <FaBars className="w-6 h-6" />
               )}
             </motion.button>
           </div>
@@ -264,7 +247,7 @@ function Navbar() {
                   end
                   className={({ isActive }) =>
                     classNames(
-                      "block text-lg px-2 py-1 transition-colors text-gray-800 dark:text-gray-200 hover:text-teal-600 dark:hover:text-teal-400",
+                      "block text-lg px-4 py-3 transition-colors text-gray-800 dark:text-gray-200 hover:text-teal-600 dark:hover:text-teal-400",
                       { "font-semibold": isActive }
                     )
                   }
@@ -276,7 +259,7 @@ function Navbar() {
                   to="/about"
                   className={({ isActive }) =>
                     classNames(
-                      "block text-lg px-2 py-1 transition-colors text-gray-800 dark:text-gray-200 hover:text-teal-600 dark:hover:text-teal-400",
+                      "block text-lg px-4 py-3 transition-colors text-gray-800 dark:text-gray-200 hover:text-teal-600 dark:hover:text-teal-400",
                       { "font-semibold": isActive }
                     )
                   }
@@ -288,7 +271,7 @@ function Navbar() {
                   to="/contact"
                   className={({ isActive }) =>
                     classNames(
-                      "block text-lg px-2 py-1 transition-colors text-gray-800 dark:text-gray-200 hover:text-teal-600 dark:hover:text-teal-400",
+                      "block text-lg px-4 py-3 transition-colors text-gray-800 dark:text-gray-200 hover:text-teal-600 dark:hover:text-teal-400",
                       { "font-semibold": isActive }
                     )
                   }
@@ -302,7 +285,7 @@ function Navbar() {
                     onClick={() => setMobileServicesOpen((prev) => !prev)}
                     aria-haspopup="true"
                     aria-expanded={mobileServicesOpen}
-                    className="w-full flex items-center justify-between text-lg px-2 py-1 text-gray-800 dark:text-gray-200 hover:text-teal-600 dark:hover:text-teal-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-300 transition-colors"
+                    className="w-full flex items-center justify-between text-lg px-4 py-3 text-gray-800 dark:text-gray-200 hover:text-teal-600 dark:hover:text-teal-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-300 transition-colors"
                   >
                     <span
                       className={classNames({
@@ -313,9 +296,9 @@ function Navbar() {
                     </span>
                     <span className="ml-2">
                       {mobileServicesOpen ? (
-                        <FaChevronUp className="w-4 h-4" aria-hidden="true" />
+                        <FaChevronUp className="w-4 h-4" />
                       ) : (
-                        <FaChevronDown className="w-4 h-4" aria-hidden="true" />
+                        <FaChevronDown className="w-4 h-4" />
                       )}
                     </span>
                   </button>
@@ -326,7 +309,7 @@ function Navbar() {
                         animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.2 }}
-                        className="mt-2 ml-4 space-y-1 overflow-hidden"
+                        className="mt-2 ml-4 space-y-2 overflow-hidden"
                       >
                         {renderServiceItems(() => {
                           setMobileOpen(false);
