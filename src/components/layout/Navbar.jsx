@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { useTheme } from "../../context/ThemeContext";
 import logo from "../../assets/logo/logo.png";
 import classNames from "classnames";
@@ -32,11 +32,11 @@ function Navbar() {
   }, []);
 
   useEffect(() => {
-    function handleClickOutside(event) {
+    function handleClickOutside(e) {
       if (
         servicesDropdownOpen &&
         dropdownRef.current &&
-        !dropdownRef.current.contains(event.target)
+        !dropdownRef.current.contains(e.target)
       ) {
         setServicesDropdownOpen(false);
       }
@@ -46,8 +46,8 @@ function Navbar() {
   }, [servicesDropdownOpen]);
 
   useEffect(() => {
-    function handleEsc(event) {
-      if (event.key === "Escape") {
+    function handleEsc(e) {
+      if (e.key === "Escape") {
         setServicesDropdownOpen(false);
         setMobileOpen(false);
         setMobileServicesOpen(false);
@@ -58,26 +58,17 @@ function Navbar() {
   }, [servicesDropdownOpen, mobileOpen, mobileServicesOpen]);
 
   const handleMobileToggle = () => {
-    setMobileOpen((prev) => !prev);
+    setMobileOpen((p) => !p);
     if (mobileOpen) setMobileServicesOpen(false);
   };
 
-  const handleNavLinkClick = () => {
+  const closeAll = () => {
     setMobileOpen(false);
     setMobileServicesOpen(false);
     setServicesDropdownOpen(false);
   };
 
-  const handleServicesToggle = () => setServicesDropdownOpen((prev) => !prev);
-  const handleServicesKeyDown = (e) => {
-    if (["Enter", " "].includes(e.key)) {
-      e.preventDefault();
-      setServicesDropdownOpen((prev) => !prev);
-    }
-    if (e.key === "Escape") setServicesDropdownOpen(false);
-  };
-
-  const renderServiceItems = (onClickItem) =>
+  const renderServiceItems = (onClick) =>
     services.map((svc) => (
       <motion.li
         key={svc.id}
@@ -88,9 +79,8 @@ function Navbar() {
       >
         <Link
           to={`/services/${svc.id}`}
-          className="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-          role="menuitem"
-          onClick={onClickItem}
+          className="block px-6 py-4 text-lg text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+          onClick={onClick}
         >
           {svc.title}
         </Link>
@@ -109,31 +99,25 @@ function Navbar() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
       className={classNames(
-        "fixed top-0 left-0 right-0 z-50 transition-colors",
-        scrolled
-          ? "bg-teal-600 dark:bg-teal-700 shadow-md"
-          : "bg-transparent dark:bg-transparent"
+        "fixed inset-x-0 z-50 transition-colors",
+        scrolled ? "bg-teal-600 dark:bg-teal-700 shadow-md" : "bg-transparent"
       )}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <Link
-            to="/"
-            onClick={handleNavLinkClick}
-            className="flex items-center"
-          >
-            <div className="h-10 w-10 rounded-lg overflow-hidden bg-white dark:bg-gray-700 flex items-center justify-center">
+          <Link to="/" onClick={closeAll} className="flex items-center">
+            <div className="h-12 w-12 sm:h-10 sm:w-10 rounded-full overflow-hidden bg-white dark:bg-gray-700 flex items-center justify-center">
               <img
                 src={logo}
                 alt="shannyTech Logo"
-                className="h-8 w-8 object-cover"
+                className="h-10 w-10 sm:h-8 sm:w-8 object-cover"
               />
             </div>
-            <span className="ml-2 text-xl font-bold text-white">
+            <span className="ml-3 text-lg sm:text-xl font-bold text-white">
               shannyTech
             </span>
           </Link>
-          <div className="hidden md:flex md:items-center md:space-x-6">
+          <div className="hidden md:flex items-center space-x-6">
             {navLinks.map(({ to, label }) => (
               <NavLink
                 key={to}
@@ -141,11 +125,11 @@ function Navbar() {
                 end={to === "/"}
                 className={({ isActive }) =>
                   classNames(
-                    "px-2 py-1 transition-colors text-white hover:text-teal-200",
+                    "px-3 py-2 text-white hover:text-teal-200 transition",
                     { "font-semibold underline": isActive }
                   )
                 }
-                onClick={handleNavLinkClick}
+                onClick={closeAll}
               >
                 {label}
               </NavLink>
@@ -155,9 +139,12 @@ function Navbar() {
                 type="button"
                 aria-haspopup="true"
                 aria-expanded={servicesDropdownOpen}
-                onClick={handleServicesToggle}
-                onKeyDown={handleServicesKeyDown}
-                className="flex items-center px-2 py-1 transition-colors text-white hover:text-teal-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-300 rounded"
+                onClick={() => setServicesDropdownOpen((p) => !p)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") e.preventDefault();
+                  setServicesDropdownOpen((p) => !p);
+                }}
+                className="flex items-center px-3 py-2 text-white hover:text-teal-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-300 rounded transition"
               >
                 <span
                   className={classNames({
@@ -166,13 +153,11 @@ function Navbar() {
                 >
                   Services
                 </span>
-                <span className="ml-1">
-                  {servicesDropdownOpen ? (
-                    <FaChevronUp className="w-4 h-4" />
-                  ) : (
-                    <FaChevronDown className="w-4 h-4" />
-                  )}
-                </span>
+                {servicesDropdownOpen ? (
+                  <FaChevronUp className="ml-1 w-4 h-4" />
+                ) : (
+                  <FaChevronDown className="ml-1 w-4 h-4" />
+                )}
               </button>
               <AnimatePresence>
                 {servicesDropdownOpen && (
@@ -182,7 +167,6 @@ function Navbar() {
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
                     className="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg"
-                    role="menu"
                   >
                     {renderServiceItems(() => setServicesDropdownOpen(false))}
                   </motion.ul>
@@ -193,7 +177,7 @@ function Navbar() {
               onClick={toggleTheme}
               aria-label="Toggle dark mode"
               whileHover={{ scale: 1.1 }}
-              className="p-3 rounded hover:bg-teal-500 dark:hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-300 transition-colors text-white"
+              className="p-3 rounded hover:bg-teal-500 dark:hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-300 text-white transition"
             >
               {isDark ? (
                 <FaSun className="w-5 h-5" />
@@ -207,7 +191,7 @@ function Navbar() {
               onClick={toggleTheme}
               aria-label="Toggle dark mode"
               whileHover={{ scale: 1.1 }}
-              className="p-3 rounded hover:bg-teal-500 dark:hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-300 mr-2 transition-colors text-white"
+              className="p-3 rounded hover:bg-teal-500 dark:hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-300 text-white transition mr-2"
             >
               {isDark ? (
                 <FaSun className="w-5 h-5" />
@@ -219,7 +203,7 @@ function Navbar() {
               onClick={handleMobileToggle}
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
               whileHover={{ scale: 1.1 }}
-              className="p-3 rounded hover:bg-teal-500 dark:hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-300 transition-colors text-white"
+              className="p-3 rounded hover:bg-teal-500 dark:hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-300 text-white transition"
             >
               {mobileOpen ? (
                 <FaTimes className="w-6 h-6" />
@@ -238,86 +222,66 @@ function Navbar() {
             exit={{ x: "100%" }}
             transition={{ type: "tween", duration: 0.2 }}
             ref={mobileMenuRef}
-            className="md:hidden fixed inset-0 bg-white dark:bg-gray-900 bg-opacity-95 z-40 overflow-y-auto"
+            className="md:hidden fixed inset-0 bg-white dark:bg-gray-900 overflow-y-auto z-40"
           >
-            <div className="px-4 pt-4 pb-6">
-              <nav className="space-y-4">
-                <NavLink
-                  to="/"
-                  end
-                  className={({ isActive }) =>
-                    classNames(
-                      "block text-lg px-4 py-3 transition-colors text-gray-800 dark:text-gray-200 hover:text-teal-600 dark:hover:text-teal-400",
-                      { "font-semibold": isActive }
-                    )
-                  }
-                  onClick={handleNavLinkClick}
-                >
-                  Home
-                </NavLink>
-                <NavLink
-                  to="/about"
-                  className={({ isActive }) =>
-                    classNames(
-                      "block text-lg px-4 py-3 transition-colors text-gray-800 dark:text-gray-200 hover:text-teal-600 dark:hover:text-teal-400",
-                      { "font-semibold": isActive }
-                    )
-                  }
-                  onClick={handleNavLinkClick}
-                >
-                  About
-                </NavLink>
-                <NavLink
-                  to="/contact"
-                  className={({ isActive }) =>
-                    classNames(
-                      "block text-lg px-4 py-3 transition-colors text-gray-800 dark:text-gray-200 hover:text-teal-600 dark:hover:text-teal-400",
-                      { "font-semibold": isActive }
-                    )
-                  }
-                  onClick={handleNavLinkClick}
-                >
-                  Contact
-                </NavLink>
-                <div>
-                  <button
-                    type="button"
-                    onClick={() => setMobileServicesOpen((prev) => !prev)}
-                    aria-haspopup="true"
-                    aria-expanded={mobileServicesOpen}
-                    className="w-full flex items-center justify-between text-lg px-4 py-3 text-gray-800 dark:text-gray-200 hover:text-teal-600 dark:hover:text-teal-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-300 transition-colors"
+            <div className="pt-4 pb-6">
+              <nav className="flex flex-col space-y-2 px-4">
+                {navLinks.map(({ to, label }) => (
+                  <NavLink
+                    key={to}
+                    to={to}
+                    end={to === "/"}
+                    className={({ isActive }) =>
+                      classNames(
+                        "block px-4 py-3 text-lg text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition",
+                        { "font-semibold": isActive }
+                      )
+                    }
+                    onClick={closeAll}
                   >
-                    <span
-                      className={classNames({
-                        "font-semibold": mobileServicesOpen,
-                      })}
+                    {label}
+                  </NavLink>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => setMobileServicesOpen((p) => !p)}
+                  className="w-full flex items-center justify-between px-4 py-3 text-lg text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-300 transition"
+                >
+                  <span
+                    className={classNames({
+                      "font-semibold": mobileServicesOpen,
+                    })}
+                  >
+                    Services
+                  </span>
+                  {mobileServicesOpen ? (
+                    <FaChevronUp className="w-4 h-4" />
+                  ) : (
+                    <FaChevronDown className="w-4 h-4" />
+                  )}
+                </button>
+                <AnimatePresence>
+                  {mobileServicesOpen && (
+                    <motion.ul
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="ml-4 border-l border-gray-200 dark:border-gray-700"
                     >
-                      Services
-                    </span>
-                    <span className="ml-2">
-                      {mobileServicesOpen ? (
-                        <FaChevronUp className="w-4 h-4" />
-                      ) : (
-                        <FaChevronDown className="w-4 h-4" />
-                      )}
-                    </span>
-                  </button>
-                  <AnimatePresence>
-                    {mobileServicesOpen && (
-                      <motion.ul
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="mt-2 ml-4 space-y-2 overflow-hidden"
-                      >
-                        {renderServiceItems(() => {
-                          setMobileOpen(false);
-                          setMobileServicesOpen(false);
-                        })}
-                      </motion.ul>
-                    )}
-                  </AnimatePresence>
+                      {renderServiceItems(() => closeAll())}
+                    </motion.ul>
+                  )}
+                </AnimatePresence>
+                <div className="pt-4">
+                  <motion.button
+                    onClick={toggleTheme}
+                    aria-label="Toggle theme"
+                    whileHover={{ scale: 1.1 }}
+                    className="w-full text-left px-4 py-3 rounded hover:bg-teal-100 dark:hover:bg-teal-800 transition text-gray-800 dark:text-gray-200"
+                  >
+                    {isDark ? "Switch to Light" : "Switch to Dark"}
+                  </motion.button>
                 </div>
               </nav>
             </div>
