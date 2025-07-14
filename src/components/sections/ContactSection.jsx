@@ -1,7 +1,7 @@
 // src/components/sections/ContactSection.jsx
 import ContactForm from "../forms/ContactForm";
 import { motion } from "framer-motion";
-import contactIllustration from "../../assets/images/contact-illustration.svg";
+import contactIllustration from "../../assets/images/contact-illustration.jpg";
 
 export default function ContactSection() {
   const container = {
