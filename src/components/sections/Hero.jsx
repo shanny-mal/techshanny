@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { FaArrowDown } from "react-icons/fa";
 import { motion } from "framer-motion";
 import heroImage from "../../assets/images/hero-image.jpg";
 
@@ -7,9 +8,9 @@ export default function Hero({ backgroundImage = heroImage }) {
     hidden: {},
     visible: { transition: { staggerChildren: 0.3 } },
   };
-  const fadeUp = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.8 } },
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
   };
   return (
     <motion.section
@@ -20,33 +21,50 @@ export default function Hero({ backgroundImage = heroImage }) {
       style={{ backgroundImage: `url(${backgroundImage})` }}
       aria-labelledby="hero-heading"
     >
-      <div className="absolute inset-0 bg-black opacity-50"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60"></div>
       <motion.div
-        className="relative z-10 text-center px-4 max-w-2xl"
-        variants={fadeUp}
+        className="relative z-10 text-center px-6 sm:px-8 lg:px-0 max-w-4xl"
+        variants={fadeInUp}
       >
         <motion.h1
           id="hero-heading"
-          className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-4"
-          variants={fadeUp}
+          className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white leading-tight mb-6"
+          variants={fadeInUp}
         >
           Empowering Your Digital Future
         </motion.h1>
         <motion.p
-          className="text-lg sm:text-xl md:text-2xl text-gray-200 mb-6"
-          variants={fadeUp}
+          className="text-base sm:text-lg md:text-xl text-gray-200 mb-8"
+          variants={fadeInUp}
         >
-          Innovative tech solutions—web, mobile, cloud, cybersecurity, data
-          engineering, and more.
+          Cutting‑edge solutions for web & mobile applications, cloud
+          infrastructure, cybersecurity, and data engineering.
         </motion.p>
-        <motion.div variants={fadeUp}>
+        <motion.div
+          variants={fadeInUp}
+          className="flex flex-col sm:flex-row justify-center gap-4"
+        >
           <Link
             to="/services"
-            className="inline-block bg-white text-teal-600 font-semibold px-6 py-3 rounded-md shadow hover:bg-gray-100 transition"
+            className="inline-flex items-center justify-center bg-teal-500 hover:bg-teal-600 text-white font-semibold px-6 py-3 rounded-lg shadow-lg transition"
           >
             Explore Services
           </Link>
+          <Link
+            to="/contact"
+            className="inline-flex items-center justify-center border-2 border-white hover:border-teal-500 text-white hover:text-teal-500 font-semibold px-6 py-3 rounded-lg transition"
+          >
+            Contact Us
+          </Link>
         </motion.div>
+      </motion.div>
+      <motion.div
+        className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1, duration: 0.6 }}
+      >
+        <FaArrowDown className="animate-bounce text-white text-2xl" />
       </motion.div>
     </motion.section>
   );

@@ -11,122 +11,102 @@ export default function Footer() {
     { to: "/services", label: "Services" },
     { to: "/about", label: "About" },
     { to: "/contact", label: "Contact" },
-    { to: "/privacy", label: "Privacy Policy" },
-    { to: "/terms", label: "Terms of Service" },
+    { to: "/privacy", label: "Privacy" },
+    { to: "/terms", label: "Terms" },
   ];
 
   const socialLinks = [
     {
       href: "https://facebook.com/shannyTech",
-      label: "Facebook",
       icon: FaFacebook,
       color: "#1877F2",
     },
     {
       href: "https://twitter.com/shannyTech",
-      label: "Twitter",
       icon: FaTwitter,
       color: "#1DA1F2",
     },
     {
       href: "https://linkedin.com/company/shannyTech",
-      label: "LinkedIn",
       icon: FaLinkedin,
       color: "#0077B5",
     },
-    {
-      href: "https://github.com/shannyTech",
-      label: "GitHub",
-      icon: FaGithub,
-      color: "#333333",
-    },
+    { href: "https://github.com/shannyTech", icon: FaGithub, color: "#333" },
   ];
 
-  const footerVariants = {
+  const container = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+    visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.1 } },
   };
-
-  const linkVariants = {
-    hover: { scale: 1.2 },
+  const item = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
   };
 
   return (
     <motion.footer
       initial="hidden"
       animate="visible"
-      variants={footerVariants}
-      className="bg-indigo-900 dark:bg-gray-800 text-gray-200"
+      variants={container}
+      className="bg-gradient-to-tr from-gray-900 to-indigo-900 text-gray-200"
     >
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={footerVariants}
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row items-center justify-between"
-      >
+      <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
         <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={footerVariants}
-          className="flex items-center space-x-2 mb-6 md:mb-0"
-        ></motion.div>
+          variants={item}
+          className="flex flex-col items-center md:items-start"
+        >
+          <div className="h-12 w-12 rounded-full overflow-hidden bg-white dark:bg-gray-700 flex items-center justify-center">
+            <img
+              src={logo}
+              alt="shannyTech"
+              className="h-10 w-10 object-contain"
+            />
+          </div>
+          <span className="mt-2 text-2xl font-bold">shannyTech</span>
+          <p className="mt-4 text-center md:text-left text-gray-300">
+            Empowering your digital future with modern web, mobile, cloud, and
+            security solutions.
+          </p>
+        </motion.div>
         <motion.nav
-          initial="hidden"
-          animate="visible"
-          variants={footerVariants}
-          aria-label="Footer navigation"
-          className="flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-4 mb-6 md:mb-0"
+          variants={item}
+          className="flex flex-col items-center md:items-start space-y-2"
         >
           {navLinks.map(({ to, label }) => (
-            <motion.div key={to} whileHover="hover" variants={linkVariants}>
-              <Link
-                to={to}
-                className="text-sm text-gray-200 hover:underline hover:text-white"
-              >
-                {label}
-              </Link>
-            </motion.div>
+            <Link
+              key={to}
+              to={to}
+              className="hover:text-white transition text-lg"
+            >
+              {label}
+            </Link>
           ))}
         </motion.nav>
         <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={footerVariants}
-          className="flex space-x-4"
+          variants={item}
+          className="flex flex-col items-center md:items-start space-y-4"
         >
-          {socialLinks.map(({ href, label, icon: IconComp, color }) => (
-            <motion.a
-              key={label}
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={label}
-              whileHover={{ scale: 1.2 }}
-              className="p-2 rounded-full bg-indigo-800 dark:bg-gray-700"
-            >
-              <IconComp
-                className="w-5 h-5"
-                style={{ color }}
-                aria-hidden="true"
-              />
-            </motion.a>
-          ))}
+          <span className="text-lg font-semibold">Follow Us</span>
+          <div className="flex space-x-4">
+            {socialLinks.map(({ href, icon: Icon, color }) => (
+              <motion.a
+                key={href}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{ scale: 1.2 }}
+                className="p-2 rounded-full bg-gray-800"
+              >
+                <Icon className="w-5 h-5" style={{ color }} />
+              </motion.a>
+            ))}
+          </div>
         </motion.div>
-      </motion.div>
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={footerVariants}
-        className="border-t border-gray-700"
-      >
-        <motion.p
-          initial="hidden"
-          animate="visible"
-          variants={footerVariants}
-          className="text-center text-sm py-4"
-        >
+      </div>
+      <motion.div variants={item} className="border-t border-gray-700">
+        <p className="text-center text-sm py-4">
           &copy; {currentYear} shannyTech. All rights reserved.
-        </motion.p>
+        </p>
       </motion.div>
     </motion.footer>
   );

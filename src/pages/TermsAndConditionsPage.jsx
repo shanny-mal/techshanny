@@ -214,7 +214,7 @@ export default function TermsAndConditionsPage() {
             For questions about these Terms, contact us at:
           </p>
           <p className="text-gray-700 dark:text-gray-300">
-            Email: support@shannytech.com
+            Email: support@shannytech.solutions
           </p>
         </motion.div>
         <motion.div variants={item}>

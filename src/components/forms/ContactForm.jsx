@@ -1,3 +1,4 @@
+// src/components/forms/ContactForm.jsx
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -6,156 +7,132 @@ import Button from "../common/Button";
 import { motion } from "framer-motion";
 
 const schema = yup.object().shape({
-  name: yup
-    .string()
-    .required("Name is required")
-    .max(100, "Maximum 100 characters"),
-  email: yup
-    .string()
-    .required("Email is required")
-    .email("Must be a valid email"),
-  company: yup.string().max(100, "Maximum 100 characters"),
-  message: yup
-    .string()
-    .required("Message is required")
-    .max(1000, "Maximum 1000 characters"),
+  name: yup.string().required().max(100),
+  email: yup.string().required().email(),
+  company: yup.string().max(100),
+  message: yup.string().required().max(1000),
 });
 
 export default function ContactForm() {
+  const [submitError, setSubmitError] = useState("");
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting, isSubmitSuccessful },
     reset,
-  } = useForm({
-    resolver: yupResolver(schema),
-  });
-  const [submitError, setSubmitError] = useState("");
+  } = useForm({ resolver: yupResolver(schema) });
+
   const onSubmit = async (data) => {
     setSubmitError("");
     try {
-      const response = await fetch("/api/contact", {
+      const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.statusText}`);
-      }
+      if (!res.ok) throw new Error();
       reset();
-    } catch (err) {
-      setSubmitError("Failed to send message. Please try again later.");
+    } catch {
+      setSubmitError("Failed to send. Please try again.");
     }
   };
+
   const container = {
     hidden: {},
-    visible: { transition: { staggerChildren: 0.2 } },
+    visible: { transition: { staggerChildren: 0.15 } },
   };
   const item = {
     hidden: { opacity: 0, y: 10 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
   };
+
   return (
     <motion.form
       onSubmit={handleSubmit(onSubmit)}
-      className="space-y-6"
       initial="hidden"
       animate="visible"
       variants={container}
+      className="grid grid-cols-1 gap-6"
     >
       <motion.div variants={item}>
-        <label
-          htmlFor="name"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-200"
-        >
-          Name<span className="text-red-500">*</span>
+        <label htmlFor="name" className="sr-only">
+          Name
         </label>
         <input
           id="name"
           type="text"
+          placeholder="Your Name"
           {...register("name")}
-          className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-          aria-invalid={errors.name ? "true" : "false"}
+          className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-transparent focus:outline-none focus:border-teal-500 transition placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-gray-100"
         />
         {errors.name && (
-          <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+          <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>
         )}
       </motion.div>
-
       <motion.div variants={item}>
-        <label
-          htmlFor="email"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-200"
-        >
-          Email<span className="text-red-500">*</span>
+        <label htmlFor="email" className="sr-only">
+          Email
         </label>
         <input
           id="email"
           type="email"
+          placeholder="Your Email"
           {...register("email")}
-          className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-          aria-invalid={errors.email ? "true" : "false"}
+          className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-transparent focus:outline-none focus:border-teal-500 transition placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-gray-100"
         />
         {errors.email && (
-          <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+          <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>
         )}
       </motion.div>
-
       <motion.div variants={item}>
-        <label
-          htmlFor="company"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-200"
-        >
+        <label htmlFor="company" className="sr-only">
           Company
         </label>
         <input
           id="company"
           type="text"
+          placeholder="Company (optional)"
           {...register("company")}
-          className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-          aria-invalid={errors.company ? "true" : "false"}
+          className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-transparent focus:outline-none focus:border-teal-500 transition placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-gray-100"
         />
         {errors.company && (
-          <p className="mt-1 text-sm text-red-600">{errors.company.message}</p>
+          <p className="mt-1 text-sm text-red-500">{errors.company.message}</p>
         )}
       </motion.div>
-
       <motion.div variants={item}>
-        <label
-          htmlFor="message"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-200"
-        >
-          Message<span className="text-red-500">*</span>
+        <label htmlFor="message" className="sr-only">
+          Message
         </label>
         <textarea
           id="message"
           rows="5"
+          placeholder="Your Message"
           {...register("message")}
-          className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-          aria-invalid={errors.message ? "true" : "false"}
+          className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-transparent focus:outline-none focus:border-teal-500 transition placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-gray-100"
         />
         {errors.message && (
-          <p className="mt-1 text-sm text-red-600">{errors.message.message}</p>
+          <p className="mt-1 text-sm text-red-500">{errors.message.message}</p>
         )}
       </motion.div>
-
       <motion.div variants={item}>
-        <Button type="submit" variant="primary" disabled={isSubmitting}>
-          {isSubmitting ? "Sending..." : "Send Message"}
+        <Button
+          type="submit"
+          variant="secondary"
+          size="lg"
+          className="w-full"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Sending..." : "Submit"}
         </Button>
       </motion.div>
-
       {submitError && (
-        <motion.p variants={item} className="text-center text-sm text-red-600">
+        <motion.p variants={item} className="text-center text-red-500">
           {submitError}
         </motion.p>
       )}
       {isSubmitSuccessful && !submitError && (
-        <motion.p
-          variants={item}
-          className="text-center text-sm text-green-600 dark:text-green-400"
-        >
-          Thank you! Your message has been sent.
+        <motion.p variants={item} className="text-center text-green-500">
+          Thank you! We'll be in touch soon.
         </motion.p>
       )}
     </motion.form>
