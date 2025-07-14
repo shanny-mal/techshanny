@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import aboutImage from "../../assets/images/about-illustration.png";
+import aboutImage from "../../assets/images/about-illustration.jpg";
 
 export default function AboutSection() {
   const container = {
