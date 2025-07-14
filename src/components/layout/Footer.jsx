@@ -52,14 +52,6 @@ export default function Footer() {
           variants={item}
           className="flex flex-col items-center md:items-start"
         >
-          <div className="h-12 w-12 rounded-full overflow-hidden bg-white dark:bg-gray-700 flex items-center justify-center">
-            <img
-              src={logo}
-              alt="shannyTech"
-              className="h-10 w-10 object-contain"
-            />
-          </div>
-          <span className="mt-2 text-2xl font-bold">shannyTech</span>
           <p className="mt-4 text-center md:text-left text-gray-300">
             Empowering your digital future with modern web, mobile, cloud, and
             security solutions.
