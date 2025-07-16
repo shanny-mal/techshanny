@@ -22,7 +22,7 @@ function Navbar() {
   const dropdownRef = useRef(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 50);
+    const onScroll = () => setScrolled(window.scrollY > 60);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -50,56 +50,71 @@ function Navbar() {
 
   return (
     <motion.nav
-      initial={{ y: -60, opacity: 0 }}
+      initial={{ y: -80, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.4 }}
+      transition={{ duration: 0.5 }}
       className={classNames(
-        "fixed w-full z-50 backdrop-blur-lg transition-colors",
+        "fixed w-full z-50 backdrop-blur backdrop-filter transition-colors",
         scrolled
-          ? "bg-white/80 dark:bg-gray-900/80 shadow-md"
+          ? "bg-white/70 dark:bg-gray-900/70 shadow-lg"
           : "bg-transparent"
       )}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link
             to="/"
-            className="flex items-center"
+            className="flex items-center space-x-2"
             onClick={() => setMobileOpen(false)}
           >
-            <div className="h-12 w-12 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+            <motion.div
+              initial={{ rotate: 0 }}
+              whileHover={{ rotate: 20 }}
+              className="h-12 w-12 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center shadow"
+            >
               <img
                 src={logo}
                 alt="shannyTech Logo"
                 className="h-10 w-10 object-cover"
               />
-            </div>
-            <span className="ml-3 text-2xl font-extrabold text-gray-800 dark:text-white">
+            </motion.div>
+            <span className="text-2xl font-extrabold text-gray-800 dark:text-white">
               shannyTech
             </span>
           </Link>
           <div className="hidden md:flex items-center space-x-8">
             {links.map(({ to, label }) => (
-              <NavLink
-                key={to}
-                to={to}
-                end={to === "/"}
-                className={({ isActive }) =>
-                  classNames(
-                    "relative text-lg px-3 py-2 transition-all",
-                    isActive
-                      ? "text-teal-600 dark:text-teal-400 font-semibold after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-6 after:h-0.5 after:bg-teal-600 dark:after:bg-teal-400"
-                      : "text-gray-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400"
-                  )
-                }
-              >
-                {label}
-              </NavLink>
+              <motion.div key={to} whileHover={{ y: -2 }} className="relative">
+                <NavLink
+                  to={to}
+                  end={to === "/"}
+                  className={({ isActive }) =>
+                    classNames(
+                      "px-3 py-2 text-lg transition",
+                      isActive
+                        ? "text-teal-600 dark:text-teal-400 font-semibold"
+                        : "text-gray-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400"
+                    )
+                  }
+                >
+                  {label}
+                </NavLink>
+                <div
+                  className={classNames(
+                    "absolute left-0 right-0 h-0.5 bg-gradient-to-r from-teal-500 to-indigo-500 rounded transition-all",
+                    {
+                      "opacity-100 top-full": window.location.pathname === to,
+                      "opacity-0": window.location.pathname !== to,
+                    }
+                  )}
+                />
+              </motion.div>
             ))}
             <div className="relative" ref={dropdownRef}>
-              <button
+              <motion.button
                 onClick={() => setServicesOpen((o) => !o)}
-                className="flex items-center text-lg px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 transition"
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center px-3 py-2 text-lg text-gray-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 transition"
               >
                 Services
                 {servicesOpen ? (
@@ -107,7 +122,7 @@ function Navbar() {
                 ) : (
                   <FaChevronDown className="ml-1 w-4 h-4" />
                 )}
-              </button>
+              </motion.button>
               <AnimatePresence>
                 {servicesOpen && (
                   <motion.ul
@@ -115,18 +130,22 @@ function Navbar() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute top-full mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-2 w-48"
+                    className="absolute top-full mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl py-2 w-52"
                   >
                     {services.map((svc) => (
-                      <li key={svc.id}>
+                      <motion.li
+                        key={svc.id}
+                        whileHover={{ x: 5 }}
+                        className="px-4 py-2"
+                      >
                         <Link
                           to={`/services/${svc.id}`}
-                          className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                          className="block text-gray-700 dark:text-gray-200 hover:text-teal-600 dark:hover:text-teal-400 transition"
                           onClick={() => setServicesOpen(false)}
                         >
                           {svc.title}
                         </Link>
-                      </li>
+                      </motion.li>
                     ))}
                   </motion.ul>
                 )}
@@ -135,7 +154,7 @@ function Navbar() {
             <motion.button
               onClick={toggleTheme}
               whileHover={{ scale: 1.1 }}
-              className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+              className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 shadow"
             >
               {isDark ? (
                 <FaSun className="w-5 h-5" />
@@ -144,11 +163,11 @@ function Navbar() {
               )}
             </motion.button>
           </div>
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center space-x-2">
             <motion.button
               onClick={toggleTheme}
               whileHover={{ scale: 1.1 }}
-              className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 mr-2"
+              className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
             >
               {isDark ? (
                 <FaSun className="w-5 h-5" />
@@ -177,38 +196,40 @@ function Navbar() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "tween", duration: 0.3 }}
-            className="fixed inset-0 bg-white dark:bg-gray-900 z-40 p-4"
+            className="fixed inset-0 bg-white dark:bg-gray-900 z-40 p-6 overflow-y-auto"
           >
             <nav className="space-y-4">
               {links.map(({ to, label }) => (
-                <NavLink
-                  key={to}
-                  to={to}
-                  end={to === "/"}
-                  className={({ isActive }) =>
-                    classNames(
-                      "block text-xl px-4 py-2 rounded-md transition",
-                      isActive
-                        ? "bg-teal-100 dark:bg-teal-800 text-teal-600 dark:text-teal-400 font-semibold"
-                        : "text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-                    )
-                  }
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {label}
-                </NavLink>
-              ))}
-              <div className="border-t border-gray-200 dark:border-gray-700 my-4"></div>
-              <div className="space-y-2">
-                {services.map((svc) => (
-                  <Link
-                    key={svc.id}
-                    to={`/services/${svc.id}`}
-                    className="block text-lg px-4 py-2 rounded-md text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+                <motion.div key={to} whileHover={{ x: 5 }}>
+                  <NavLink
+                    to={to}
+                    end={to === "/"}
+                    className={({ isActive }) =>
+                      classNames(
+                        "block text-xl px-4 py-2 rounded-lg transition",
+                        isActive
+                          ? "bg-teal-100 dark:bg-teal-800 text-teal-600 dark:text-teal-400 font-semibold"
+                          : "text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+                      )
+                    }
                     onClick={() => setMobileOpen(false)}
                   >
-                    {svc.title}
-                  </Link>
+                    {label}
+                  </NavLink>
+                </motion.div>
+              ))}
+              <div className="border-t border-gray-200 dark:border-gray-700 my-4"></div>
+              <div className="space-y-3">
+                {services.map((svc) => (
+                  <motion.div key={svc.id} whileHover={{ x: 5 }}>
+                    <Link
+                      to={`/services/${svc.id}`}
+                      className="block text-lg px-4 py-2 rounded-lg transition text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      {svc.title}
+                    </Link>
+                  </motion.div>
                 ))}
               </div>
             </nav>
