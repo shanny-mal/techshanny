@@ -1,5 +1,6 @@
 /* src/components/sections/Hero.css */
 @import "tailwindcss";
+@tailwind utilities;
 
 @layer components {
   .blob {

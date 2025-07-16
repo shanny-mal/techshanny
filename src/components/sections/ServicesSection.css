@@ -1,0 +1,12 @@
+/* src/components/sections/ServicesSection.css */
+.service-blob {
+  position: absolute;
+  top: -100px;
+  left: -100px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle at center, rgba(14, 165, 233, 0.2), transparent 70%);
+  border-radius: 50%;
+  filter: blur(150px);
+  z-index: 0;
+}

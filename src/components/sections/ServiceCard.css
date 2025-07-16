@@ -1,0 +1,25 @@
+/* src/components/sections/ServiceCard.css */
+@import "tailwindcss";
+@tailwind utilities;
+
+@layer components {
+  .service-card {
+    @apply relative flex flex-col p-8 bg-white dark:bg-gray-800 rounded-3xl shadow-lg overflow-hidden transition-transform;
+  }
+  .service-card::before {
+    content: "";
+    @apply absolute inset-0 bg-gradient-to-tr from-indigo-500 to-teal-400 opacity-0 rounded-3xl transition-opacity;
+  }
+  .service-card:hover::before {
+    @apply opacity-20;
+  }
+  .icon-wrapper {
+    @apply w-16 h-16 bg-indigo-500 dark:bg-teal-400 rounded-full flex items-center justify-center;
+  }
+  .learn-more {
+    @apply mt-6 inline-block text-indigo-600 dark:text-indigo-400 font-medium transition-colors;
+  }
+  .learn-more:hover {
+    @apply text-teal-500 dark:text-teal-300;
+  }
+}
