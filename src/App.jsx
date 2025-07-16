@@ -1,5 +1,7 @@
+// src/App.jsx
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import { ApiProvider } from "./context/ApiContext";
 import Navbar from "./components/layout/Navbar.jsx";
 import Footer from "./components/layout/Footer.jsx";
 import HomePage from "./pages/Home.jsx";
@@ -15,11 +17,14 @@ import {
   MobileAppDevelopmentPage,
   WebAppDevelopmentPage,
 } from "./pages/ServiceSubPages.jsx";
+import BlogList from "./components/sections/BlogList.jsx";
+import BlogDetail from "./components/sections/BlogDetail.jsx";
+import ChatbotWidget from "./components/chat/ChatbotWidget.jsx";
 
 export default function App() {
   const location = useLocation();
   return (
-    <>
+    <ApiProvider>
       <Navbar />
       <AnimatePresence mode="wait">
         <motion.main
@@ -47,16 +52,17 @@ export default function App() {
               element={<WebAppDevelopmentPage />}
             />
             <Route path="/services/:id" element={<ServiceDetailPage />} />
-            <Route path="/services/:slug" element={<ServiceDetailPage />} />
-            <Route path="/services" element={<ServicesPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/blog" element={<BlogList />} />
+            <Route path="/blog/:slug" element={<BlogDetail />} />
             <Route path="/privacy" element={<PrivacyPolicyPage />} />
             <Route path="/terms" element={<TermsAndConditionsPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </motion.main>
       </AnimatePresence>
+      <ChatbotWidget />
       <Footer />
-    </>
+    </ApiProvider>
   );
 }
