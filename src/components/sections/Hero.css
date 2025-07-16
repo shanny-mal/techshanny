@@ -1,0 +1,36 @@
+/* src/components/sections/Hero.css */
+@import "tailwindcss";
+
+@layer components {
+  .blob {
+    position: absolute;
+    background: radial-gradient(circle at center, rgba(107, 99, 246, 0.4), transparent 70%);
+    border-radius: 50%;
+    filter: blur(100px);
+  }
+  .blob-1 {
+    width: 400px;
+    height: 400px;
+    top: -50px;
+    left: -50px;
+  }
+  .blob-2 {
+    width: 300px;
+    height: 300px;
+    bottom: -50px;
+    right: -50px;
+  }
+
+  .hero-gradient {
+    background: linear-gradient(90deg, #05FFC8, #3F3FFF);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center bg-gradient-to-r from-teal-400 to-indigo-600 text-white font-semibold px-6 py-3 rounded-full shadow-xl transition-transform transform hover:scale-105;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center border-2 border-white text-white font-semibold px-6 py-3 rounded-full shadow-lg transition-transform hover:-translate-y-1 hover:bg-white/20;
+  }
+}
