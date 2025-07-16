@@ -1,0 +1,60 @@
+@import "tailwindcss";
+@tailwind utilities;
+
+@layer components {
+  .navbar {
+    @apply bg-transparent;
+  }
+  .navbar--scrolled {
+    @apply bg-white/70 dark:bg-gray-900/70 shadow-lg;
+  }
+  .container {
+    @apply relative flex items-center justify-between;
+  }
+  .logo__img-wrapper {
+    @apply h-12 w-12 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center shadow;
+  }
+  .logo__img {
+    @apply h-10 w-10 object-cover;
+  }
+  .logo__text {
+    @apply ml-3 text-2xl font-extrabold text-gray-800 dark:text-white;
+  }
+  .nav-link {
+    @apply px-3 py-2 text-lg transition;
+  }
+  .nav-link--active {
+    @apply text-teal-600 dark:text-teal-400 font-semibold;
+  }
+  .nav-link:not(.nav-link--active):hover {
+    @apply text-teal-600 dark:text-teal-400;
+  }
+  .dropdown {
+    @apply absolute top-full mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl py-2 w-52;
+    z-index: 999;
+  }
+  .dropdown__link {
+    @apply block px-4 py-2 text-gray-700 dark:text-gray-200 hover:text-teal-600 dark:hover:text-teal-400 transition;
+  }
+  .theme-toggle, .theme-toggle--mobile {
+    @apply p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 shadow;
+  }
+  .mobile-toggle {
+    @apply p-2 rounded-md text-gray-800 dark:text-gray-200;
+  }
+  .mobile-menu {
+    @apply fixed inset-0 bg-white dark:bg-gray-900 z-40 p-6 overflow-y-auto;
+  }
+  .mobile-menu__nav {
+    @apply flex flex-col;
+  }
+  .mobile-link {
+    @apply block text-xl px-4 py-2 rounded-lg transition text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800;
+  }
+  .mobile-link--active {
+    @apply bg-teal-100 dark:bg-teal-800 text-teal-600 dark:text-teal-400 font-semibold;
+  }
+  .mobile-menu__divider {
+    @apply border-t border-gray-200 dark:border-gray-700 my-4;
+  }
+}

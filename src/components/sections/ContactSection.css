@@ -1,0 +1,23 @@
+@import "tailwindcss";
+@tailwind utilities;
+
+@layer components {
+  .contact-section {
+    @apply py-20 bg-gradient-to-b from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800;
+  }
+  .contact-grid {
+    @apply grid gap-12 lg:grid-cols-2 items-center px-4 sm:px-6 lg:px-8;
+  }
+  .contact-image img {
+    @apply w-full h-auto rounded-xl shadow-lg;
+  }
+  .contact-form-wrapper {
+    @apply bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl;
+  }
+  .contact-title {
+    @apply text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white mb-4;
+  }
+  .contact-subtitle {
+    @apply text-gray-600 dark:text-gray-300 mb-6;
+  }
+}

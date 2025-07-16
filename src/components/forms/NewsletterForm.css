@@ -1,0 +1,17 @@
+@import "tailwindcss";
+@tailwind utilities;
+
+@layer components {
+  .newsletter-form {
+    @apply text-white;
+  }
+  .newsletter-input {
+    @apply w-full px-5 py-3 rounded-lg border-2 border-transparent bg-white/20 placeholder-white/70 focus:outline-none focus:border-white focus:ring-0 transition;
+  }
+  .newsletter-error {
+    @apply absolute text-sm text-red-300 mt-1;
+  }
+  .newsletter-success {
+    @apply text-center text-green-200 mt-4;
+  }
+}

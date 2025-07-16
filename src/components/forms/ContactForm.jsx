@@ -1,16 +1,16 @@
-// src/components/forms/ContactForm.jsx
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import Button from "../common/Button";
 import { motion } from "framer-motion";
+import "./ContactForm.css";
 
 const schema = yup.object().shape({
-  name: yup.string().required().max(100),
-  email: yup.string().required().email(),
+  name: yup.string().required("Name is required").max(100),
+  email: yup.string().required("Email is required").email("Invalid email"),
   company: yup.string().max(100),
-  message: yup.string().required().max(1000),
+  message: yup.string().required("Message is required").max(1000),
 });
 
 export default function ContactForm() {
@@ -52,66 +52,54 @@ export default function ContactForm() {
       initial="hidden"
       animate="visible"
       variants={container}
-      className="grid grid-cols-1 gap-6"
+      className="contact-form-grid"
     >
+      {[
+        {
+          id: "name",
+          type: "text",
+          placeholder: "Your Name",
+          error: errors.name,
+          register: register("name"),
+        },
+        {
+          id: "email",
+          type: "email",
+          placeholder: "Your Email",
+          error: errors.email,
+          register: register("email"),
+        },
+        {
+          id: "company",
+          type: "text",
+          placeholder: "Company (optional)",
+          error: errors.company,
+          register: register("company"),
+        },
+      ].map(({ id, type, placeholder, error, register }) => (
+        <motion.div key={id} variants={item}>
+          <input
+            id={id}
+            type={type}
+            placeholder={placeholder}
+            {...register}
+            className="contact-input"
+            aria-invalid={error ? "true" : "false"}
+          />
+          {error && <p className="contact-error">{error.message}</p>}
+        </motion.div>
+      ))}
       <motion.div variants={item}>
-        <label htmlFor="name" className="sr-only">
-          Name
-        </label>
-        <input
-          id="name"
-          type="text"
-          placeholder="Your Name"
-          {...register("name")}
-          className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-transparent focus:outline-none focus:border-teal-500 transition placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-gray-100"
-        />
-        {errors.name && (
-          <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>
-        )}
-      </motion.div>
-      <motion.div variants={item}>
-        <label htmlFor="email" className="sr-only">
-          Email
-        </label>
-        <input
-          id="email"
-          type="email"
-          placeholder="Your Email"
-          {...register("email")}
-          className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-transparent focus:outline-none focus:border-teal-500 transition placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-gray-100"
-        />
-        {errors.email && (
-          <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>
-        )}
-      </motion.div>
-      <motion.div variants={item}>
-        <label htmlFor="company" className="sr-only">
-          Company
-        </label>
-        <input
-          id="company"
-          type="text"
-          placeholder="Company (optional)"
-          {...register("company")}
-          className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-transparent focus:outline-none focus:border-teal-500 transition placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-gray-100"
-        />
-        {errors.company && (
-          <p className="mt-1 text-sm text-red-500">{errors.company.message}</p>
-        )}
-      </motion.div>
-      <motion.div variants={item}>
-        <label htmlFor="message" className="sr-only">
-          Message
-        </label>
         <textarea
           id="message"
           rows="5"
           placeholder="Your Message"
           {...register("message")}
-          className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-transparent focus:outline-none focus:border-teal-500 transition placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-gray-100"
+          className="contact-textarea"
+          aria-invalid={errors.message ? "true" : "false"}
         />
         {errors.message && (
-          <p className="mt-1 text-sm text-red-500">{errors.message.message}</p>
+          <p className="contact-error">{errors.message.message}</p>
         )}
       </motion.div>
       <motion.div variants={item}>
@@ -126,12 +114,12 @@ export default function ContactForm() {
         </Button>
       </motion.div>
       {submitError && (
-        <motion.p variants={item} className="text-center text-red-500">
+        <motion.p variants={item} className="contact-error-center">
           {submitError}
         </motion.p>
       )}
       {isSubmitSuccessful && !submitError && (
-        <motion.p variants={item} className="text-center text-green-500">
+        <motion.p variants={item} className="contact-success-center">
           Thank you! We'll be in touch soon.
         </motion.p>
       )}

@@ -1,5 +1,7 @@
+// src/components/sections/NewsletterSection.jsx
 import NewsletterForm from "../forms/NewsletterForm";
 import { motion } from "framer-motion";
+import "./NewsletterSection.css";
 
 export default function NewsletterSection() {
   const container = {
@@ -16,21 +18,18 @@ export default function NewsletterSection() {
       initial="hidden"
       animate="visible"
       variants={container}
-      className="py-20 bg-gradient-to-r from-teal-500 to-indigo-600 dark:from-teal-700 dark:to-indigo-800"
+      className="newsletter-section py-20"
       aria-labelledby="newsletter-heading"
     >
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <motion.h2
           id="newsletter-heading"
-          className="text-4xl font-extrabold text-white mb-4"
+          className="newsletter-title"
           variants={item}
         >
           Stay Updated
         </motion.h2>
-        <motion.p
-          className="text-lg text-white/90 mb-8 max-w-lg mx-auto"
-          variants={item}
-        >
+        <motion.p className="newsletter-subtitle" variants={item}>
           Join our newsletter for product updates, tutorials, and exclusive
           insights from the shannyTech team.
         </motion.p>

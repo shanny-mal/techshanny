@@ -1,37 +1,44 @@
+// src/components/sections/Testimonials.jsx
 import PropTypes from "prop-types";
 import { testimonials } from "../../data/testimonialsData";
 import { motion } from "framer-motion";
+import "./Testimonials.css";
 
 export default function Testimonials() {
   if (!testimonials || testimonials.length === 0) return null;
 
   const container = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
+    hidden: {},
+    visible: { transition: { staggerChildren: 0.25 } },
   };
   const item = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+    hidden: { opacity: 0, y: 40 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: "easeOut" },
+    },
   };
 
   return (
     <motion.section
+      className="testimonial-section py-24 bg-gradient-to-b from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800"
       initial="hidden"
       animate="visible"
       variants={container}
-      className="py-20 bg-gradient-to-b from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800"
       aria-labelledby="testimonials-heading"
     >
+      <div className="testimonial-blob" />
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.h2
           id="testimonials-heading"
-          className="text-4xl font-extrabold text-center text-indigo-600 dark:text-indigo-400 mb-12"
+          className="text-5xl font-extrabold text-center text-indigo-600 dark:text-indigo-400 mb-16"
           variants={item}
         >
           What Our Clients Say
         </motion.h2>
         <motion.div
-          className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3"
+          className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3"
           variants={container}
         >
           {testimonials.map((t) => (
@@ -46,11 +53,12 @@ export default function Testimonials() {
 function TestimonialCard({ name, role, quote, avatar, variants }) {
   return (
     <motion.div
+      className="testimonial-card"
       variants={variants}
-      whileHover={{ scale: 1.02 }}
-      className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-tr before:from-indigo-500 before:to-teal-400 before:opacity-10"
+      whileHover={{ scale: 1.03 }}
+      transition={{ type: "spring", stiffness: 300 }}
     >
-      <div className="flex items-start space-x-4">
+      <div className="flex items-start space-x-5">
         <div className="flex-shrink-0">
           {avatar ? (
             <img
@@ -66,7 +74,7 @@ function TestimonialCard({ name, role, quote, avatar, variants }) {
           )}
         </div>
         <div className="flex-1">
-          <p className="text-gray-800 dark:text-gray-200 italic mb-4">
+          <p className="text-gray-800 dark:text-gray-200 italic mb-6">
             &ldquo;{quote}&rdquo;
           </p>
           <p className="font-semibold text-lg text-gray-900 dark:text-white">

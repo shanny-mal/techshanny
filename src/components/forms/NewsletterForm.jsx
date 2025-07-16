@@ -1,11 +1,13 @@
+// src/components/forms/NewsletterForm.jsx
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import Button from "../common/Button";
 import { motion } from "framer-motion";
+import "./NewsletterForm.css";
 
 const schema = yup.object().shape({
-  email: yup.string().required().email(),
+  email: yup.string().required("Email is required").email("Invalid email"),
 });
 
 export default function NewsletterForm() {
@@ -45,7 +47,7 @@ export default function NewsletterForm() {
       initial="hidden"
       animate="visible"
       variants={container}
-      className="grid grid-cols-1 sm:grid-cols-[2fr_1fr] gap-4"
+      className="newsletter-form grid grid-cols-1 sm:grid-cols-[2fr_1fr] gap-4"
     >
       <motion.div variants={item}>
         <div className="relative">
@@ -54,11 +56,11 @@ export default function NewsletterForm() {
             type="email"
             placeholder="Enter your email"
             {...register("email")}
-            className="w-full px-5 py-3 rounded-lg border-2 border-transparent focus:outline-none focus:border-white focus:ring-0 bg-white/20 placeholder-white/70 text-white"
+            className="newsletter-input"
             aria-invalid={errors.email ? "true" : "false"}
           />
           {errors.email && (
-            <p className="mt-1 text-sm text-red-300">{errors.email.message}</p>
+            <p className="newsletter-error">{errors.email.message}</p>
           )}
         </div>
       </motion.div>
@@ -74,10 +76,7 @@ export default function NewsletterForm() {
         </Button>
       </motion.div>
       {isSubmitSuccessful && (
-        <motion.p
-          variants={item}
-          className="sm:col-span-2 text-center text-green-200 mt-4"
-        >
+        <motion.p variants={item} className="newsletter-success sm:col-span-2">
           Thanks for subscribing!
         </motion.p>
       )}
