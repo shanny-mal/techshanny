@@ -1,4 +1,5 @@
-@import "tailwindcss";
+/* src/components/layout/Navbar.css */
+@import 'tailwindcss';
 @tailwind utilities;
 
 @layer components {
@@ -6,13 +7,13 @@
     @apply bg-transparent;
   }
   .navbar--scrolled {
-    @apply bg-white/70 dark:bg-gray-900/70 shadow-lg;
+    @apply bg-white/80 dark:bg-gray-900/80 shadow-lg;
   }
   .container {
-    @apply relative flex items-center justify-between;
+    @apply mx-auto flex items-center justify-between;
   }
   .logo__img-wrapper {
-    @apply h-12 w-12 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center shadow;
+    @apply h-12 w-12 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center shadow-lg;
   }
   .logo__img {
     @apply h-10 w-10 object-cover;
@@ -21,23 +22,26 @@
     @apply ml-3 text-2xl font-extrabold text-gray-800 dark:text-white;
   }
   .nav-link {
-    @apply px-3 py-2 text-lg transition;
+    @apply relative px-3 py-2 text-lg text-gray-700 dark:text-gray-300 transition-colors;
   }
   .nav-link--active {
     @apply text-teal-600 dark:text-teal-400 font-semibold;
   }
-  .nav-link:not(.nav-link--active):hover {
+  .nav-link:hover {
     @apply text-teal-600 dark:text-teal-400;
   }
+  .nav-underline {
+    @apply absolute bottom-0 left-1/2 transform -translate-x-1/2 w-6 h-0.5 bg-gradient-to-r from-teal-500 to-indigo-500 rounded;
+  }
   .dropdown {
-    @apply absolute top-full mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl py-2 w-52;
-    z-index: 999;
+    @apply absolute top-full mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl py-2 w-52 z-50;
   }
   .dropdown__link {
     @apply block px-4 py-2 text-gray-700 dark:text-gray-200 hover:text-teal-600 dark:hover:text-teal-400 transition;
   }
-  .theme-toggle, .theme-toggle--mobile {
-    @apply p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 shadow;
+  .theme-toggle,
+  .theme-toggle--mobile {
+    @apply p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 shadow-lg;
   }
   .mobile-toggle {
     @apply p-2 rounded-md text-gray-800 dark:text-gray-200;
@@ -49,7 +53,7 @@
     @apply flex flex-col;
   }
   .mobile-link {
-    @apply block text-xl px-4 py-2 rounded-lg transition text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800;
+    @apply block text-xl px-4 py-2 rounded-lg transition-colors text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800;
   }
   .mobile-link--active {
     @apply bg-teal-100 dark:bg-teal-800 text-teal-600 dark:text-teal-400 font-semibold;

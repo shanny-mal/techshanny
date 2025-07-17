@@ -1,4 +1,3 @@
-// src/components/sections/Hero.jsx
 import { Link } from "react-router-dom";
 import { FaArrowDown } from "react-icons/fa";
 import { motion } from "framer-motion";
@@ -24,26 +23,27 @@ export default function Hero({ backgroundImage = heroImage }) {
       initial="hidden"
       animate="visible"
       variants={container}
-      className="relative flex items-center justify-center h-screen overflow-hidden"
+      className="relative flex items-center justify-center h-screen overflow-hidden bg-cover bg-center"
       style={{ backgroundImage: `url(${backgroundImage})` }}
       aria-labelledby="hero-heading"
     >
-      <div className="absolute inset-0 bg-black/60" />
+      <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-black/70" />
       <motion.div variants={fadeInUp} className="blob blob-1" />
       <motion.div variants={fadeInUp} className="blob blob-2" />
+
       <motion.div
         variants={fadeInUp}
-        className="relative z-10 text-center px-6 lg:px-0 max-w-3xl"
+        className="relative z-10 text-center px-6 lg:px-0 max-w-3xl space-y-6"
       >
         <motion.h1
           id="hero-heading"
-          className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-6 hero-gradient"
+          className="text-4xl sm:text-5xl md:text-6xl font-extrabold hero-gradient leading-tight"
           variants={fadeInUp}
         >
           Empowering Your Digital Future
         </motion.h1>
         <motion.p
-          className="text-base sm:text-lg md:text-xl text-gray-200 mb-10"
+          className="text-base sm:text-lg md:text-xl text-gray-200 max-w-2xl mx-auto"
           variants={fadeInUp}
         >
           Cutting‑edge solutions for web & mobile apps, cloud infrastructure,
@@ -53,14 +53,21 @@ export default function Hero({ backgroundImage = heroImage }) {
           variants={fadeInUp}
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
-          <Link to="/services" className="btn-primary">
+          <Link
+            to="/services"
+            className="btn-primary transform hover:scale-105"
+          >
             Explore Services
           </Link>
-          <Link to="/contact" className="btn-secondary">
+          <Link
+            to="/contact"
+            className="btn-secondary transform hover:-translate-y-1"
+          >
             Contact Us
           </Link>
         </motion.div>
       </motion.div>
+
       <motion.div
         className="absolute bottom-10 left-1/2 -translate-x-1/2"
         initial={{ opacity: 0, y: 20 }}

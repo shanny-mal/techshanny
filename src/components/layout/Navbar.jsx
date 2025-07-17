@@ -47,7 +47,7 @@ export default function Navbar() {
   const links = [
     { to: "/", label: "Home" },
     { to: "/about", label: "About" },
-    { to: "/services", label: "Services" },
+    { to: "/blog", label: "Blog" },
     { to: "/contact", label: "Contact" },
   ];
 
@@ -58,16 +58,16 @@ export default function Navbar() {
       transition={{ duration: 0.5 }}
       className={classNames(
         "navbar fixed inset-x-0 z-50 backdrop-blur-md transition-colors",
-        scrolled ? "navbar--scrolled" : ""
+        scrolled && "navbar--scrolled"
       )}
     >
       <div className="container mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
         <Link
           to="/"
-          className="logo flex items-center"
+          className="logo flex items-center space-x-2"
           onClick={() => setMobileOpen(false)}
         >
-          <motion.div whileHover={{ rotate: 20 }} className="logo__img-wrapper">
+          <motion.div whileHover={{ scale: 1.1 }} className="logo__img-wrapper">
             <img src={logo} alt="shannyTech" className="logo__img" />
           </motion.div>
           <span className="logo__text">shannyTech</span>
@@ -75,7 +75,7 @@ export default function Navbar() {
 
         <div className="hidden md:flex items-center space-x-8">
           {links.map(({ to, label }) => (
-            <motion.div key={to} whileHover={{ y: -2 }} className="nav-item">
+            <motion.div key={to} whileHover={{ y: -2 }}>
               <NavLink
                 to={to}
                 end={to === "/"}
@@ -86,6 +86,9 @@ export default function Navbar() {
                 }
               >
                 {label}
+                {location.pathname === to && (
+                  <motion.div layoutId="underline" className="nav-underline" />
+                )}
               </NavLink>
             </motion.div>
           ))}

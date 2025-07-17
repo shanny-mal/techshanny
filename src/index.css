@@ -18,3 +18,21 @@ html {
 [id] {
   scroll-margin-top: 4rem;
 }
+
+:root {
+  --scrollbar-thumb: rgba(100,100,100,0.4);
+  --scrollbar-thumb-dark: rgba(150,150,150,0.4);
+}
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 3px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb-dark);
+}
