@@ -1,17 +1,23 @@
 import { Link } from "react-router-dom";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useReducedMotion,
+} from "framer-motion";
 import { FaArrowDown } from "react-icons/fa";
-import { motion, useViewportScroll, useTransform } from "framer-motion";
+import { Blob } from "../ui/Blob";
 import heroJpg from "../../assets/images/hero-image.jpg";
 import heroWebP from "../../assets/images/hero-image.webp";
 import heroAvif from "../../assets/images/hero-image.avif";
-import usePrefersReducedMotion from "../../hooks/usePrefersReducedMotion";
 import useParallax from "../../hooks/useParallax";
 import "./Hero.css";
 
 export default function Hero() {
-  const reduceMotion = usePrefersReducedMotion();
-  const { scrollY } = useViewportScroll();
-  const y1 = useParallax(scrollY, 0, 500, 0, -100);
+  const reduceMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll();
+  const yBlob1 = useParallax(scrollYProgress, 0, 1, 0, 50);
+  const yBlob2 = useParallax(scrollYProgress, 0, 1, 0, -50);
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 40 },
@@ -29,10 +35,10 @@ export default function Hero() {
       initial="hidden"
       animate="visible"
       variants={{ visible: { transition: { staggerChildren: 0.3 } } }}
-      className="hero relative h-screen flex items-center justify-center overflow-hidden"
+      className="relative h-screen flex items-center justify-center overflow-hidden"
     >
-      {/* Responsive background image */}
-      <picture className="hero__bg -z-10 absolute inset-0">
+      {/* Background image */}
+      <picture className="absolute inset-0 -z-10">
         <source srcSet={heroAvif} type="image/avif" />
         <source srcSet={heroWebP} type="image/webp" />
         <img
@@ -45,33 +51,36 @@ export default function Hero() {
       </picture>
 
       {/* Dark overlay */}
-      <div className="absolute inset-0 bg-surface-dark/70" />
+      <div className="absolute inset-0 bg-black/70" />
 
-      {/* Animated blobs */}
+      {/* Parallax blobs */}
       {!reduceMotion && (
         <>
-          <motion.div style={{ y: y1 }} className="blob blob-1" />
-          <motion.div
-            style={{ y: useTransform(scrollY, [0, 500], [0, 80]) }}
-            className="blob blob-2"
+          <Blob
+            className="absolute w-[480px] h-[480px] top-[-80px] left-[-80px]"
+            style={{ y: yBlob1, background: "rgba(107,99,246,0.4)" }}
+          />
+          <Blob
+            className="absolute w-[360px] h-[360px] bottom-[-80px] right-[-80px]"
+            style={{ y: yBlob2, background: "rgba(56,189,248,0.3)" }}
           />
         </>
       )}
 
-      {/* Content */}
+      {/* Hero Content */}
       <div className="relative z-10 text-center px-6 lg:px-0 max-w-3xl space-y-6">
         <motion.h1
           id="hero-heading"
-          className="font-heading tracking-tight hero-gradient leading-tight"
+          className="font-heading hero-gradient tracking-tight leading-tight"
+          style={{ fontSize: "clamp(2rem,6vw,4rem)" }}
           variants={fadeInUp}
-          style={{ fontSize: "clamp(2rem, 6vw, 4rem)" }}
         >
           Empowering Your Digital Future
         </motion.h1>
         <motion.p
-          className="max-w-2xl mx-auto text-body-light"
+          className="font-body text-body-light max-w-2xl mx-auto"
+          style={{ fontSize: "clamp(1rem,2.5vw,1.25rem)" }}
           variants={fadeInUp}
-          style={{ fontSize: "clamp(1rem, 2.5vw, 1.25rem)" }}
         >
           Cutting‑edge solutions for web & mobile apps, cloud infrastructure,
           cybersecurity, and data engineering.
@@ -97,15 +106,15 @@ export default function Hero() {
         </motion.div>
       </div>
 
-      {/* Scroll indicator */}
+      {/* Scroll‑down indicator */}
       {!reduceMotion && (
         <motion.div
-          className="absolute bottom-10 left-1/2 -translate-x-1/2"
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white"
           animate={{ y: [0, -10, 0], opacity: [1, 1, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
           aria-hidden="true"
         >
-          <FaArrowDown className="text-on-surface text-3xl" />
+          <FaArrowDown className="w-6 h-6" />
         </motion.div>
       )}
     </motion.section>
