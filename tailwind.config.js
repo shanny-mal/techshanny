@@ -5,6 +5,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // Brand palette
         teal: {
           50: "#f0fdfa",
           100: "#ccfbf1",
@@ -29,25 +30,30 @@ module.exports = {
           800: "#3730a3",
           900: "#312e81",
         },
-        surface: {
-          light: "#FFFFFF",
-          dark: "#1F2937",
-        },
-        body: {
-          light: "#4B5563",
-          dark: "#D1D5DB",
-        },
+        // Semantic surface tokens
+        "surface-light": "#FFFFFF",
+        "surface-dark": "#1F2937",
+        // Semantic on‑surface text tokens
+        "on-surface-light": "#4B5563",
+        "on-surface-dark": "#D1D5DB",
+        // Primary alias (using teal‑500)
+        primary: "#14b8a6",
+        "primary-light": "#2dd4bf",
+        "primary-dark": "#0d9488",
+        // Outline/border token
+        outline: "#D1D5DB",
+        "outline-dark": "#374151",
       },
       fontFamily: {
         heading: ["Poppins", "sans-serif"],
         body: ["Inter", "sans-serif"],
       },
       boxShadow: {
-        xl: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-        "2xl": "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+        xl: "0 20px 25px -5px rgba(0,0,0,0.1),0 10px 10px -5px rgba(0,0,0,0.04)",
+        "2xl": "0 25px 50px -12px rgba(0,0,0,0.25)",
       },
       transitionTimingFunction: {
-        "in-expo": "cubic-bezier(0.95, 0.05, 0.795, 0.035)",
+        "in-expo": "cubic-bezier(0.95,0.05,0.795,0.035)",
       },
       transitionDuration: {
         DEFAULT: "300ms",

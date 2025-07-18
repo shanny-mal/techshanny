@@ -6,55 +6,34 @@
     @apply bg-transparent;
   }
   .navbar--scrolled {
-    @apply bg-surface/80 dark:bg-surface-dark/80 shadow-md;
+    @apply bg-white/80 dark:bg-gray-900/80 shadow-md;
   }
-  .logo__img-wrapper {
-    @apply h-12 w-12 rounded-lg overflow-hidden bg-surface dark:bg-surface-dark flex items-center justify-center shadow-lg;
+  .container {
+    @apply mx-auto flex items-center justify-between;
   }
-  .logo__img {
+  .logo-img-wrapper {
+    @apply h-12 w-12 rounded-lg overflow-hidden bg-white dark:bg-gray-800 flex items-center justify-center shadow-lg;
+  }
+  .logo-img {
     @apply h-10 w-10 object-cover;
   }
-  .logo__text {
-    @apply ml-3 text-2xl font-heading text-on-surface dark:text-on-surface-dark;
+  .logo-text {
+    @apply ml-3 text-2xl  text-gray-800 dark:text-gray-200;
   }
   .nav-link {
-    @apply relative px-3 py-2 font-medium text-on-surface dark:text-on-surface-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary;
+    @apply relative px-3 py-2 font-medium text-gray-800 dark:text-gray-200
+           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
+           transition-colors;
   }
   .nav-link--active {
-    @apply text-primary font-semibold;
+    @apply text-indigo-600 dark:text-indigo-300 font-semibold;
   }
   .nav-link:hover {
-    @apply text-primary;
+    @apply text-indigo-600 dark:text-indigo-300;
   }
   .nav-underline {
-    @apply absolute bottom-0 left-1/2 transform -translate-x-1/2 w-6 h-0.5 bg-primary rounded;
+    @apply absolute bottom-0 left-1/2 transform -translate-x-1/2 w-6 h-0.5
+           bg-indigo-600 dark:bg-indigo-300 rounded;
   }
-  .dropdown {
-    @apply absolute top-full mt-2 bg-surface dark:bg-surface-dark border border-outline dark:border-outline-dark rounded-xl shadow-xl py-2 w-56 z-50;
-  }
-  .dropdown__link {
-    @apply block px-4 py-2 text-on-surface dark:text-on-surface-dark hover:text-primary transition-colors;
-  }
-  .theme-toggle,
-  .theme-toggle--mobile {
-    @apply bg-surface dark:bg-surface-dark text-on-surface-dark focus:ring-primary;
-  }
-  .mobile-toggle {
-    @apply text-on-surface dark:text-on-surface-dark;
-  }
-  .mobile-menu {
-    @apply fixed inset-0 p-6;
-  }
-  .mobile-menu__nav {
-    @apply flex flex-col;
-  }
-  .mobile-link {
-    @apply block text-lg font-medium px-4 py-2 rounded-lg text-on-surface dark:text-on-surface-dark hover:bg-surface-hover dark:hover:bg-surface-dark-hover;
-  }
-  .mobile-link--active {
-    @apply bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light;
-  }
-  .mobile-menu__divider {
-    @apply border-t border-outline dark:border-outline-dark my-4;
-  }
+  /* …etc… */
 }

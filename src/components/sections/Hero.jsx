@@ -1,14 +1,18 @@
 import { Link } from "react-router-dom";
 import { FaArrowDown } from "react-icons/fa";
-import { motion } from "framer-motion";
-import heroImage from "../../assets/images/hero-image.jpg";
+import { motion, useViewportScroll, useTransform } from "framer-motion";
+import heroJpg from "../../assets/images/hero-image.jpg";
+import heroWebP from "../../assets/images/hero-image.webp";
+import heroAvif from "../../assets/images/hero-image.avif";
+import usePrefersReducedMotion from "../../hooks/usePrefersReducedMotion";
+import useParallax from "../../hooks/useParallax";
 import "./Hero.css";
 
-export default function Hero({ backgroundImage = heroImage }) {
-  const container = {
-    hidden: {},
-    visible: { transition: { staggerChildren: 0.3 } },
-  };
+export default function Hero() {
+  const reduceMotion = usePrefersReducedMotion();
+  const { scrollY } = useViewportScroll();
+  const y1 = useParallax(scrollY, 0, 500, 0, -100);
+
   const fadeInUp = {
     hidden: { opacity: 0, y: 40 },
     visible: {
@@ -20,31 +24,54 @@ export default function Hero({ backgroundImage = heroImage }) {
 
   return (
     <motion.section
+      role="banner"
+      aria-labelledby="hero-heading"
       initial="hidden"
       animate="visible"
-      variants={container}
-      className="relative flex items-center justify-center h-screen overflow-hidden bg-cover bg-center"
-      style={{ backgroundImage: `url(${backgroundImage})` }}
-      aria-labelledby="hero-heading"
+      variants={{ visible: { transition: { staggerChildren: 0.3 } } }}
+      className="hero relative h-screen flex items-center justify-center overflow-hidden"
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-black/70" />
-      <motion.div variants={fadeInUp} className="blob blob-1" />
-      <motion.div variants={fadeInUp} className="blob blob-2" />
+      {/* Responsive background image */}
+      <picture className="hero__bg -z-10 absolute inset-0">
+        <source srcSet={heroAvif} type="image/avif" />
+        <source srcSet={heroWebP} type="image/webp" />
+        <img
+          src={heroJpg}
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+          className="w-full h-full object-cover"
+        />
+      </picture>
 
-      <motion.div
-        variants={fadeInUp}
-        className="relative z-10 text-center px-6 lg:px-0 max-w-3xl space-y-6"
-      >
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-surface-dark/70" />
+
+      {/* Animated blobs */}
+      {!reduceMotion && (
+        <>
+          <motion.div style={{ y: y1 }} className="blob blob-1" />
+          <motion.div
+            style={{ y: useTransform(scrollY, [0, 500], [0, 80]) }}
+            className="blob blob-2"
+          />
+        </>
+      )}
+
+      {/* Content */}
+      <div className="relative z-10 text-center px-6 lg:px-0 max-w-3xl space-y-6">
         <motion.h1
           id="hero-heading"
-          className="text-4xl sm:text-5xl md:text-6xl font-extrabold hero-gradient leading-tight"
+          className="font-heading tracking-tight hero-gradient leading-tight"
           variants={fadeInUp}
+          style={{ fontSize: "clamp(2rem, 6vw, 4rem)" }}
         >
           Empowering Your Digital Future
         </motion.h1>
         <motion.p
-          className="text-base sm:text-lg md:text-xl text-gray-200 max-w-2xl mx-auto"
+          className="max-w-2xl mx-auto text-body-light"
           variants={fadeInUp}
+          style={{ fontSize: "clamp(1rem, 2.5vw, 1.25rem)" }}
         >
           Cutting‑edge solutions for web & mobile apps, cloud infrastructure,
           cybersecurity, and data engineering.
@@ -55,27 +82,32 @@ export default function Hero({ backgroundImage = heroImage }) {
         >
           <Link
             to="/services"
-            className="btn-primary transform hover:scale-105"
+            role="button"
+            className="btn-primary focus:ring-4 focus:ring-teal-300"
           >
             Explore Services
           </Link>
           <Link
             to="/contact"
-            className="btn-secondary transform hover:-translate-y-1"
+            role="button"
+            className="btn-secondary focus:ring-4 focus:ring-white"
           >
             Contact Us
           </Link>
         </motion.div>
-      </motion.div>
+      </div>
 
-      <motion.div
-        className="absolute bottom-10 left-1/2 -translate-x-1/2"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.2, duration: 0.7, ease: "easeOut" }}
-      >
-        <FaArrowDown className="text-white text-3xl animate-bounce" />
-      </motion.div>
+      {/* Scroll indicator */}
+      {!reduceMotion && (
+        <motion.div
+          className="absolute bottom-10 left-1/2 -translate-x-1/2"
+          animate={{ y: [0, -10, 0], opacity: [1, 1, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+          aria-hidden="true"
+        >
+          <FaArrowDown className="text-on-surface text-3xl" />
+        </motion.div>
+      )}
     </motion.section>
   );
 }
