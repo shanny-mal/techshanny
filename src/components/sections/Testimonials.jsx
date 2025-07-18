@@ -8,10 +8,8 @@ import TestimonialCard from "./TestimonialCard";
 
 export default function Testimonials() {
   const PLACE_ID = import.meta.env.VITE_GOOGLE_PLACE_ID;
-  const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
   const { reviews, loading, error } = useGoogleReviews({
     placeId: PLACE_ID,
-    apiKey: API_KEY,
   });
 
   const ref = useRef(null);
