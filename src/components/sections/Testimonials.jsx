@@ -1,100 +1,83 @@
 // src/components/sections/Testimonials.jsx
-import PropTypes from "prop-types";
-import { testimonials } from "../../data/testimonialsData";
-import { motion } from "framer-motion";
-import "./Testimonials.css";
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
+
+import useGoogleReviews from "../../hooks/useGoogleReviews";
+import TestimonialSkeleton from "./TestimonialSkeleton";
+import TestimonialCard from "./TestimonialCard";
 
 export default function Testimonials() {
-  if (!testimonials || testimonials.length === 0) return null;
+  const PLACE_ID = import.meta.env.VITE_GOOGLE_PLACE_ID;
+  const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
+  const { reviews, loading, error } = useGoogleReviews({
+    placeId: PLACE_ID,
+    apiKey: API_KEY,
+  });
 
-  const container = {
-    hidden: {},
-    visible: { transition: { staggerChildren: 0.25 } },
-  };
-  const item = {
-    hidden: { opacity: 0, y: 40 },
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-100px" });
+
+  const fadeIn = {
+    hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.6, ease: "easeOut" },
+      transition: { duration: 0.5, ease: "easeOut" },
     },
   };
 
   return (
-    <motion.section
-      className="testimonial-section py-24 bg-gradient-to-b from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800"
-      initial="hidden"
-      animate="visible"
-      variants={container}
+    <section
+      ref={ref}
+      role="region"
       aria-labelledby="testimonials-heading"
+      className="relative py-24 bg-gradient-to-b from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800"
     >
-      <div className="testimonial-blob" />
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.h2
           id="testimonials-heading"
-          className="text-5xl font-extrabold text-center text-indigo-600 dark:text-indigo-400 mb-16"
-          variants={item}
+          className="text-4xl font-extrabold text-center text-indigo-600 dark:text-indigo-400 mb-16"
+          initial={{ opacity: 0, y: -10 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6 }}
         >
           What Our Clients Say
         </motion.h2>
-        <motion.div
-          className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3"
-          variants={container}
-        >
-          {testimonials.map((t) => (
-            <TestimonialCard key={t.id} {...t} variants={item} />
-          ))}
-        </motion.div>
+
+        {loading && (
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <TestimonialSkeleton key={i} />
+            ))}
+          </div>
+        )}
+
+        {error && (
+          <p role="alert" className="text-center text-red-500">
+            {error}
+          </p>
+        )}
+
+        {!loading && !error && (
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {reviews.map((r, i) => (
+              <motion.div
+                key={i}
+                variants={fadeIn}
+                initial="hidden"
+                animate={inView ? "visible" : "hidden"}
+              >
+                <TestimonialCard
+                  name={r.author_name}
+                  role={r.author_url}
+                  quote={r.text}
+                  avatar={r.profile_photo_url}
+                />
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
-    </motion.section>
+    </section>
   );
 }
-
-function TestimonialCard({ name, role, quote, avatar, variants }) {
-  return (
-    <motion.div
-      className="testimonial-card"
-      variants={variants}
-      whileHover={{ scale: 1.03 }}
-      transition={{ type: "spring", stiffness: 300 }}
-    >
-      <div className="flex items-start space-x-5">
-        <div className="flex-shrink-0">
-          {avatar ? (
-            <img
-              src={avatar}
-              alt={`${name} avatar`}
-              className="w-16 h-16 rounded-full object-cover border-4 border-white dark:border-gray-800 shadow-md"
-              loading="lazy"
-            />
-          ) : (
-            <div className="w-16 h-16 rounded-full bg-indigo-600 flex items-center justify-center text-white text-2xl shadow-md">
-              {name.charAt(0)}
-            </div>
-          )}
-        </div>
-        <div className="flex-1">
-          <p className="text-gray-800 dark:text-gray-200 italic mb-6">
-            &ldquo;{quote}&rdquo;
-          </p>
-          <p className="font-semibold text-lg text-gray-900 dark:text-white">
-            {name}
-          </p>
-          {role && (
-            <p className="text-sm text-indigo-600 dark:text-indigo-400">
-              {role}
-            </p>
-          )}
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-TestimonialCard.propTypes = {
-  name: PropTypes.string.isRequired,
-  role: PropTypes.string,
-  quote: PropTypes.string.isRequired,
-  avatar: PropTypes.string,
-  variants: PropTypes.object,
-};

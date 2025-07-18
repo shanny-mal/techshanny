@@ -1,31 +1,14 @@
+/* src/components/sections/Testimonials.css */
 @import "tailwindcss";
 @tailwind utilities;
 
 @layer components {
-  .testimonial-section {
-    position: relative;
-    overflow: hidden;
-  }
+  .testimonial-section { @apply relative; }
   .testimonial-blob {
-    position: absolute;
-    width: 600px;
-    height: 600px;
-    top: -200px;
-    right: -200px;
-    background: radial-gradient(
-      circle at center,
-      rgba(99, 102, 241, 0.2),
-      transparent 70%
-    );
-    border-radius: 50%;
-    filter: blur(200px);
-    z-index: 0;
-  }
-  .testimonial-card {
-    @apply relative bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl overflow-hidden transition-transform;
+    @apply absolute w-[600px] h-[600px] -top-52 -right-52 rounded-full bg-indigo-200/20 filter blur-3xl pointer-events-none;
   }
   .testimonial-card::before {
-    content: "";
     @apply absolute inset-0 bg-gradient-to-br from-indigo-400 to-teal-300 opacity-10 rounded-3xl;
+    content: "";
   }
 }

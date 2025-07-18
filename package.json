@@ -17,7 +17,7 @@
     "axios": "^1.9.0",
     "bootstrap": "^5.3.3",
     "emailjs-com": "^3.2.0",
-    "framer-motion": "^12.19.1",
+    "framer-motion": "^12.23.6",
     "html2canvas": "^1.4.1",
     "i18next": "^25.0.2",
     "i18next-browser-languagedetector": "^8.1.0",
@@ -36,6 +36,7 @@
     "react-router-dom": "^7.3.0",
     "react-toastify": "^11.0.5",
     "recharts": "^2.15.3",
+    "swiper": "^11.2.10",
     "tailwindcss": "^4.1.10",
     "yup": "^1.6.1"
   },
