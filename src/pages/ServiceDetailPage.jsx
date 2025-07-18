@@ -4,39 +4,23 @@ import { services } from "../data/servicesData";
 import { motion } from "framer-motion";
 import { useDocumentMeta } from "../hooks/useDocumentMeta";
 
-const container = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.3 } },
-};
-const item = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
-};
-
 export default function ServiceDetailPage() {
   const { id } = useParams();
   const svc = services.find((s) => (s.slug || s.id) === id);
-
   if (!svc) {
     return (
       <motion.main
-        role="main"
-        aria-live="polite"
-        initial="hidden"
-        animate="visible"
-        variants={container}
-        className="flex-grow flex items-center justify-center bg-surface-light dark:bg-surface-dark py-16"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="py-16 flex flex-col items-center justify-center bg-gradient-to-b from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800"
       >
-        <motion.p variants={item} className="text-body text-center">
-          Service not found.
-        </motion.p>
-        <Link to="/services" className="mt-4 btn-outline inline-block">
-          ← Back to Services
+        <Link to="/services" className="text-teal-600 hover:underline">
+          Back to Services
         </Link>
       </motion.main>
     );
   }
-
   useDocumentMeta({
     title: `${svc.title} | shannyTech`,
     description: svc.shortDescription,
@@ -51,38 +35,51 @@ export default function ServiceDetailPage() {
       description: svc.shortDescription,
     },
   });
-
+  const container = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.3 } },
+  };
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+  };
   return (
     <motion.main
-      role="main"
       initial="hidden"
       animate="visible"
       variants={container}
-      className="flex-grow bg-surface-light dark:bg-surface-dark py-16"
+      className="py-16 bg-gradient-to-b from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800"
     >
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.h1
           variants={item}
-          className="font-heading text-primary text-[clamp(1.75rem,5vw,2.25rem)]"
+          className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-4"
         >
           {svc.title}
         </motion.h1>
-        <motion.p variants={item} className="text-body">
+        <motion.p
+          variants={item}
+          className="text-gray-700 dark:text-gray-300 mb-6"
+        >
           {svc.detailedDescription || svc.shortDescription}
         </motion.p>
-
         {Array.isArray(svc.features) && svc.features.length > 0 && (
           <motion.ul
-            variants={item}
-            className="list-disc list-inside space-y-2 text-body"
+            variants={container}
+            className="list-disc list-inside space-y-2 mb-6"
           >
-            {svc.features.map((feat, i) => (
-              <li key={i}>{feat}</li>
+            {svc.features.map((feat, idx) => (
+              <motion.li
+                key={idx}
+                variants={item}
+                className="text-gray-700 dark:text-gray-300"
+              >
+                {feat}
+              </motion.li>
             ))}
           </motion.ul>
         )}
-
-        <Link to="/services" className="btn-outline">
+        <Link to="/services" className="text-teal-600 hover:underline">
           ← Back to Services
         </Link>
       </div>
