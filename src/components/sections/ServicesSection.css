@@ -1,12 +1,7 @@
-/* src/components/sections/ServicesSection.css */
-.service-blob {
-  position: absolute;
-  top: -100px;
-  left: -100px;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle at center, rgba(14, 165, 233, 0.2), transparent 70%);
-  border-radius: 50%;
-  filter: blur(150px);
-  z-index: 0;
+@import 'tailwindcss';
+@layer components {
+  .service-blob {
+    @apply absolute -top-24 -left-24 w-[500px] h-[500px] rounded-full
+      bg-teal-300/20 dark:bg-indigo-500/20 filter blur-[150px] z-0;
+  }
 }
