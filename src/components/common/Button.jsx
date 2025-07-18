@@ -12,14 +12,11 @@ export default function Button({
   ...rest
 }) {
   const base =
-    "font-medium rounded focus:outline-none focus:ring-2 focus:ring-offset-2 transition";
+    "font-body rounded focus:outline-none focus:ring-2 focus:ring-offset-2 transition";
   const variants = {
-    primary:
-      "bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500",
-    secondary:
-      "bg-gray-600 text-white hover:bg-gray-700 dark:bg-gray-500 dark:hover:bg-gray-600 focus:ring-gray-500",
-    outline:
-      "bg-transparent border border-indigo-600 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900 focus:ring-indigo-500",
+    primary: "btn-primary", // uses bg-teal-500 text-white hover:bg-teal-600 focus:ring-teal-500
+    secondary: "btn-secondary", // uses bg-surface-light text-body hover:bg-surface-dark focus:ring-surface-light
+    outline: "btn-outline", // uses border border-indigo-500 text-indigo-500 hover:bg-indigo-50 focus:ring-indigo-500
   };
   const sizes = {
     sm: "px-3 py-1.5 text-sm",

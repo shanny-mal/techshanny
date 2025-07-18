@@ -1,5 +1,4 @@
-/* src/components/layout/Navbar.css */
-@import 'tailwindcss';
+@import "tailwindcss";
 @tailwind utilities;
 
 @layer components {
@@ -7,58 +6,55 @@
     @apply bg-transparent;
   }
   .navbar--scrolled {
-    @apply bg-white/80 dark:bg-gray-900/80 shadow-lg;
-  }
-  .container {
-    @apply mx-auto flex items-center justify-between;
+    @apply bg-surface/80 dark:bg-surface-dark/80 shadow-md;
   }
   .logo__img-wrapper {
-    @apply h-12 w-12 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center shadow-lg;
+    @apply h-12 w-12 rounded-lg overflow-hidden bg-surface dark:bg-surface-dark flex items-center justify-center shadow-lg;
   }
   .logo__img {
     @apply h-10 w-10 object-cover;
   }
   .logo__text {
-    @apply ml-3 text-2xl font-extrabold text-gray-800 dark:text-white;
+    @apply ml-3 text-2xl font-heading text-on-surface dark:text-on-surface-dark;
   }
   .nav-link {
-    @apply relative px-3 py-2 text-lg text-gray-700 dark:text-gray-300 transition-colors;
+    @apply relative px-3 py-2 font-medium text-on-surface dark:text-on-surface-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary;
   }
   .nav-link--active {
-    @apply text-teal-600 dark:text-teal-400 font-semibold;
+    @apply text-primary font-semibold;
   }
   .nav-link:hover {
-    @apply text-teal-600 dark:text-teal-400;
+    @apply text-primary;
   }
   .nav-underline {
-    @apply absolute bottom-0 left-1/2 transform -translate-x-1/2 w-6 h-0.5 bg-gradient-to-r from-teal-500 to-indigo-500 rounded;
+    @apply absolute bottom-0 left-1/2 transform -translate-x-1/2 w-6 h-0.5 bg-primary rounded;
   }
   .dropdown {
-    @apply absolute top-full mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl py-2 w-52 z-50;
+    @apply absolute top-full mt-2 bg-surface dark:bg-surface-dark border border-outline dark:border-outline-dark rounded-xl shadow-xl py-2 w-56 z-50;
   }
   .dropdown__link {
-    @apply block px-4 py-2 text-gray-700 dark:text-gray-200 hover:text-teal-600 dark:hover:text-teal-400 transition;
+    @apply block px-4 py-2 text-on-surface dark:text-on-surface-dark hover:text-primary transition-colors;
   }
   .theme-toggle,
   .theme-toggle--mobile {
-    @apply p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 shadow-lg;
+    @apply bg-surface dark:bg-surface-dark text-on-surface-dark focus:ring-primary;
   }
   .mobile-toggle {
-    @apply p-2 rounded-md text-gray-800 dark:text-gray-200;
+    @apply text-on-surface dark:text-on-surface-dark;
   }
   .mobile-menu {
-    @apply fixed inset-0 bg-white dark:bg-gray-900 z-40 p-6 overflow-y-auto;
+    @apply fixed inset-0 p-6;
   }
   .mobile-menu__nav {
     @apply flex flex-col;
   }
   .mobile-link {
-    @apply block text-xl px-4 py-2 rounded-lg transition-colors text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800;
+    @apply block text-lg font-medium px-4 py-2 rounded-lg text-on-surface dark:text-on-surface-dark hover:bg-surface-hover dark:hover:bg-surface-dark-hover;
   }
   .mobile-link--active {
-    @apply bg-teal-100 dark:bg-teal-800 text-teal-600 dark:text-teal-400 font-semibold;
+    @apply bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light;
   }
   .mobile-menu__divider {
-    @apply border-t border-gray-200 dark:border-gray-700 my-4;
+    @apply border-t border-outline dark:border-outline-dark my-4;
   }
 }

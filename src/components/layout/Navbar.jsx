@@ -1,20 +1,46 @@
-// src/components/layout/Navbar.jsx
-import { useState, useRef, useEffect } from "react";
+import {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  lazy,
+  Suspense,
+} from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { useTheme } from "../../context/ThemeContext";
 import logo from "../../assets/logo/logo.png";
 import classNames from "classnames";
-import { services } from "../../data/servicesData";
-import {
-  FaChevronDown,
-  FaChevronUp,
-  FaMoon,
-  FaSun,
-  FaBars,
-  FaTimes,
-} from "react-icons/fa";
+import { FaMoon, FaSun, FaBars, FaTimes } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
+import useOnClickOutside from "../../hooks/useOnClickOutside";
 import "./Navbar.css";
+
+const LazyServicesMenu = lazy(() => import("../menus/ServicesMenu"));
+
+const NAV_LINKS = [
+  { to: "/", label: "Home" },
+  { to: "/about", label: "About" },
+  { to: "/services", label: "Services", isDropdown: true },
+  { to: "/blog", label: "Blog" },
+  { to: "/contact", label: "Contact" },
+];
+
+function NavItem({ to, label, isActive }) {
+  return (
+    <NavLink
+      to={to}
+      end={to === "/"}
+      className={({ isActive }) =>
+        classNames("nav-link", isActive && "nav-link--active")
+      }
+    >
+      {label}
+      {isActive && (
+        <motion.span layoutId="underline" className="nav-underline" />
+      )}
+    </NavLink>
+  );
+}
 
 export default function Navbar() {
   const { isDark, toggleTheme } = useTheme();
@@ -30,32 +56,27 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => {
-    const onClick = (e) => {
-      if (
-        servicesOpen &&
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target)
-      ) {
-        setServicesOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
-  }, [servicesOpen]);
+  useOnClickOutside(dropdownRef, () => setServicesOpen(false));
 
-  const links = [
-    { to: "/", label: "Home" },
-    { to: "/about", label: "About" },
-    { to: "/blog", label: "Blog" },
-    { to: "/contact", label: "Contact" },
-  ];
+  const handleKeyDown = useCallback((e) => {
+    if (e.key === "Escape") {
+      setServicesOpen(false);
+      setMobileOpen(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
 
   return (
     <motion.nav
+      role="navigation"
+      aria-label="Main navigation"
       initial={{ y: -80, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.4 }}
       className={classNames(
         "navbar fixed inset-x-0 z-50 backdrop-blur-md transition-colors",
         scrolled && "navbar--scrolled"
@@ -64,100 +85,87 @@ export default function Navbar() {
       <div className="container mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
         <Link
           to="/"
-          className="logo flex items-center space-x-2"
+          className="logo flex items-center"
           onClick={() => setMobileOpen(false)}
         >
-          <motion.div whileHover={{ scale: 1.1 }} className="logo__img-wrapper">
-            <img src={logo} alt="shannyTech" className="logo__img" />
+          <motion.div whileHover={{ rotate: 5 }} className="logo__img-wrapper">
+            <img src={logo} alt="shannyTech logo" className="logo__img" />
           </motion.div>
           <span className="logo__text">shannyTech</span>
         </Link>
 
+        {/* Desktop Links */}
         <div className="hidden md:flex items-center space-x-8">
-          {links.map(({ to, label }) => (
-            <motion.div key={to} whileHover={{ y: -2 }}>
-              <NavLink
-                to={to}
-                end={to === "/"}
-                className={({ isActive }) =>
-                  classNames("nav-link", {
-                    "nav-link--active": location.pathname === to,
-                  })
-                }
-              >
-                {label}
-                {location.pathname === to && (
-                  <motion.div layoutId="underline" className="nav-underline" />
-                )}
-              </NavLink>
-            </motion.div>
-          ))}
-
-          <div className="relative" ref={dropdownRef}>
-            <motion.button
-              onClick={() => setServicesOpen((o) => !o)}
-              whileTap={{ scale: 0.95 }}
-              className="nav-link flex items-center"
-            >
-              Services{" "}
-              {servicesOpen ? (
-                <FaChevronUp className="ml-1" />
-              ) : (
-                <FaChevronDown className="ml-1" />
-              )}
-            </motion.button>
-            <AnimatePresence>
-              {servicesOpen && (
-                <motion.ul
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                  className="dropdown"
+          {NAV_LINKS.map(({ to, label, isDropdown }) =>
+            isDropdown ? (
+              <div key={to} className="relative" ref={dropdownRef}>
+                <button
+                  aria-haspopup="menu"
+                  aria-expanded={servicesOpen}
+                  onClick={() => setServicesOpen((o) => !o)}
+                  className="nav-link flex items-center"
                 >
-                  {services.map((svc) => (
-                    <motion.li key={svc.id} whileHover={{ x: 5 }}>
-                      <Link
-                        to={`/services/${svc.id}`}
-                        className="dropdown__link"
-                        onClick={() => setServicesOpen(false)}
-                      >
-                        {svc.title}
-                      </Link>
-                    </motion.li>
-                  ))}
-                </motion.ul>
-              )}
-            </AnimatePresence>
-          </div>
+                  {label}
+                  {servicesOpen ? (
+                    <FaTimes className="ml-1" />
+                  ) : (
+                    <FaBars className="ml-1" />
+                  )}
+                </button>
+                <AnimatePresence>
+                  {servicesOpen && (
+                    <Suspense
+                      fallback={
+                        <div className="dropdown--loading">Loading…</div>
+                      }
+                    >
+                      <LazyServicesMenu
+                        onClose={() => setServicesOpen(false)}
+                      />
+                    </Suspense>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <motion.div key={to} whileHover={{ y: -2 }}>
+                <NavItem
+                  to={to}
+                  label={label}
+                  isActive={location.pathname === to}
+                />
+              </motion.div>
+            )
+          )}
 
-          <motion.button
+          <button
             onClick={toggleTheme}
-            whileHover={{ scale: 1.1 }}
-            className="theme-toggle"
+            className="theme-toggle p-2 rounded-full bg-surface dark:bg-surface-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+            aria-label="Toggle dark mode"
           >
             {isDark ? <FaSun /> : <FaMoon />}
-          </motion.button>
+          </button>
         </div>
 
+        {/* Mobile Controls */}
         <div className="md:hidden flex items-center space-x-2">
-          <motion.button
+          <button
             onClick={toggleTheme}
-            whileHover={{ scale: 1.1 }}
-            className="theme-toggle--mobile"
+            className="theme-toggle--mobile p-2 rounded-full bg-surface dark:bg-surface-dark focus:outline-none"
+            aria-label="Toggle dark mode"
           >
             {isDark ? <FaSun /> : <FaMoon />}
-          </motion.button>
-          <motion.button
+          </button>
+          <button
             onClick={() => setMobileOpen((o) => !o)}
-            whileHover={{ scale: 1.1 }}
-            className="mobile-toggle"
+            className="mobile-toggle p-2 rounded focus:outline-none"
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
           >
             {mobileOpen ? <FaTimes /> : <FaBars />}
-          </motion.button>
+          </button>
         </div>
       </div>
 
+      {/* Mobile Menu */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -165,10 +173,10 @@ export default function Navbar() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "tween", duration: 0.3 }}
-            className="mobile-menu"
+            className="mobile-menu fixed inset-0 bg-surface dark:bg-surface-dark z-40 p-6 overflow-y-auto"
           >
-            <nav className="mobile-menu__nav space-y-4">
-              {links.map(({ to, label }) => (
+            <nav className="mobile-menu__nav flex flex-col space-y-4">
+              {NAV_LINKS.map(({ to, label }) => (
                 <NavLink
                   key={to}
                   to={to}
@@ -184,16 +192,13 @@ export default function Navbar() {
                 </NavLink>
               ))}
               <div className="mobile-menu__divider" />
-              {services.map((svc) => (
-                <Link
-                  key={svc.id}
-                  to={`/services/${svc.id}`}
-                  className="mobile-link"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {svc.title}
-                </Link>
-              ))}
+              <Link
+                to="/services"
+                className="mobile-link"
+                onClick={() => setMobileOpen(false)}
+              >
+                Services
+              </Link>
             </nav>
           </motion.div>
         )}

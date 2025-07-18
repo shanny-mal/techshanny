@@ -29,6 +29,14 @@ module.exports = {
           800: "#3730a3",
           900: "#312e81",
         },
+        surface: {
+          light: "#FFFFFF",
+          dark: "#1F2937",
+        },
+        body: {
+          light: "#4B5563",
+          dark: "#D1D5DB",
+        },
       },
       fontFamily: {
         heading: ["Poppins", "sans-serif"],
