@@ -17,6 +17,14 @@ import { useTheme } from "../../context/ThemeContext";
 import useOnClickOutside from "../../hooks/useOnClickOutside";
 import useScrollSpy from "../../hooks/useScrollSpy";
 import SearchBar from "./SearchBar.jsx";
+import {
+  FaMoon,
+  FaSun,
+  FaChevronDown,
+  FaChevronUp,
+  FaBars,
+  FaTimes,
+} from "react-icons/fa";
 import { services } from "../../data/servicesData";
 import "./Navbar.css";
 
