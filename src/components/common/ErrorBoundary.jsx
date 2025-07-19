@@ -1,4 +1,3 @@
-// src/components/common/ErrorBoundary.jsx
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -14,8 +13,8 @@ export default class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, info) {
-    // You can log error to an external service here
     this.setState({ info });
+    // You could also send errors to Sentry/LogRocket etc.
     console.error("ErrorBoundary caught an error", error, info);
   }
 
@@ -46,14 +45,16 @@ export default class ErrorBoundary extends React.Component {
               />
             </svg>
           </motion.div>
+
           <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
             Oops! Something went wrong.
           </h1>
           <p className="text-gray-700 dark:text-gray-300 mb-6 text-center max-w-md">
-            An unexpected error has occurred. Please try refreshing the page or
-            return to the homepage.
+            An unexpected error has occurred. You can try reloading, return
+            home, or report this issue so we can fix it.
           </p>
-          <div className="flex space-x-4">
+
+          <div className="flex space-x-4 mb-4">
             <button
               onClick={() => window.location.reload()}
               className="px-5 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg shadow transition"
@@ -67,6 +68,16 @@ export default class ErrorBoundary extends React.Component {
               Go Home
             </Link>
           </div>
+
+          <a
+            href="https://github.com/your-repo/issues/new"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-teal-600 hover:underline"
+          >
+            Report this issue
+          </a>
+
           {this.state.error && (
             <details className="mt-6 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-inner text-left overflow-auto max-h-48 w-full max-w-lg">
               <summary className="cursor-pointer text-sm text-gray-600 dark:text-gray-400">

@@ -1,9 +1,11 @@
-import { useState, useRef, useEffect } from "react";
+// src/components/chat/ChatbotWidget.jsx
+import { useChat } from "../../hooks/useChat";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRef, useEffect, useState } from "react";
 import "./ChatbotWidget.css";
 
 export default function ChatbotWidget() {
-  const [messages, setMessages] = useState([]);
+  const { messages, sendMessage } = useChat();
   const [input, setInput] = useState("");
   const [open, setOpen] = useState(false);
   const containerRef = useRef(null);
@@ -14,24 +16,11 @@ export default function ChatbotWidget() {
     }
   }, [messages]);
 
-  const send = async () => {
+  const handleSend = () => {
     const text = input.trim();
     if (!text) return;
-    setMessages((m) => [...m, { from: "user", text }]);
+    sendMessage(text);
     setInput("");
-    try {
-      const resp = await fetch("/api/chat/send/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_message: text }),
-      }).then((r) => r.json());
-      setMessages((m) => [...m, { from: "bot", text: resp.bot_response }]);
-    } catch {
-      setMessages((m) => [
-        ...m,
-        { from: "bot", text: "Oops, something went wrong." },
-      ]);
-    }
   };
 
   return (
@@ -46,7 +35,11 @@ export default function ChatbotWidget() {
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           >
             <div className="chatbot-header">
-              <button className="chatbot-close" onClick={() => setOpen(false)}>
+              <button
+                aria-label="Close chat"
+                className="chatbot-close"
+                onClick={() => setOpen(false)}
+              >
                 ×
               </button>
             </div>
@@ -67,15 +60,16 @@ export default function ChatbotWidget() {
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && send()}
+                onKeyDown={(e) => e.key === "Enter" && handleSend()}
                 placeholder="Type a message…"
               />
-              <button onClick={send}>Send</button>
+              <button onClick={handleSend}>Send</button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
       <motion.button
+        aria-label="Open chat"
         className="chatbot-toggle"
         onClick={() => setOpen((o) => !o)}
         animate={open ? { rotate: 45 } : { rotate: 0 }}
