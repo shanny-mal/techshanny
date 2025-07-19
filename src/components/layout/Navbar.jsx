@@ -12,7 +12,6 @@ import logo from "../../assets/logo/logo.png";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import classNames from "classnames";
-import { FaMoon, FaSun, FaChevronDown, FaBars, FaTimes } from "react-icons/fa";
 import { useTheme } from "../../context/ThemeContext";
 import useOnClickOutside from "../../hooks/useOnClickOutside";
 import useScrollSpy from "../../hooks/useScrollSpy";
