@@ -8,7 +8,9 @@ import React, {
   lazy,
   Suspense,
 } from "react";
+// ← Make sure this path points to your actual logo file
 import logo from "../../assets/logo/logo.png";
+
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import classNames from "classnames";
@@ -16,6 +18,7 @@ import { useTheme } from "../../context/ThemeContext";
 import useOnClickOutside from "../../hooks/useOnClickOutside";
 import useScrollSpy from "../../hooks/useScrollSpy";
 import SearchBar from "./SearchBar.jsx";
+
 import {
   FaMoon,
   FaSun,
@@ -24,10 +27,11 @@ import {
   FaBars,
   FaTimes,
 } from "react-icons/fa";
+
 import { services } from "../../data/servicesData";
 import "./Navbar.css";
 
-// Lazy‑loaded desktop menu
+// Lazy‑loaded desktop submenu
 const ServicesMenu = lazy(() => import("../menus/ServicesMenu"));
 
 const NAV_LINKS = [
@@ -46,40 +50,43 @@ const NAV_LINKS = [
 export default function Navbar() {
   const { isDark, toggleTheme } = useTheme();
   const location = useLocation();
+
   const [mobileOpen, setMobileOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
   const dropdownRef = useRef(null);
 
-  // Highlight nav item as you scroll
+  // Scroll‑spy for section highlighting
   const currentSection = useScrollSpy(
     NAV_LINKS.map((l) => l.sectionId).filter(Boolean),
     { offset: -80 }
   );
 
-  // Shadow on scroll
+  // Shadow & background on scroll
   useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 60);
+    const handler = () => setScrolled(window.scrollY > 80);
     window.addEventListener("scroll", handler);
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
-  // Close desktop dropdown when clicking outside
-  useOnClickOutside(dropdownRef, () =>
-    startTransition(() => setServicesOpen(false))
-  );
+  // Close dropdown when clicking outside
+  useOnClickOutside(dropdownRef, () => setServicesOpen(false));
 
-  // Close all on Escape
-  const onEsc = useCallback((e) => {
-    if (e.key === "Escape") {
-      startTransition(() => {
-        setMobileOpen(false);
-        setServicesOpen(false);
-        setMobileServicesOpen(false);
-      });
-    }
-  }, []);
+  // Close all menus on Escape
+  const onEsc = useCallback(
+    (e) => {
+      if (e.key === "Escape") {
+        startTransition(() => {
+          setMobileOpen(false);
+          setServicesOpen(false);
+          setMobileServicesOpen(false);
+        });
+      }
+    },
+    [setMobileOpen, setServicesOpen, setMobileServicesOpen]
+  );
   useEffect(() => {
     document.addEventListener("keydown", onEsc);
     return () => document.removeEventListener("keydown", onEsc);
@@ -87,220 +94,205 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Skip to main content */}
+      {/* Skip‑to‑content for a11y */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:underline fixed top-2 left-2 z-50 bg-white dark:bg-gray-800 p-2 rounded"
+        className="sr-only focus:not-sr-only focus:underline fixed top-4 left-4 z-50 bg-white dark:bg-gray-800 p-2 rounded"
       >
         Skip to content
       </a>
 
       <motion.nav
         role="navigation"
-        aria-label="Main navigation"
-        initial={{ y: -80, opacity: 0 }}
+        aria-label="Main nav"
+        initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.4 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
         className={classNames(
-          "fixed inset-x-0 top-0 z-40 backdrop-blur-lg transition-colors",
+          "fixed inset-x-0 top-0 z-50 py-2 px-4 md:px-8 transition-colors",
           scrolled
-            ? "bg-white/70 dark:bg-gray-900/70 shadow-md"
+            ? "backdrop bg-white/80 dark:bg-gray-900/80 shadow-lg"
             : "bg-transparent"
         )}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            {/* Logo */}
-            <Link
-              to="/"
-              className="flex items-center space-x-2"
-              onClick={() => startTransition(() => setMobileOpen(false))}
-            >
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                className="h-10 w-10 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center shadow"
-              >
-                <img
-                  src={logo}
-                  alt="shannyTech Logo"
-                  className="h-8 w-8 object-cover"
-                />
-              </motion.div>
-              <span className="font-heading text-xl text-gray-800 dark:text-gray-100">
-                shannyTech
-              </span>
-            </Link>
+        <div className="max-w-7xl mx-auto flex items-center justify-between h-16">
+          {/* Logo */}
+          <Link
+            to="/"
+            onClick={() => startTransition(() => setMobileOpen(false))}
+            className="flex items-center space-x-2"
+          >
+            <motion.img
+              src={logo}
+              alt="shannyTech logo"
+              className="h-10 w-10"
+              whileHover={{ rotate: 10 }}
+            />
+            <span className="font-heading text-xl text-gray-800 dark:text-gray-100">
+              shannyTech
+            </span>
+          </Link>
 
-            {/* DESKTOP LINKS */}
-            <div className="hidden md:flex items-center space-x-6">
-              {NAV_LINKS.map(({ to, label, isDropdown, sectionId }) =>
-                isDropdown ? (
-                  <div key={to} className="relative" ref={dropdownRef}>
-                    <button
-                      type="button"
-                      aria-haspopup="menu"
-                      aria-expanded={servicesOpen}
-                      onClick={() =>
-                        startTransition(() => setServicesOpen((o) => !o))
-                      }
-                      className={classNames(
-                        "nav-link flex items-center",
-                        (currentSection === sectionId ||
-                          location.pathname.startsWith("/services")) &&
-                          "nav-link--active"
-                      )}
-                    >
-                      {label}
-                      {servicesOpen ? (
-                        <FaChevronUp className="ml-1" />
-                      ) : (
-                        <FaChevronDown className="ml-1" />
-                      )}
-                    </button>
-                    <AnimatePresence>
-                      {servicesOpen && (
-                        <Suspense
-                          fallback={
-                            <div className="dropdown-loading p-4">Loading…</div>
-                          }
-                        >
-                          <ServicesMenu
-                            onClose={() => setServicesOpen(false)}
-                          />
-                        </Suspense>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                ) : (
-                  <NavLink
-                    key={to}
-                    to={to}
-                    end={to === "/"}
-                    className={({ isActive }) =>
-                      classNames(
-                        "nav-link",
-                        (isActive || currentSection === sectionId) &&
-                          "nav-link--active"
-                      )
-                    }
+          {/* Desktop menu */}
+          <div className="hidden md:flex items-center space-x-6">
+            {NAV_LINKS.map(({ to, label, isDropdown, sectionId }) =>
+              isDropdown ? (
+                <div key={to} ref={dropdownRef} className="relative">
+                  <button
+                    aria-haspopup="true"
+                    aria-expanded={servicesOpen}
+                    onClick={() => setServicesOpen((o) => !o)}
+                    className={classNames(
+                      "nav-link flex items-center",
+                      (currentSection === sectionId ||
+                        location.pathname.startsWith("/services")) &&
+                        "active"
+                    )}
                   >
                     {label}
-                  </NavLink>
-                )
-              )}
+                    <FaChevronDown className="ml-1 text-sm" />
+                  </button>
+                  <AnimatePresence>
+                    {servicesOpen && (
+                      <motion.ul
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        className="submenu"
+                      >
+                        {services.map((s) => (
+                          <li key={s.id}>
+                            <Link
+                              to={`/services/${s.slug || s.id}`}
+                              className="submenu-link"
+                              onClick={() => setServicesOpen(false)}
+                            >
+                              {s.title}
+                            </Link>
+                          </li>
+                        ))}
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ) : (
+                <NavLink
+                  key={to}
+                  to={to}
+                  end={to === "/"}
+                  className={({ isActive }) =>
+                    classNames("nav-link", isActive && "active")
+                  }
+                >
+                  {label}
+                </NavLink>
+              )
+            )}
 
-              {/* Search */}
-              <SearchBar />
+            <SearchBar className="w-48" />
 
-              {/* Theme toggle */}
-              <button
-                onClick={toggleTheme}
-                aria-label="Toggle dark mode"
-                className="p-2 rounded-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                {isDark ? <FaSun /> : <FaMoon />}
-              </button>
-            </div>
+            <button
+              onClick={toggleTheme}
+              aria-label="Toggle theme"
+              className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+            >
+              {isDark ? <FaSun /> : <FaMoon />}
+            </button>
+          </div>
 
-            {/* MOBILE / TABLET CONTROLS */}
-            <div className="md:hidden flex items-center space-x-2">
-              <button
-                onClick={toggleTheme}
-                aria-label="Toggle dark mode"
-                className="p-2 rounded-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none"
-              >
-                {isDark ? <FaSun /> : <FaMoon />}
-              </button>
-              <button
-                onClick={() => startTransition(() => setMobileOpen((o) => !o))}
-                aria-label={mobileOpen ? "Close menu" : "Open menu"}
-                className="p-2 rounded focus:outline-none"
-              >
-                {mobileOpen ? <FaTimes /> : <FaBars />}
-              </button>
-            </div>
+          {/* Mobile toggle */}
+          <div className="md:hidden flex items-center space-x-2">
+            <button onClick={toggleTheme} className="p-2">
+              {isDark ? <FaSun /> : <FaMoon />}
+            </button>
+            <motion.button
+              onClick={() => startTransition(() => setMobileOpen((o) => !o))}
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              className="p-2"
+              animate={{ rotate: mobileOpen ? 90 : 0 }}
+            >
+              {mobileOpen ? <FaTimes /> : <FaBars />}
+            </motion.button>
           </div>
         </div>
 
-        {/* MOBILE SLIDE‑IN MENU */}
+        {/* Mobile slide‑down */}
         <AnimatePresence>
           {mobileOpen && (
             <motion.div
-              role="dialog"
-              aria-modal="true"
-              aria-label="Mobile menu"
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "tween", duration: 0.3 }}
-              className="fixed inset-0 bg-white dark:bg-gray-900 z-50 p-6 overflow-y-auto"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="md:hidden overflow-hidden bg-white dark:bg-gray-900 shadow-inner"
             >
-              <nav className="flex flex-col space-y-4" role="menu">
+              <nav className="flex flex-col divide-y divide-gray-200 dark:divide-gray-700">
                 {NAV_LINKS.map(({ to, label, isDropdown }) =>
                   !isDropdown ? (
                     <NavLink
                       key={to}
                       to={to}
-                      end={to === "/"}
-                      role="menuitem"
-                      className={({ isActive }) =>
-                        classNames(
-                          "block text-lg font-medium px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500",
-                          isActive
-                            ? "bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-300"
-                            : "text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-                        )
-                      }
+                      className="p-4 font-medium"
                       onClick={() => setMobileOpen(false)}
                     >
                       {label}
                     </NavLink>
                   ) : (
-                    <div key={to} className="px-4">
-                      <button
-                        onClick={() => setMobileServicesOpen((o) => !o)}
-                        aria-expanded={mobileServicesOpen}
-                        aria-controls="mobile-services-submenu"
-                        className="w-full flex justify-between items-center text-lg font-medium py-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                      >
-                        {label}
-                        {mobileServicesOpen ? (
-                          <FaChevronUp />
-                        ) : (
-                          <FaChevronDown />
-                        )}
-                      </button>
-                      {mobileServicesOpen && (
-                        <ul
-                          id="mobile-services-submenu"
-                          className="mt-2 space-y-1 pl-4 border-l border-gray-200 dark:border-gray-700"
-                        >
-                          {services.map((svc) => (
-                            <li key={svc.id}>
-                              <Link
-                                to={`/services/${svc.slug || svc.id}`}
-                                className="block px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
-                                onClick={() => setMobileOpen(false)}
-                              >
-                                {svc.title}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
+                    <MobileServices
+                      key={to}
+                      label={label}
+                      items={services}
+                      onClose={() => setMobileOpen(false)}
+                    />
                   )
                 )}
-
-                <hr className="border-gray-200 dark:border-gray-700 my-4" />
-
-                {/* Mobile search */}
-                <SearchBar mobile />
+                <div className="p-4">
+                  <SearchBar mobile placeholder="Search…" />
+                </div>
               </nav>
             </motion.div>
           )}
         </AnimatePresence>
       </motion.nav>
     </>
+  );
+}
+
+// Inline mobile “Services” accordion
+function MobileServices({ label, items, onClose }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="p-4">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="w-full flex justify-between items-center font-medium"
+      >
+        {label}
+        <FaChevronDown
+          className={classNames("transition-transform", open && "rotate-180")}
+        />
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.ul
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="mt-2 space-y-2 pl-4"
+          >
+            {items.map((s) => (
+              <li key={s.id}>
+                <Link
+                  to={`/services/${s.slug || s.id}`}
+                  onClick={onClose}
+                  className="block hover:underline"
+                >
+                  {s.title}
+                </Link>
+              </li>
+            ))}
+          </motion.ul>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
