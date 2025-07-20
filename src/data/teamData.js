@@ -1,41 +1,26 @@
 // src/data/teamData.js
+import shannonAvatar from "../assets/images/shannon.webp";
+import neobertAvatar from "../assets/images/neobert.webp";
+import sophiaAvatar from "../assets/images/sophia.webp";
 
 const teamMembers = [
   {
     id: "1",
-    name: "Alice Johnson",
+    name: "Shannon Chipezeze",
     role: "Chief Executive Officer",
-    avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+    avatar: shannonAvatar,
   },
   {
     id: "2",
-    name: "Marcus Lee",
-    role: "Chief Technology Officer",
-    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+    name: "Neobert Mare",
+    role: "Senior Mobile Developer",
+    avatar: neobertAvatar,
   },
   {
     id: "3",
-    name: "Sophia Patel",
+    name: "Shahyana Marklin",
     role: "Head of Product",
-    avatar: "https://randomuser.me/api/portraits/women/65.jpg",
-  },
-  {
-    id: "4",
-    name: "David Kim",
-    role: "Lead Software Engineer",
-    avatar: "https://randomuser.me/api/portraits/men/85.jpg",
-  },
-  {
-    id: "5",
-    name: "Emma García",
-    role: "UX/UI Designer",
-    avatar: "https://randomuser.me/api/portraits/women/22.jpg",
-  },
-  {
-    id: "6",
-    name: "Liam O’Connor",
-    role: "DevOps Engineer",
-    avatar: "https://randomuser.me/api/portraits/men/57.jpg",
+    avatar: sophiaAvatar,
   },
 ];
 

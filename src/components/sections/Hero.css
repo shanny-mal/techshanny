@@ -3,52 +3,43 @@
 @tailwind utilities;
 
 @layer components {
+  .hero-gradient {
+    background: linear-gradient(90deg, #05ffc8, #3f3fff);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center bg-gradient-to-r from-teal-400 to-indigo-600
+      text-white font-semibold px-6 py-3 rounded-full shadow-xl transition-transform transform
+      hover:-translate-y-1 hover:scale-105 focus:outline-none;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center border-2 border-white
+      text-white font-semibold px-6 py-3 rounded-full shadow transition-colors
+      hover:bg-white hover:text-black focus:outline-none;
+  }
+
   .blob {
     position: absolute;
-    background: radial-gradient(
-      circle at center,
-      rgba(107, 99, 246, 0.4),
-      transparent 70%
-    );
     border-radius: 50%;
     filter: blur(120px);
     mix-blend-mode: screen;
   }
   .blob-1 {
-    width: 480px;
-    height: 480px;
-    top: -80px;
-    left: -80px;
-    animation: float 8s ease-in-out infinite;
+    --size: 480px;
+    width: var(--size);
+    height: var(--size);
+    top: -100px;
+    left: -120px;
+    background: rgba(107, 99, 246, 0.4);
   }
   .blob-2 {
-    width: 360px;
-    height: 360px;
+    --size: 360px;
+    width: var(--size);
+    height: var(--size);
     bottom: -80px;
-    right: -80px;
-    animation: float 6s ease-in-out infinite reverse;
+    right: -100px;
+    background: rgba(56, 189, 248, 0.3);
   }
-
-  @keyframes float {
-    0%,
-    100% {
-      transform: translateY(0) scale(1);
-    }
-    50% {
-      transform: translateY(20px) scale(1.1);
-    }
-  }
-
-  .hero-gradient {
-  background: linear-gradient(90deg, #05FFC8, #3F3FFF);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.btn-primary {
-  @apply inline-flex items-center justify-center bg-gradient-to-r from-teal-400 to-indigo-600 text-white font-semibold px-6 py-3 rounded-full shadow-xl transition;
-}
-.btn-secondary {
-  @apply inline-flex items-center justify-center border-2 border-white text-white font-semibold px-6 py-3 rounded-full shadow-lg transition;
-}
 }

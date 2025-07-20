@@ -7,7 +7,12 @@ import classNames from "classnames";
  * A decorative, blurred radial‑gradient “blob”.
  * Accepts any Tailwind classes to control size, position & color.
  */
-export function Blob({ className, style, children, ...props }) {
+export function Blob({
+  className = "",
+  style = {},
+  children = null,
+  ...props
+}) {
   return (
     <div
       aria-hidden="true"
@@ -29,10 +34,4 @@ Blob.propTypes = {
   /** Optional inline styles (e.g. background color override) */
   style: PropTypes.object,
   children: PropTypes.node,
-};
-
-Blob.defaultProps = {
-  className: "",
-  style: {},
-  children: null,
 };

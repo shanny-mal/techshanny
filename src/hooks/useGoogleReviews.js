@@ -1,3 +1,4 @@
+// src/hooks/useGoogleReviews.js
 import { useState, useEffect } from "react";
 
 export default function useGoogleReviews({ placeId }) {
@@ -6,54 +7,59 @@ export default function useGoogleReviews({ placeId }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Wait until the SDK has loaded
-    function waitForSdk() {
-      return new Promise((resolve, reject) => {
-        if (window.google?.maps?.places) {
-          resolve();
-        } else {
-          const interval = setInterval(() => {
-            if (window.google?.maps?.places) {
-              clearInterval(interval);
-              resolve();
-            }
-          }, 100);
-          // optional timeout after e.g. 5s
-          setTimeout(() => {
-            clearInterval(interval);
-            reject(new Error("Google Maps SDK load timeout"));
-          }, 5000);
-        }
-      });
+    if (!placeId) {
+      setError("No placeId provided");
+      setLoading(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    const apiKey = import.meta.env.VITE_GOOGLE_API_KEY;
+    if (!apiKey) {
+      setError("Google API key missing");
+      setLoading(false);
+      return;
     }
 
     async function fetchReviews() {
       setLoading(true);
+      setError(null);
       try {
-        await waitForSdk();
-        // Create an off-DOM div for the service
-        const service = new window.google.maps.places.PlacesService(
-          document.createElement("div")
+        const url = new URL(
+          "https://maps.googleapis.com/maps/api/place/details/json"
         );
-        service.getDetails(
-          { placeId, fields: ["reviews"] },
-          (result, status) => {
-            if (status !== window.google.maps.places.PlacesServiceStatus.OK) {
-              setError(status);
-              setReviews([]);
-            } else {
-              setReviews(result.reviews || []);
-            }
-            setLoading(false);
-          }
-        );
+        url.searchParams.set("place_id", placeId);
+        url.searchParams.set("fields", "reviews");
+        url.searchParams.set("key", apiKey);
+
+        const resp = await fetch(url.toString(), {
+          signal: controller.signal,
+        });
+        if (!resp.ok) {
+          throw new Error(`HTTP ${resp.status}`);
+        }
+        const data = await resp.json();
+        if (data.status !== "OK") {
+          throw new Error(
+            data.status + (data.error_message ? `: ${data.error_message}` : "")
+          );
+        }
+        setReviews(data.result.reviews || []);
       } catch (e) {
-        setError(e.message);
+        if (e.name !== "AbortError") {
+          setError(e.message);
+          setReviews([]);
+        }
+      } finally {
         setLoading(false);
       }
     }
 
     fetchReviews();
+
+    return () => {
+      controller.abort();
+    };
   }, [placeId]);
 
   return { reviews, loading, error };
