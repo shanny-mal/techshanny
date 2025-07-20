@@ -13,67 +13,53 @@ export default function useGoogleReviews({ placeId }) {
       return;
     }
 
-    const apiKey = import.meta.env.VITE_GOOGLE_API_KEY;
-    if (!apiKey) {
-      setError("Google API key missing");
-      setLoading(false);
-      return;
-    }
-
-    const controller = new AbortController();
-    const signal = controller.signal;
+    // Wait until the Maps SDK has loaded
+    const checkGoogle = () =>
+      new Promise((resolve, reject) => {
+        if (window.google?.maps?.places) {
+          resolve();
+        } else {
+          const i = setInterval(() => {
+            if (window.google?.maps?.places) {
+              clearInterval(i);
+              resolve();
+            }
+          }, 100);
+          setTimeout(() => {
+            clearInterval(i);
+            reject(new Error("Google SDK load timeout"));
+          }, 5000);
+        }
+      });
 
     async function fetchReviews() {
       setLoading(true);
       setError(null);
 
       try {
-        // Use the REST Place Details endpoint
-        const url = new URL(
-          "https://maps.googleapis.com/maps/api/place/details/json"
+        await checkGoogle();
+        const service = new window.google.maps.places.PlacesService(
+          document.createElement("div")
         );
-        url.searchParams.set("place_id", placeId);
-        url.searchParams.set("fields", "reviews"); // only pull reviews
-        url.searchParams.set("key", apiKey);
-
-        const resp = await fetch(url.toString(), { signal });
-        if (!resp.ok) {
-          throw new Error(`HTTP ${resp.status}`);
-        }
-
-        const data = await resp.json();
-        if (data.status !== "OK") {
-          // API returned an error
-          const msg = data.error_message
-            ? `${data.status}: ${data.error_message}`
-            : data.status;
-          throw new Error(msg);
-        }
-
-        // Normalize or annotate reviews if you like
-        setReviews(
-          (data.result.reviews || []).map((r) => ({
-            author_name: r.author_name,
-            author_url: r.author_url,
-            rating: r.rating,
-            time: r.relative_time_description,
-            text: r.text,
-            profile_photo_url: r.profile_photo_url,
-          }))
+        service.getDetails(
+          { placeId, fields: ["reviews"] },
+          (result, status) => {
+            if (status !== window.google.maps.places.PlacesServiceStatus.OK) {
+              setError(status);
+              setReviews([]);
+            } else {
+              setReviews(result.reviews || []);
+            }
+            setLoading(false);
+          }
         );
       } catch (e) {
-        if (e.name !== "AbortError") {
-          setError(e.message);
-          setReviews([]);
-        }
-      } finally {
+        setError(e.message);
         setLoading(false);
       }
     }
 
     fetchReviews();
-
-    return () => controller.abort();
   }, [placeId]);
 
   return { reviews, loading, error };
