@@ -7,7 +7,6 @@ import Footer from "./components/layout/Footer.jsx";
 import ChatbotWidget from "./components/chat/ChatbotWidget.jsx";
 import ErrorBoundary from "./components/common/ErrorBoundary.jsx";
 
-// code‑split pages
 const HomePage = lazy(() => import("./pages/Home.jsx"));
 const AboutPage = lazy(() => import("./pages/AboutPage.jsx"));
 const ServicesPage = lazy(() => import("./pages/ServicesPage.jsx"));
@@ -44,7 +43,7 @@ export default function App() {
   return (
     <ApiProvider>
       <ErrorBoundary>
-        {/* Skip Link for a11y */}
+       
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-white dark:bg-gray-800 p-2 rounded shadow"
